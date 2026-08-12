@@ -9,7 +9,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { ScenarioRegistry } from '../../core/scenario-registry.service';
-import { scenarioStepPath, type ScenarioRouteData } from '../../core/scenario-routes';
+import {
+  scenarioStepPath,
+  stepIndicator,
+  type ScenarioRouteData,
+} from '../../core/scenario-routes';
 import type { Scenario, ScenarioStep } from '../../models/domain.model';
 import { BarrierPanelComponent } from '../barrier-panel/barrier-panel.component';
 import { SimulationRegionComponent } from '../simulation-region/simulation-region.component';
@@ -53,9 +57,13 @@ export class ScenarioPageComponent {
 
   readonly hasMultipleSteps = computed(() => this.scenario().steps.length > 1);
 
-  readonly stepIndicator = computed(
-    () => `Schritt ${this.stepIndex() + 1} von ${this.scenario().steps.length}`,
-  );
+  /**
+   * docs/UX-COPY.md §5.3 `scenario.stepIndicator`, composed by
+   * core/scenario-routes.ts so the visible line, the document title and the
+   * page-change announcement cannot disagree about what this step is called.
+   * Rendered only for multi-step scenarios — see the template.
+   */
+  readonly stepIndicator = computed(() => stepIndicator(this.scenario(), this.step()));
 
   readonly previousStep = computed<ScenarioStep | undefined>(() => {
     const index = this.stepIndex();

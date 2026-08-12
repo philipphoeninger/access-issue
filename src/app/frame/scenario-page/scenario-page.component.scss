@@ -13,10 +13,16 @@ h1 {
   font-weight: var(--wi-weight-bold);
 }
 
+// Now that it names the step, this line is the only place on the page that
+// says which one you are on — it is no longer a caption under the heading but
+// part of the page's identity, so it takes body size and the control weight
+// rather than the meta size it had while it read "Schritt 2 von 4"
+// (docs/DESIGN.md §4.1).
 .step-indicator {
   margin: var(--wi-space-2) 0 0;
   color: var(--wi-text-primary);
-  font-size: var(--wi-size-meta);
+  font-size: var(--wi-size-body);
+  font-weight: var(--wi-weight-semibold);
 }
 
 // Colour comes from --mat-button-text-* in styles/_material-theme.scss.

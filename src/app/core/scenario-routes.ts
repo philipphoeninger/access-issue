@@ -25,6 +25,40 @@ export interface ScenarioRouteData {
   hasPanel: true;
 }
 
+/** 1-based position of a step in its scenario, or 0 if it does not belong to it. */
+function stepNumber(scenario: Scenario, step: ScenarioStep): number {
+  return scenario.steps.findIndex((candidate) => candidate.id === step.id) + 1;
+}
+
+/**
+ * docs/UX-COPY.md §5.3 `scenario.stepIndicator` — „Schritt 2 von 4 —
+ * Bewerbungsformular". The step is named, not just counted: the page `h1` is
+ * the *scenario* title and identical on all four steps, so a bare count
+ * answered "how far along am I" while leaving "where am I" unanswered.
+ *
+ * The scenario name is deliberately absent: the `h1` directly above already
+ * says it.
+ */
+export function stepIndicator(scenario: Scenario, step: ScenarioStep): string {
+  return `Schritt ${stepNumber(scenario, step)} von ${scenario.steps.length} — ${step.title}`;
+}
+
+/**
+ * docs/UX-COPY.md §5.3 `scenario.pageTitle` — the page's name, used for the
+ * document title and as the first sentence of the page-change announcement
+ * (§5.7). Both come from here so a tab, a bookmark and a screen reader can
+ * never disagree about what the page is called.
+ *
+ * Scenario first, because tab strips truncate at the end. A single-step
+ * scenario drops the count entirely — "Schritt 1 von 1" is not information.
+ */
+export function stepPageTitle(scenario: Scenario, step: ScenarioStep): string {
+  if (scenario.steps.length === 1) {
+    return scenario.title;
+  }
+  return `${scenario.title}, ${stepIndicator(scenario, step)}`;
+}
+
 /**
  * The `routerLink` segments for one step of a scenario, following the same
  * grammar `buildScenarioRoutes` uses to register the route. Shared so a link

@@ -1,7 +1,11 @@
 <h1>{{ scenario().title }}</h1>
-<p class="step-indicator">{{ stepIndicator() }}</p>
 
+<!-- Both only where there is more than one step: "Schritt 1 von 1 — …" would
+     be counting for its own sake, and the h1 plus the region heading already
+     name a single-step scenario (docs/UX-COPY.md §5.3). -->
 @if (hasMultipleSteps()) {
+  <p class="step-indicator">{{ stepIndicator() }}</p>
+
   <!-- `queryParamsHandling="preserve"` because barrier state is scoped to the
        *scenario*, not to the step: `frei` lists barriers from all four steps
        (docs/ARCHITECTURE.md §8), the panel shows all of them grouped by step

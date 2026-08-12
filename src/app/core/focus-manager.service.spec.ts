@@ -143,7 +143,9 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
       expect(TestBed.inject(Announcer).message()).toBe('AccessIssue: Barrieren sichtbar machen');
     });
 
-    it('announces the title and how many barriers are still active on a scenario step', async () => {
+    // The announcement names the step, because the h1 does not: it carries
+    // the scenario title and is the same on all four steps (UX-COPY §5.3).
+    it('announces the step and how many barriers are still active on a scenario step', async () => {
       TestBed.inject(FocusManager);
       await navigateOnce(events, 1);
       heading.textContent = 'Bewerbungsprozess';
@@ -151,7 +153,18 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
       await navigateOnce(events, 2, '/szenario/bewerbung/formular');
 
       expect(TestBed.inject(Announcer).message()).toBe(
-        'Bewerbungsprozess. 11 von 11 Barrieren aktiv.',
+        'Bewerbungsprozess, Schritt 2 von 4 — Bewerbungsformular. 11 von 11 Barrieren aktiv.',
+      );
+    });
+
+    it('titles the document by the step, so two steps are not the same tab', async () => {
+      TestBed.inject(FocusManager);
+      await navigateOnce(events, 1);
+      onScenarioRoute();
+      await navigateOnce(events, 2, '/szenario/bewerbung/formular');
+
+      expect(TestBed.inject(Title).getTitle()).toBe(
+        'Bewerbungsprozess, Schritt 2 von 4 — Bewerbungsformular – AccessIssue',
       );
     });
 
@@ -166,7 +179,7 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
       await navigateOnce(events, 2, '/szenario/bewerbung/formular?frei=labels,pdf,grafik');
 
       expect(TestBed.inject(Announcer).message()).toBe(
-        'Bewerbungsprozess. 8 von 11 Barrieren aktiv.',
+        'Bewerbungsprozess, Schritt 2 von 4 — Bewerbungsformular. 8 von 11 Barrieren aktiv.',
       );
     });
 

@@ -159,7 +159,9 @@ für aufgezählte URLs beschreibt, nur in der Copy.
 
 | Schlüssel | Text |
 | --- | --- |
-| `scenario.stepIndicator` | Schritt {current} von {total} |
+| `scenario.stepIndicator` | Schritt {current} von {total} — {title} |
+| `scenario.pageTitle` | {scenario}, Schritt {current} von {total} — {step} |
+| `scenario.pageTitle.singleStep` | {scenario} |
 | `scenario.step.next` | Weiter zu: {title} |
 | `scenario.step.previous` | Zurück zu: {title} |
 | `scenario.stepsNavLabel` | Schritte in diesem Szenario |
@@ -172,6 +174,20 @@ für aufgezählte URLs beschreibt, nur in der Copy.
 
 Die Schrittbeschriftung nennt immer das Ziel, nie nur die Richtung. „Weiter" allein ist
 für Screenreader-Nutzer wertlos, wenn mehrere Links auf einer Seite so heißen.
+
+**Der Schritt wird benannt, nicht nur gezählt.** `scenario.stepIndicator` hieß zunächst nur
+„Schritt 2 von 4". Die `h1` trägt den Szenariotitel und ist auf allen vier Schritten
+dieselbe — damit stand nirgends auf der Seite, wie der Schritt heißt, in dem man sich
+befindet. Die Zählung allein beantwortet „wie weit bin ich", nicht „wo bin ich".
+
+`scenario.pageTitle` ist derselbe Gedanke für den Seitentitel: Er füllt den Browser-Tab,
+die Chronik, das Lesezeichen und den ersten Satz der Seitenwechsel-Ansage (Abschnitt 5.7).
+Vorher hießen alle vier Schritte im Tab identisch „Bewerbungsprozess – AccessIssue", was
+vier offene Tabs desselben Szenarios ununterscheidbar machte (WCAG 2.4.2). Bei einstufigen
+Szenarien entfällt die Zählung ganz: „Schritt 1 von 1" ist keine Information.
+
+Der Szenariotitel steht im Seitentitel vorn, weil Tab-Leisten hinten abschneiden, und im
+sichtbaren Schrittindikator gar nicht, weil die `h1` unmittelbar darüber ihn schon nennt.
 
 ### 5.4 Simulationsleiste (Signatur-Element)
 

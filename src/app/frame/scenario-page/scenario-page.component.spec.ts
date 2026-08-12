@@ -36,11 +36,14 @@ describe('ScenarioPageComponent (docs/SPEC_v1.md Slice 3)', () => {
     expect(h1.textContent?.trim()).toBe('Bewerbungsprozess');
   });
 
-  it('shows the step indicator for the current step', () => {
+  // The h1 is the scenario title and identical on all four steps, so the
+  // indicator is the only place on the page that says *which* step this is —
+  // counting alone answered "how far along", never "where" (UX-COPY §5.3).
+  it('names the current step in the indicator, not just its number', () => {
     const fixture = setup({ scenarioPath: 'bewerbung', stepPath: 'formular', hasPanel: true });
 
     const indicator: HTMLElement = fixture.nativeElement.querySelector('.step-indicator');
-    expect(indicator.textContent?.trim()).toBe('Schritt 2 von 4');
+    expect(indicator.textContent?.trim()).toBe('Schritt 2 von 4 — Bewerbungsformular');
   });
 
   it('links forward from step 1 and has no back link', () => {

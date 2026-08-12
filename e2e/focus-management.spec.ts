@@ -34,7 +34,7 @@ test.describe('Route-change focus management', () => {
     await page.getByRole('link', { name: 'Bewerbungsprozess' }).click();
 
     await expect(page.locator('[aria-live="polite"]')).toHaveText(
-      'Bewerbungsprozess. 11 von 11 Barrieren aktiv.',
+      'Bewerbungsprozess, Schritt 1 von 4 — Stellenanzeige. 11 von 11 Barrieren aktiv.',
     );
   });
 
@@ -43,7 +43,22 @@ test.describe('Route-change focus management', () => {
     await page.getByRole('link', { name: 'Weiter zu: Bewerbungsformular' }).click();
 
     await expect(page.locator('[aria-live="polite"]')).toHaveText(
-      'Bewerbungsprozess. 9 von 11 Barrieren aktiv.',
+      'Bewerbungsprozess, Schritt 2 von 4 — Bewerbungsformular. 9 von 11 Barrieren aktiv.',
+    );
+  });
+
+  // Four steps sharing one document title made four open tabs of the same
+  // scenario indistinguishable, in the tab strip, the history and the
+  // bookmark list alike (WCAG 2.4.2).
+  test('gives each step its own document title', async ({ page }) => {
+    await gotoRendered(page, '/szenario/bewerbung/stellenanzeige');
+    await expect(page).toHaveTitle(
+      'Bewerbungsprozess, Schritt 1 von 4 — Stellenanzeige – AccessIssue',
+    );
+
+    await page.getByRole('link', { name: 'Weiter zu: Bewerbungsformular' }).click();
+    await expect(page).toHaveTitle(
+      'Bewerbungsprozess, Schritt 2 von 4 — Bewerbungsformular – AccessIssue',
     );
   });
 

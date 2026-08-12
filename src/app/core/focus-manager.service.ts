@@ -43,11 +43,11 @@ import { Title } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
 import type { ActivatedRouteSnapshot } from '@angular/router';
 import { filter } from 'rxjs';
-import type { Scenario } from '../models/domain.model';
+import type { Scenario, ScenarioStep } from '../models/domain.model';
 import { Announcer } from './announcer.service';
 import { BarrierStateService } from './barrier-state.service';
 import { ScenarioRegistry } from './scenario-registry.service';
-import type { ScenarioRouteData } from './scenario-routes';
+import { stepPageTitle, type ScenarioRouteData } from './scenario-routes';
 
 @Injectable({ providedIn: 'root' })
 export class FocusManager {
@@ -108,8 +108,7 @@ export class FocusManager {
   }
 
   private setTitleFromHeading(): void {
-    const text = this.document.querySelector('h1')?.textContent?.trim() ?? '';
-    this.title.setTitle(text === '' ? 'AccessIssue' : `${text} – AccessIssue`);
+    this.title.setTitle(this.documentTitle());
   }
 
   private focusHeading(): void {
@@ -124,17 +123,41 @@ export class FocusManager {
     heading.setAttribute('tabindex', '-1');
     (heading as HTMLElement).focus();
 
-    const text = heading.textContent?.trim() ?? '';
-    this.title.setTitle(text === '' ? 'AccessIssue' : `${text} – AccessIssue`);
-    this.announcer.announce(this.pageChangeAnnouncement(text));
+    this.title.setTitle(this.documentTitle());
+    this.announcer.announce(this.pageChangeAnnouncement());
+  }
+
+  /**
+   * What this page is called: `scenario.pageTitle` (docs/UX-COPY.md §5.3) on
+   * a scenario step, the `h1` text anywhere else.
+   *
+   * The step is part of it because the `h1` is the *scenario* title and is the
+   * same on all four steps — four tabs of one scenario were previously
+   * indistinguishable in the tab strip, the history and the bookmark list
+   * (WCAG 2.4.2). The `h1` stays the fallback rather than the source, so a
+   * route with no scenario data (home, not found) still titles itself
+   * correctly, and so the zoneless render-timing behaviour this method had
+   * before is preserved for those routes.
+   */
+  private pageTitle(): string {
+    const step = this.currentStep();
+    if (step) {
+      return stepPageTitle(step.scenario, step.step);
+    }
+    return this.document.querySelector('h1')?.textContent?.trim() ?? '';
+  }
+
+  private documentTitle(): string {
+    const title = this.pageTitle();
+    return title === '' ? 'AccessIssue' : `${title} – AccessIssue`;
   }
 
   /**
    * docs/UX-COPY.md §5.7, "Seitenwechsel": *{Seitentitel}. {n} von {total}
    * Barrieren aktiv.* Same two-sentence shape as every other announcement —
    * what is now, how many remain — so a screen reader user who arrives on a
-   * step knows immediately how much of it is still broken, without having to
-   * go looking for the simulation bar.
+   * step hears which step it is and how much of it is still broken, without
+   * having to go looking for the heading or the simulation bar.
    *
    * The count is only appended where it means something: the home page and
    * the not-found page have no barriers, and "0 von 0 Barrieren aktiv" is not
@@ -143,37 +166,45 @@ export class FocusManager {
    * This is not a second counter (CLAUDE.md rule 17). It is spoken once, on
    * arrival, and rendered nowhere.
    */
-  private pageChangeAnnouncement(title: string): string {
-    const scenario = this.currentScenario();
-    if (!scenario || scenario.barriers.length === 0) {
+  private pageChangeAnnouncement(): string {
+    const title = this.pageTitle();
+    const step = this.currentStep();
+    if (!step || step.scenario.barriers.length === 0) {
       return title;
     }
 
-    const active = this.barriers.activeBarrierCount(scenario);
-    return `${title}. ${active} von ${scenario.barriers.length} Barrieren aktiv.`;
+    const active = this.barriers.activeBarrierCount(step.scenario);
+    return `${title}. ${active} von ${step.scenario.barriers.length} Barrieren aktiv.`;
   }
 
   /**
-   * The scenario of the route just activated, read from the router's own
-   * snapshot rather than from the URL string: `scenarioPath` is put into the
-   * route `data` by core/scenario-routes.ts, so this cannot drift out of sync
-   * with the path grammar the way a hand-written parse would. `undefined` for
-   * any route that is not a scenario step.
+   * The scenario and step of the route just activated, read from the router's
+   * own snapshot rather than from the URL string: `scenarioPath` and
+   * `stepPath` are put into the route `data` by core/scenario-routes.ts, so
+   * this cannot drift out of sync with the path grammar the way a
+   * hand-written parse would. `undefined` for any route that is not a
+   * scenario step.
    *
-   * Read at announcement time, after `NavigationEnd`, so the snapshot is
-   * already the new one — and `frei` with it, which is what makes the count
-   * correct on a deep link into a partially resolved scenario.
+   * Read after `NavigationEnd`, so the snapshot is already the new one — and
+   * `frei` with it, which is what makes the count correct on a deep link into
+   * a partially resolved scenario.
    */
-  private currentScenario(): Scenario | undefined {
+  private currentStep(): { scenario: Scenario; step: ScenarioStep } | undefined {
     let route: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
     while (route.firstChild) {
       route = route.firstChild;
     }
 
-    const { scenarioPath } = route.data as Partial<ScenarioRouteData>;
-    if (!scenarioPath) {
+    const { scenarioPath, stepPath } = route.data as Partial<ScenarioRouteData>;
+    if (!scenarioPath || !stepPath) {
       return undefined;
     }
-    return this.registry.getScenario(scenarioPath);
+
+    const scenario = this.registry.getScenario(scenarioPath);
+    const step = this.registry.getStep(scenarioPath, stepPath);
+    if (!scenario || !step) {
+      return undefined;
+    }
+    return { scenario, step };
   }
 }
