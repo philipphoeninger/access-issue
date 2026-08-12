@@ -19,20 +19,12 @@ h1 {
   font-size: var(--wi-size-meta);
 }
 
+// Colour comes from --mat-button-text-* in styles/_material-theme.scss.
 .step-nav {
   display: flex;
   flex-wrap: wrap;
   gap: var(--wi-space-4);
   margin-top: var(--wi-space-4);
-
-  a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--wi-target-min);
-    padding: var(--wi-space-2) var(--wi-space-3);
-    color: var(--wi-text-link);
-    font-weight: var(--wi-weight-semibold);
-  }
 }
 
 // docs/DESIGN.md §5: panel column left, matching DOM order; single column

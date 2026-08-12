@@ -7,13 +7,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { ScenarioRegistry } from '../../core/scenario-registry.service';
 import { scenarioStepPath, type ScenarioRouteData } from '../../core/scenario-routes';
 import type { Scenario, ScenarioStep } from '../../models/domain.model';
 
 @Component({
   selector: 'app-scenario-page',
-  imports: [RouterLink],
+  imports: [RouterLink, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './scenario-page.component.html',
   styleUrl: './scenario-page.component.scss',

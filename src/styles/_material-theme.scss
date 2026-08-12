@@ -1,0 +1,95 @@
+// Angular Material in the frame only (docs/ARCHITECTURE.md §11 corollary:
+// "Material components are engineered to be accessible ... the panel,
+// navigation, and explanation views use Material and benefit from its
+// accessibility work"). Never `@use` this partial from `src/app/scenarios/**`
+// — Material resists being made inaccessible, which is exactly why it must
+// not appear inside a deliberately non-conforming simulation region
+// (docs/ARCHITECTURE.md §11 corollary, docs/DESIGN.md §2).
+//
+// This file does two things: (1) brings in Material's M3 token system so
+// components have real values to render with, and (2) repoints the small set
+// of component-level tokens actually used in the frame at the existing
+// --wi-* design tokens (docs/DESIGN.md §3), so Material components carry the
+// WERTE.IT identity instead of Material's own default palette. Overriding
+// component tokens is Material's own documented customisation path — this is
+// reskinning Material, not fighting it.
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      // Only 400/600/700 are self-hosted as WOFF2 (docs/DESIGN.md §4.1).
+      // Material's default type scale uses weight 500 ("medium") for labels,
+      // titles, etc. — an unloaded weight the browser would synthesise as
+      // faux-bold, exactly the defect DESIGN.md §4.1 already warns against
+      // for a different reason. Pointing "medium" at 600 avoids reintroducing
+      // it inside Material components.
+      typography: (
+          plain-family: 'Poppins',
+          brand-family: 'Poppins',
+          bold-weight: 700,
+          medium-weight: 600,
+          regular-weight: 400,
+        ),
+      density: 0,
+    )
+  );
+
+  // Material's own MDC base styles set `outline: none` on interactive
+  // components and hide the `.mat-focus-indicator` overlay by default,
+  // leaving only a subtle background "state layer" as focus feedback. That
+  // is not enough under this project's own rule: "outline: none is
+  // forbidden everywhere" (CLAUDE.md, docs/DESIGN.md §5). `strong-focus-
+  // indicators` is Material's supported opt-in for a real, visible
+  // indicator — applies to every Material component uniformly, present and
+  // future, so this is written once here rather than per component.
+  @include mat.strong-focus-indicators(
+    (
+      border-color: var(--wi-focus-ring),
+      border-width: var(--wi-focus-width),
+    )
+  );
+
+  // ---- Toolbar (site header) ----
+  --mat-toolbar-container-background-color: var(--wi-navy);
+  --mat-toolbar-container-text-color: var(--wi-text-on-inverse);
+
+  // ---- Buttons ----
+  // Default (frame links outside the toolbar: step navigation, "Szenario
+  // öffnen"). Buttons *inside* `<mat-toolbar>` automatically pick up the
+  // toolbar's own text colour instead (Material's built-in
+  // `.mat-toolbar .mat-mdc-button-base.mat-unthemed` override), so the
+  // scenario-nav links need no separate rule here.
+  --mat-button-text-label-text-color: var(--wi-blue);
+  --mat-button-text-state-layer-color: var(--wi-blue);
+  --mat-button-filled-container-color: var(--wi-blue);
+  --mat-button-filled-label-text-color: var(--wi-white);
+  --mat-button-filled-state-layer-color: var(--wi-white);
+
+  // ---- Cards (home page scenario list) ----
+  // Elevated (default) appearance, matching the previous hand-rolled card:
+  // tinted surface, large radius, soft shadow, no border.
+  --mat-card-elevated-container-color: var(--wi-surface-card);
+  --mat-card-elevated-container-shape: var(--wi-radius-lg);
+  --mat-card-elevated-container-elevation: var(--wi-shadow-card);
+
+  // ---- Chips ("In Vorbereitung" badge) ----
+  // Used with `disabled` to signal "not interactive", not "content
+  // unavailable" — the badge itself must stay fully readable. Material's own
+  // disabled-chip tokens default to ~38%-opacity text, which measures
+  // ~2.3:1 on the card surface and fails WCAG AA; axe does not flag it
+  // because a disabled control is exempt from the contrast check, so this
+  // needed a manual check, not just a green frame-gate run
+  // (docs/TESTING.md §16). The disabled-state tokens are overridden
+  // separately from the (currently unused) enabled-state ones because
+  // Material keys them independently.
+  --mat-chip-label-text-color: var(--wi-text-primary);
+  --mat-chip-outline-color: var(--wi-navy);
+  --mat-chip-disabled-label-text-color: var(--wi-text-primary);
+  --mat-chip-disabled-outline-color: var(--wi-navy);
+  --mat-chip-container-shape-radius: var(--wi-radius-pill);
+}

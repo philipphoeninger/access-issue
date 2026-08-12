@@ -1,18 +1,20 @@
 <app-skip-links [hasPanel]="hasPanel()" />
 
-<header class="site-header">
-  <div class="brand">
-    <p class="project-name">WERTE.IT</p>
-    <p class="tool-name">AccessIssue</p>
-    <p class="tagline">Barrieren sehen, verstehen, beheben</p>
-  </div>
+<header>
+  <mat-toolbar class="site-header">
+    <div class="brand">
+      <p class="project-name">WERTE.IT</p>
+      <p class="tool-name">AccessIssue</p>
+      <p class="tagline">Barrieren sehen, verstehen, beheben</p>
+    </div>
 
-  <nav class="scenario-nav" aria-label="Szenarien">
-    <a routerLink="/">Startseite</a>
-    @for (scenario of availableScenarios(); track scenario.id) {
-      <a [routerLink]="scenarioLink(scenario)">{{ scenario.title }}</a>
-    }
-  </nav>
+    <nav class="scenario-nav" aria-label="Szenarien">
+      <a mat-button routerLink="/">Startseite</a>
+      @for (scenario of availableScenarios(); track scenario.id) {
+        <a mat-button [routerLink]="scenarioLink(scenario)">{{ scenario.title }}</a>
+      }
+    </nav>
+  </mat-toolbar>
 </header>
 
 <main id="content">

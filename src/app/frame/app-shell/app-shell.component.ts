@@ -5,6 +5,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { filter } from 'rxjs';
 import { Announcer } from '../../core/announcer.service';
 import { FocusManager } from '../../core/focus-manager.service';
@@ -16,7 +18,14 @@ import { SkipLinksComponent } from '../../shared/skip-links/skip-links.component
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterLink, RouterOutlet, SkipLinksComponent, VisuallyHidden],
+  imports: [
+    RouterLink,
+    RouterOutlet,
+    SkipLinksComponent,
+    VisuallyHidden,
+    MatToolbarModule,
+    MatButtonModule,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',

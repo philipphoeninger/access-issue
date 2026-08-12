@@ -28,16 +28,25 @@
   <h2 id="scenarios-h2">Szenarien</h2>
   <ul class="scenario-list">
     @for (scenario of scenarios(); track scenario.id) {
-      <li class="scenario-card">
-        <h3>{{ scenario.title }}</h3>
-        <p>{{ scenario.summary }}</p>
-        @if (isAvailable(scenario)) {
-          <p class="barrier-count">{{ barrierCountLabel(scenario) }}</p>
-          <a [routerLink]="openLink(scenario)">Szenario öffnen</a>
-        } @else {
-          <p class="planned-badge">In Vorbereitung</p>
-          <p>Dieses Szenario wird gerade erarbeitet und ist noch nicht verfügbar.</p>
-        }
+      @let available = isAvailable(scenario);
+      <li>
+        <mat-card class="scenario-card">
+          <h3 matCardTitle>{{ scenario.title }}</h3>
+          <mat-card-content>
+            <p>{{ scenario.summary }}</p>
+            @if (available) {
+              <p class="barrier-count">{{ barrierCountLabel(scenario) }}</p>
+            } @else {
+              <mat-chip class="planned-badge" disabled>In Vorbereitung</mat-chip>
+              <p>Dieses Szenario wird gerade erarbeitet und ist noch nicht verfügbar.</p>
+            }
+          </mat-card-content>
+          @if (available) {
+            <mat-card-actions>
+              <a mat-flat-button [routerLink]="openLink(scenario)">Szenario öffnen</a>
+            </mat-card-actions>
+          }
+        </mat-card>
       </li>
     }
   </ul>

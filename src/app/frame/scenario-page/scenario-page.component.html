@@ -4,10 +4,10 @@
 @if (hasMultipleSteps()) {
   <nav class="step-nav" aria-label="Schritte in diesem Szenario">
     @if (previousStep(); as prev) {
-      <a [routerLink]="stepLink(prev)">Zurück zu: {{ prev.title }}</a>
+      <a mat-button [routerLink]="stepLink(prev)">Zurück zu: {{ prev.title }}</a>
     }
     @if (nextStep(); as next) {
-      <a [routerLink]="stepLink(next)">Weiter zu: {{ next.title }}</a>
+      <a mat-button [routerLink]="stepLink(next)">Weiter zu: {{ next.title }}</a>
     }
   </nav>
 }

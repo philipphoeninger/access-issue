@@ -16,7 +16,7 @@ describe('HomePageComponent (docs/UX-COPY.md §5.2)', () => {
     fixture.detectChanges();
   });
 
-  function cards(): HTMLLIElement[] {
+  function cards(): HTMLElement[] {
     return Array.from(fixture.nativeElement.querySelectorAll('.scenario-card'));
   }
 

@@ -3,15 +3,28 @@
   min-height: 100vh;
 }
 
+// mat-toolbar assumes a single fixed-height row; this header wraps to
+// multiple lines (brand block + nav), so the fixed height is overridden.
+// Colour and text colour come from --mat-toolbar-container-* in
+// styles/_material-theme.scss, not from this file — the component-token
+// override is the only place the frame/simulation boundary rule
+// (docs/ARCHITECTURE.md §12.2: never a --wi-* token inside the simulation,
+// and vice versa) needs to be honoured for Material components.
 .site-header {
+  // The app-wide strong-focus-indicators colour (styles/_material-theme.scss)
+  // is --wi-focus-ring (blue), which fails contrast on navy (docs/DESIGN.md
+  // §3.2: "Electric blue on navy 1.68:1 — Fails"). Every button inside this
+  // navy toolbar needs the inverse ring instead, same as the nav links'
+  // previous hand-written focus style did (docs/DESIGN.md §5).
+  --mat-focus-indicator-border-color: var(--wi-focus-ring-inverse);
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--wi-space-4);
+  height: auto;
   padding: var(--wi-space-4) var(--wi-space-6);
-  background: var(--wi-navy);
-  color: var(--wi-text-on-inverse);
 }
 
 .brand {
@@ -21,7 +34,6 @@
 
 .project-name {
   margin: 0;
-  color: var(--wi-text-on-inverse);
   font-size: var(--wi-size-meta);
   font-weight: var(--wi-weight-semibold);
   letter-spacing: 0.02em;
@@ -30,14 +42,12 @@
 
 .tool-name {
   margin: 0;
-  color: var(--wi-text-on-inverse);
   font-size: var(--wi-size-h2);
   font-weight: var(--wi-weight-bold);
 }
 
 .tagline {
   margin: 0;
-  color: var(--wi-text-on-inverse);
   font-size: var(--wi-size-meta);
   opacity: 0.85;
 }
@@ -45,22 +55,8 @@
 .scenario-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--wi-space-4);
-
-  a {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--wi-target-min);
-    padding: var(--wi-space-2) var(--wi-space-3);
-    color: var(--wi-text-on-inverse);
-    font-weight: var(--wi-weight-semibold);
-    text-decoration: none;
-
-    &:focus-visible {
-      outline: var(--wi-focus-width) solid var(--wi-focus-ring-inverse);
-      outline-offset: var(--wi-focus-offset);
-    }
-  }
+  align-items: center;
+  gap: var(--wi-space-2);
 }
 
 main {

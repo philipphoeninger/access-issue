@@ -1,4 +1,5 @@
 @use 'styles/tokens';
+@use 'styles/material-theme';
 
 html {
   font-family: var(--wi-font-family);
@@ -17,16 +18,26 @@ body {
   overflow-wrap: break-word;
 }
 
-// Visible keyboard focus on every frame element (DESIGN.md §5). Explicitly
-// excludes [data-simulation-region] — the boundary marker SimulationRegionComponent
-// will render (slice 4) and the selector docs/TESTING.md §5 run 1 excludes —
-// so a --wi-* ring can never bleed into the simulation by default. The
-// simulation gets its own --sim-focus-ring instead (docs/ARCHITECTURE.md
-// §12.2 token boundary): never rely on component-style specificity alone to
-// keep the two apart.
-a:focus-visible:not([data-simulation-region] *),
-button:focus-visible:not([data-simulation-region] *),
-[tabindex]:focus-visible:not([data-simulation-region] *) {
+// Visible keyboard focus on every *plain* (non-Material) frame element
+// (DESIGN.md §5) — a safety net for any hand-written frame control that
+// isn't a Material component. Excludes `.mat-mdc-button-base` (the common
+// host class on every Material button variant): those already get a real
+// indicator from `mat.strong-focus-indicators()` in
+// styles/_material-theme.scss, and without this exclusion both rules would
+// draw at once — a native `outline` (always --wi-focus-ring, i.e. blue) on
+// top of Material's own border, which is wrong on a navy surface where blue
+// fails contrast (docs/DESIGN.md §3.2) and where the Material-side override
+// already correctly switches to --wi-focus-ring-inverse.
+//
+// Explicitly excludes [data-simulation-region] — the boundary marker
+// SimulationRegionComponent will render (slice 4) and the selector
+// docs/TESTING.md §5 run 1 excludes — so a --wi-* ring can never bleed into
+// the simulation by default. The simulation gets its own --sim-focus-ring
+// instead (docs/ARCHITECTURE.md §12.2 token boundary): never rely on
+// component-style specificity alone to keep the two apart.
+a:focus-visible:not([data-simulation-region] *):not(.mat-mdc-button-base),
+button:focus-visible:not([data-simulation-region] *):not(.mat-mdc-button-base),
+[tabindex]:focus-visible:not([data-simulation-region] *):not(.mat-mdc-button-base) {
   outline: var(--wi-focus-width) solid var(--wi-focus-ring);
   outline-offset: var(--wi-focus-offset);
 }

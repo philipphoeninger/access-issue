@@ -3,13 +3,16 @@
 // ages correctly as barriers are added.
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import { ScenarioRegistry } from '../../core/scenario-registry.service';
 import { firstStepPath } from '../../core/scenario-routes';
 import type { Scenario } from '../../models/domain.model';
 
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink],
+  imports: [RouterLink, MatButtonModule, MatCardModule, MatChipsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',

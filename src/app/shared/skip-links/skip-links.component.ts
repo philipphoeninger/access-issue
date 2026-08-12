@@ -2,9 +2,11 @@
 // ("Simulationsbereich überspringen") is not header-level and is rendered by
 // SimulationRegionComponent immediately before the region (slice 4).
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-skip-links',
+  imports: [MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './skip-links.component.html',
   styleUrl: './skip-links.component.scss',

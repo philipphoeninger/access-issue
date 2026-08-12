@@ -1,27 +1,32 @@
 // Off-screen until focused, not display:none — the links stay in the tab
 // order at all times, and only become visible when a keyboard user reaches
 // them (docs/DESIGN.md §5, §8: visible keyboard focus on every element).
+//
+// Coloured navy-on-white to read as an overlay pill, independent of the
+// default --mat-button-filled-* brand colour (electric blue) set in
+// styles/_material-theme.scss — a link that appears directly on top of the
+// navy header needs its own contrast pairing, not the frame's general link
+// colour.
 .skip-link {
+  --mat-button-filled-container-color: var(--wi-navy);
+  --mat-button-filled-label-text-color: var(--wi-text-on-inverse);
+  --mat-button-filled-state-layer-color: var(--wi-text-on-inverse);
+  --mat-button-filled-container-shape: var(--wi-radius-sm);
+  // The app-wide strong-focus-indicators colour (styles/_material-theme.scss)
+  // is --wi-focus-ring (blue), which fails contrast on navy (docs/DESIGN.md
+  // §3.2: "Electric blue on navy 1.68:1 — Fails"). The pill sits over the
+  // navy header when visible, so it needs the inverse ring, same as any
+  // other frame control on a navy surface (docs/DESIGN.md §5).
+  --mat-focus-indicator-border-color: var(--wi-focus-ring-inverse);
+
   position: absolute;
   top: -3rem;
   left: var(--wi-space-4);
   z-index: 1000;
-  display: inline-flex;
-  align-items: center;
   min-height: var(--wi-target-min);
-  padding: var(--wi-space-2) var(--wi-space-4);
-  background: var(--wi-navy);
-  color: var(--wi-text-on-inverse);
-  font-family: var(--wi-font-family);
-  font-size: var(--wi-size-control);
-  font-weight: var(--wi-weight-semibold);
-  text-decoration: none;
-  border-radius: var(--wi-radius-sm);
   transition: top var(--wi-motion-fast) var(--wi-motion-ease);
 
   &:focus-visible {
     top: var(--wi-space-4);
-    outline: var(--wi-focus-width) solid var(--wi-focus-ring-inverse);
-    outline-offset: var(--wi-focus-offset);
   }
 }
