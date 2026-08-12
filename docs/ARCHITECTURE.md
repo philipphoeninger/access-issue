@@ -550,12 +550,35 @@ Recording this now avoids a late rewrite of every published URL.
 
 **Route change accessibility.** Angular does not move focus on navigation, which leaves
 screen reader users unaware that the page changed. The frame therefore installs a
-`FocusManager` that, on every `NavigationEnd`:
+`FocusManager` that, on a `NavigationEnd` **that changes the path**:
 
 1. sets focus to the main heading (`h1`, `tabindex="-1"`, focus outline suppressed only
    for this programmatic case)
 2. announces the new page title through a polite live region
 3. resets scroll position
+
+Two kinds of `NavigationEnd` are excluded, and both exclusions are load-bearing rather
+than cosmetic:
+
+- **the initial load** — moving focus off the top of the document there would skip past
+  the skip links on the user's very first `Tab` (`UX-COPY.md` §5.1), and the problem this
+  service solves does not exist on a full page load. Title only.
+- **a navigation that keeps the path** — a barrier toggle writing `frei` (§8), or a
+  fragment link whose target the browser has just focused. Focusing the `h1` on those
+  would move focus away from the checkbox the user activated (§12.2) and would silently
+  break the region's exit link, which is the one safety-critical path in the application
+  (`TESTING.md` §7). Same path means: no focus move, no announcement, no scroll reset.
+
+**In-page fragment links go through `FragmentLink`** (`shared/fragment-link.directive.ts`).
+`index.html` carries `<base href>`, against which a bare `href="#panel"` resolves — so on
+a scenario route it points at `/#panel`, a *different document*, and following it reloads
+the application on the home page. The directive writes the current path and query string
+in front of the fragment, which keeps the navigation same-document; the browser then
+scrolls *and focuses* the target natively. `routerLink` with `fragment` is not an
+alternative: it renders a correct href but intercepts the click, and its navigation
+neither scrolls nor moves focus. Every fragment target therefore also carries
+`tabindex="-1"` — without it the browser only sets the sequential-navigation starting
+point and a screen reader's reading cursor stays put.
 
 `withComponentInputBinding()` is enabled so route params bind directly to component
 inputs and signals, avoiding manual subscription plumbing.
@@ -688,8 +711,9 @@ Frame-owned, in `core/` and `shared/`:
 | `Announcer` | The frame's single polite `aria-live` region. Announces toggle changes, route changes, and bulk actions. Exactly one per document — see the scoping rule below. |
 | `FocusManager` | Focus on route change (§9); returns focus to the panel on `Escape` within the simulation region; guarantees focus is never left on a removed element after a toggle. |
 | `SkipLinksComponent` | "Zum Inhalt" and "Zum Barriere-Panel" in the page header; "Simulationsbereich überspringen" rendered immediately before the region, not in the header (a jump from the top of the page to the end of a region the user has not entered is not a useful destination). All three live outside the simulation region. |
-| `SimulationRegionComponent` | The boundary (§5.1). |
+| `SimulationRegionComponent` | The boundary (§5.1). Also renders the simulation bar, the skip link before the region and the end anchor after it — all three outside the region's own subtree. |
 | `VisuallyHidden` directive | Standard clip-rect pattern, one implementation, no ad-hoc copies. |
+| `FragmentLink` directive | Every in-page fragment link (skip links, exit link). Prefixes the current path so `<base href>` cannot turn a skip into a page load — see §9. |
 
 **Live regions are scoped, not globally unique.** An earlier draft said "one live region
 only". That is right for the frame and wrong for the application, because the resolved

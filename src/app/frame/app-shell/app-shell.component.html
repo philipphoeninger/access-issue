@@ -17,7 +17,12 @@
   </mat-toolbar>
 </header>
 
-<main id="content">
+<!-- tabindex="-1" for the same reason as the panel column in
+     ScenarioPageComponent: without it a fragment link only sets the
+     sequential-navigation starting point, and screen readers whose reading
+     cursor follows focus stay where they were — a skip link that changes the
+     URL and nothing else. -->
+<main id="content" tabindex="-1">
   <router-outlet />
 </main>
 

@@ -18,8 +18,8 @@ function settle(): Promise<void> {
 // therefore treated as the initial load: title only, no focus, no
 // announcement. `navigateOnce` fires that one and settles it, so each test
 // below can exercise the "real" (second-and-later) navigation behaviour.
-async function navigateOnce(events: Subject<unknown>, id = 1): Promise<void> {
-  events.next(new NavigationEnd(id, '/a', '/a'));
+async function navigateOnce(events: Subject<unknown>, id = 1, url = '/a'): Promise<void> {
+  events.next(new NavigationEnd(id, url, url));
   await settle();
 }
 
@@ -89,7 +89,7 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
       TestBed.inject(FocusManager);
       await navigateOnce(events, 1);
       heading.textContent = 'Bewerbungsformular';
-      await navigateOnce(events, 2);
+      await navigateOnce(events, 2, '/b');
 
       expect(document.activeElement).toBe(heading);
       expect(heading.getAttribute('tabindex')).toBe('-1');
@@ -99,7 +99,7 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
       TestBed.inject(FocusManager);
       await navigateOnce(events, 1);
       heading.textContent = 'Bewerbungsformular';
-      await navigateOnce(events, 2);
+      await navigateOnce(events, 2, '/b');
 
       expect(TestBed.inject(Announcer).message()).toBe('Bewerbungsformular');
     });
@@ -108,7 +108,7 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
       TestBed.inject(FocusManager);
       await navigateOnce(events, 1);
       heading.textContent = 'Bewerbungsformular';
-      await navigateOnce(events, 2);
+      await navigateOnce(events, 2, '/b');
 
       expect(TestBed.inject(Title).getTitle()).toBe('Bewerbungsformular – AccessIssue');
     });
@@ -122,6 +122,51 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
         events.next(new NavigationEnd(2, '/b', '/b'));
       }).not.toThrow();
       await settle();
+    });
+  });
+
+  // A navigation that keeps the path is not a page change. Two things in the
+  // application produce one, and both would be broken by focusing the h1:
+  // a barrier toggle writing `frei` (focus must stay on the checkbox,
+  // docs/ARCHITECTURE.md §12.2) and a fragment link, where the browser has
+  // just moved focus to the target the user asked for (docs/TESTING.md §7).
+  describe('a NavigationEnd that only changes the query string or fragment', () => {
+    it('leaves focus where it is when a barrier toggle rewrites `frei`', async () => {
+      TestBed.inject(FocusManager);
+      await navigateOnce(events, 1, '/szenario/bewerbung/formular');
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      document.body.appendChild(checkbox);
+      checkbox.focus();
+
+      await navigateOnce(events, 2, '/szenario/bewerbung/formular?frei=labels');
+
+      expect(document.activeElement).toBe(checkbox);
+      checkbox.remove();
+    });
+
+    it('leaves focus where it is when a fragment link moves it', async () => {
+      TestBed.inject(FocusManager);
+      await navigateOnce(events, 1, '/szenario/bewerbung/formular');
+
+      const target = document.createElement('div');
+      target.tabIndex = -1;
+      document.body.appendChild(target);
+      target.focus();
+
+      await navigateOnce(events, 2, '/szenario/bewerbung/formular#panel');
+
+      expect(document.activeElement).toBe(target);
+      target.remove();
+    });
+
+    it('announces nothing, so a toggle announcement is never overwritten', async () => {
+      TestBed.inject(FocusManager);
+      await navigateOnce(events, 1, '/szenario/bewerbung/formular');
+      await navigateOnce(events, 2, '/szenario/bewerbung/formular?frei=alle');
+
+      expect(TestBed.inject(Announcer).message()).toBe('');
     });
   });
 

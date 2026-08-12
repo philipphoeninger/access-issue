@@ -1,0 +1,90 @@
+// Frame code on a navy surface — only --wi-* tokens here
+// (docs/ARCHITECTURE.md §12.2). Nothing in this file is sticky: a bar that
+// stayed put while the page scrolled would cover the exit link, which sits at
+// the top of the region directly below (docs/DESIGN.md §5, SC 2.4.11).
+:host {
+  display: block;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--wi-space-2) var(--wi-space-4);
+  align-items: baseline;
+  padding: var(--wi-space-3) var(--wi-space-4);
+  border-radius: var(--wi-radius-md) var(--wi-radius-md) 0 0;
+  background: var(--wi-surface-inverse);
+  color: var(--wi-text-on-inverse);
+  font-size: var(--wi-size-meta);
+}
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--wi-space-3);
+  margin: 0;
+}
+
+// White pill on navy (14.30:1). Deliberately not --wi-magenta: magenta on
+// navy measures 2.96:1 (docs/DESIGN.md §3.2), and the chip is the visual
+// marker of the boundary — the one element that must not be the weakest
+// contrast on the page.
+.chip {
+  padding: var(--wi-space-1) var(--wi-space-3);
+  border-radius: var(--wi-radius-pill);
+  background: var(--wi-white);
+  color: var(--wi-navy);
+  font-weight: var(--wi-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// Low emphasis, per docs/DESIGN.md §6 — white at 85 % on navy still measures
+// well above AA, so the de-emphasis costs no legibility.
+.address {
+  opacity: 0.85;
+}
+
+.counter {
+  justify-self: end;
+  margin: 0;
+  font-weight: var(--wi-weight-semibold);
+}
+
+.description {
+  grid-column: 1 / -1;
+  max-width: var(--wi-measure);
+  margin: 0;
+  opacity: 0.85;
+}
+
+.suppression {
+  grid-column: 1 / -1;
+  padding: var(--wi-space-3);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-state-active-surface);
+  color: var(--wi-text-primary);
+
+  p {
+    max-width: var(--wi-measure);
+    margin: 0;
+
+    + p {
+      margin-top: var(--wi-space-2);
+    }
+  }
+}
+
+// Below the layout breakpoint the counter drops under the identity line
+// rather than being squeezed beside it (docs/DESIGN.md §5: reflow to 320 px
+// without horizontal scrolling).
+@media (max-width: 30rem) {
+  .bar {
+    grid-template-columns: 1fr;
+  }
+
+  .counter {
+    justify-self: start;
+  }
+}

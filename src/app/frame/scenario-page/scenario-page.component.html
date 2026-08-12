@@ -13,6 +13,19 @@
 }
 
 <div class="scenario-layout">
-  <div class="panel-column" id="panel"></div>
-  <div class="simulation-column"></div>
+  <!-- tabindex="-1" so the two links that target `#panel` — the header skip
+       link and the simulation region's exit link — actually move focus here.
+       Without it the browser only sets a sequential-navigation starting point
+       and `document.activeElement` stays on <body>, which is precisely the
+       half-working exit docs/TESTING.md §7 exists to catch.
+       BarrierPanelComponent (slice 5) renders into this column. -->
+  <div class="panel-column" id="panel" tabindex="-1"></div>
+  <div class="simulation-column">
+    <!-- `simulatedPath` stays unset until the step components exist: the
+         Elbwerk address is simulation content (docs/UX-COPY.md §8), and the
+         frame does not invent it. Scenario content is projected into the
+         region from slice 7 on; until then the region is deliberately
+         rendered and empty (docs/SPEC_v1.md slice 4 acceptance). -->
+    <app-simulation-region [scenario]="scenario()" />
+  </div>
 </div>

@@ -4,8 +4,9 @@
 // app's initial load, this focuses the page `h1`, announces its text through
 // the frame's single live region, and resets scroll position.
 //
-// The initial load is deliberately excluded from focus-stealing and
-// announcing. Two reasons, not one:
+// Two kinds of NavigationEnd are deliberately excluded.
+//
+// The initial load, for two reasons, not one:
 //  - Angular Router fires a `NavigationEnd` for the very first navigation
 //    too, and moving focus away from the browser's own initial focus state
 //    (the top of the document) on first load is itself a known
@@ -18,6 +19,10 @@
 //    already covers it.
 // The document title is still set on first load (`Title`), since that has
 // no bearing on focus or tab order.
+//
+// And navigations that keep the same path — a barrier toggle writing `frei`,
+// a fragment link moving focus to its target — which are not page changes at
+// all; the reasoning is at the check itself in `onNavigationEnd`.
 //
 // A root-provided singleton, constructed once and never destroyed — the
 // subscription below lives for the application's lifetime, so it does not
@@ -38,17 +43,34 @@ export class FocusManager {
   private readonly title = inject(Title);
   private readonly announcer = inject(Announcer);
 
-  private isFirstNavigation = true;
+  /** Path of the last navigation, query string and fragment stripped. */
+  private lastPath: string | null = null;
 
   constructor() {
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe(() => this.onNavigationEnd());
+      .subscribe((event) => this.onNavigationEnd(event));
   }
 
-  private onNavigationEnd(): void {
-    const isFirstNavigation = this.isFirstNavigation;
-    this.isFirstNavigation = false;
+  private onNavigationEnd(event: NavigationEnd): void {
+    const path = event.urlAfterRedirects.split(/[?#]/)[0];
+    const isFirstNavigation = this.lastPath === null;
+    const isSamePage = path === this.lastPath;
+    this.lastPath = path;
+
+    // Not every NavigationEnd is a page change, and treating them alike
+    // breaks two things at once. Resolving a barrier writes a query
+    // parameter (docs/ARCHITECTURE.md §8) — focus has to stay on the
+    // checkbox the user just activated (§12.2), not jump to the h1. And a
+    // fragment link — the skip links, the simulation region's exit link —
+    // makes the browser move focus to its target, which the router then
+    // reports as a navigation; focusing the h1 here would undo the jump the
+    // user asked for and silently break the safety-critical exit path
+    // (docs/TESTING.md §7). Same path, so: nothing to announce, nothing to
+    // focus, and no scroll to the top either.
+    if (isSamePage) {
+      return;
+    }
 
     if (!isFirstNavigation) {
       this.document.defaultView?.scrollTo(0, 0);

@@ -1,12 +1,19 @@
 // docs/UX-COPY.md §5.1. Two of the three skip links; the third
 // ("Simulationsbereich überspringen") is not header-level and is rendered by
-// SimulationRegionComponent immediately before the region (slice 4).
+// SimulationRegionComponent immediately before the region.
+//
+// Both links go through FragmentLink rather than carrying a literal
+// `href="#content"`: under `<base href="/">` a bare fragment resolves against
+// the base, so on a scenario route these two used to reload the application
+// on the home page instead of skipping anything — see the directive for the
+// full story.
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { FragmentLink } from '../fragment-link.directive';
 
 @Component({
   selector: 'app-skip-links',
-  imports: [MatButtonModule],
+  imports: [MatButtonModule, FragmentLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './skip-links.component.html',
   styleUrl: './skip-links.component.scss',

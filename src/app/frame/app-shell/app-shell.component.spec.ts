@@ -52,15 +52,15 @@ describe('AppShellComponent (docs/ARCHITECTURE.md §12.2)', () => {
   });
 
   it('shows only the content skip link on a page without a panel', () => {
-    expect(fixture.nativeElement.querySelector('a[href="#content"]')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('a[href="#panel"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('a[href$="#content"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('a[href$="#panel"]')).toBeNull();
   });
 
   it('shows both skip links once navigated to a page with a panel', async () => {
     await router.navigateByUrl('/szenario/bewerbung/stellenanzeige');
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('a[href="#panel"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('a[href$="#panel"]')).not.toBeNull();
   });
 
   it('lists available scenarios in the header navigation, not planned ones', () => {

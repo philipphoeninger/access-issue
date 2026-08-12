@@ -1,0 +1,36 @@
+<!-- docs/UX-COPY.md §5.1: the third skip link belongs here, immediately before
+     the region, not in the page header — jumping to the end of a region you
+     have never entered is not a destination anyone wants. Outside the region
+     subtree, so no barrier can ever apply to it. -->
+<a class="skip-simulation" [appFragmentLink]="endAnchorId">Simulationsbereich überspringen</a>
+
+<app-simulation-bar
+  [scenario]="scenario()"
+  [simulatedPath]="simulatedPath()"
+  [suppressionNotes]="suppressionNotes()"
+/>
+
+<section
+  class="simulation-region"
+  data-simulation-region
+  role="region"
+  [attr.aria-labelledby]="headingId"
+  [attr.aria-describedby]="descriptionId"
+>
+  <!-- Visually hidden, not decorative: the region is already marked visually
+       by the navy bar above it and by its border, and a WERTE.IT-worded
+       heading rendered inside the Elbwerk page would undo the deceptive
+       realism the whole design rests on (docs/DESIGN.md §2). The heading
+       still carries the outline (h1 → h2 → h3) and the region's accessible
+       name. -->
+  <h2 appVisuallyHidden [id]="headingId">Simulation: Website der Elbwerk GmbH</h2>
+
+  <!-- First focusable element in the region, in every barrier state
+       (docs/TESTING.md §7). Written out in full: "Verlassen" alone does not
+       say where to. -->
+  <a class="exit-link" appFragmentLink="panel">Simulation verlassen — zurück zum Barriere-Panel</a>
+
+  <ng-content />
+</section>
+
+<p appVisuallyHidden [id]="endAnchorId" tabindex="-1">Ende des Simulationsbereichs</p>

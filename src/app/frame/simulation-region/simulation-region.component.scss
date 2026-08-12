@@ -1,0 +1,88 @@
+// Two token sets meet in this file, and the line between them is the whole
+// point of the component (docs/ARCHITECTURE.md §12.2):
+//   .skip-simulation  — frame, outside the region  → --wi-* only
+//   .simulation-region, .exit-link — inside the region → --sim-* only
+// The simulation token set has no spacing or radius scale, by design: Elbwerk
+// is a different company, and its stylesheet would not share WERTE.IT's
+// spacing rhythm. Plain values inside the region are therefore correct, not
+// an oversight.
+:host {
+  display: block;
+  position: relative;
+}
+
+// Both hidden links use the same technique — laid out at full size, parked
+// off-screen to the left, moved into view on focus — but they are written out
+// separately, because one is frame code and the other is inside the region:
+// a shared rule block would have to pick one token set for both.
+//
+// Not `clip: rect(0,0,0,0)`: a clipped link measures 1×1 px, which would fail
+// the 24×24 px target assertion in e2e/target-size.spec.ts (WCAG 2.5.8) on an
+// element that is genuinely full-size the moment anyone can reach it. Not
+// `top: -3rem` either, the pattern the header skip links use: a negative
+// offset there puts the link above the viewport, while here it would put it
+// on top of the simulation bar, visible and unreadable. Left overflow creates
+// no horizontal scrolling in a left-to-right document (docs/DESIGN.md §8).
+.skip-simulation {
+  position: absolute;
+  top: var(--wi-space-2);
+  left: -9999px;
+  z-index: 2;
+  display: inline-block;
+  min-height: var(--wi-target-min);
+  padding: var(--wi-space-2) var(--wi-space-3);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-white);
+  color: var(--wi-text-link);
+  font-size: var(--wi-size-control);
+  font-weight: var(--wi-weight-semibold);
+
+  // `:focus`, not `:focus-visible`: an off-screen link is unreachable by
+  // pointer, so every focus it can receive is a keyboard focus — and a
+  // reveal that depended on the heuristic would risk leaving it invisible.
+  &:focus {
+    left: var(--wi-space-2);
+  }
+}
+
+// docs/DESIGN.md §6: the bar carries the top corners, the region the bottom
+// ones, so the two read as one element.
+.simulation-region {
+  position: relative;
+  min-height: 8rem; // holds shape while the region is still empty (slices 7–10 fill it)
+  padding: 1rem;
+  border: 2px solid var(--sim-border);
+  border-top: 0;
+  border-radius: 0 0 4px 4px;
+  background: var(--sim-white);
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  line-height: var(--sim-leading-body);
+}
+
+// The safety-critical control (docs/TESTING.md §7). A missing or invisible
+// focus indicator is never an admissible barrier, so the ring is stated here
+// as well as in the global rule for projected content — this link must never
+// depend on someone else's stylesheet to stay findable.
+.exit-link {
+  position: absolute;
+  top: 0.5rem;
+  left: -9999px;
+  z-index: 2;
+  display: inline-block;
+  min-height: var(--sim-target-min);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--sim-border);
+  border-radius: 4px;
+  background: var(--sim-white);
+  color: var(--sim-brand);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+
+  &:focus {
+    left: 0.5rem;
+    outline: var(--sim-focus-width) solid var(--sim-focus-ring);
+    outline-offset: var(--sim-focus-offset);
+  }
+}

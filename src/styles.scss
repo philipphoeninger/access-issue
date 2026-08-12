@@ -42,6 +42,20 @@ button:focus-visible:not([data-simulation-region] *):not(.mat-mdc-button-base),
   outline-offset: var(--wi-focus-offset);
 }
 
+// The counterpart inside the simulation: --sim-focus-ring on every focusable
+// element in the region (docs/DESIGN.md §5, docs/SPEC_v1.md slice 4). Global
+// rather than scoped to SimulationRegionComponent on purpose — scenario
+// content is *projected* into the region, so it carries the scenario
+// component's style-encapsulation attribute, not the region's, and a
+// component-scoped rule could never reach it. A missing focus indicator is
+// never an admissible barrier (docs/ARCHITECTURE.md §5.3), which makes this
+// the one piece of simulation styling that must not be left to the component
+// that authors the barrier.
+[data-simulation-region] :focus-visible {
+  outline: var(--sim-focus-width) solid var(--sim-focus-ring);
+  outline-offset: var(--sim-focus-offset);
+}
+
 // The only programmatic focus allowed to suppress the visible ring: the page
 // h1 focused by FocusManager on route change, which is not user-initiated
 // (docs/ARCHITECTURE.md §9, docs/DESIGN.md §5).

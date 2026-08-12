@@ -1,6 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import type { ScenarioRouteData } from '../../core/scenario-routes';
 import { ScenarioPageComponent } from './scenario-page.component';
@@ -11,7 +11,12 @@ function setup(data: ScenarioRouteData): ComponentFixture<ScenarioPageComponent>
     providers: [
       provideZonelessChangeDetection(),
       provideRouter([]),
-      { provide: ActivatedRoute, useValue: { data: of(data) } },
+      {
+        provide: ActivatedRoute,
+        // `queryParamMap` is for BarrierStateService, which the simulation
+        // bar inside the region reads the barrier count from (slice 4).
+        useValue: { data: of(data), queryParamMap: of(convertToParamMap({})) },
+      },
     ],
   });
   const fixture = TestBed.createComponent(ScenarioPageComponent);

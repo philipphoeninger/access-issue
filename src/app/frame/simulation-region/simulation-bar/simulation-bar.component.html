@@ -1,0 +1,29 @@
+<div class="bar">
+  <p class="identity">
+    <!-- docs/UX-COPY.md §5.4: the string is "Simulation", not "SIMULATION" —
+         the capitals come from text-transform in the stylesheet, because some
+         screen readers spell out all-caps strings letter by letter. -->
+    <span class="chip">Simulation</span>
+    <span class="address">{{ address() }}</span>
+  </p>
+
+  <p class="counter">{{ counterLabel() }}</p>
+
+  <p class="description" [id]="descriptionId">
+    Nachbau der Website der fiktiven Elbwerk GmbH. Kein echtes Unternehmen, keine echte Bewerbung,
+    keine Datenübertragung.
+  </p>
+
+  @if (suppressionNotes().length > 0) {
+    <!-- docs/UX-COPY.md §5.9 `suppressed.label`. Labelled with aria-label
+         rather than a heading: the bar sits between the page h1 and the
+         region's h2, so any heading here would have to be an h2 competing
+         with the region's own — and this note is an aside about rendering,
+         not a section of the page outline. -->
+    <section class="suppression" aria-label="Hinweis zur Darstellung">
+      @for (note of suppressionNotes(); track $index) {
+        <p>{{ note }}</p>
+      }
+    </section>
+  }
+</div>
