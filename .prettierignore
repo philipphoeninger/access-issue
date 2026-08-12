@@ -1,0 +1,9 @@
+# Hand-authored prose and structured tables; formatted for readability, not by Prettier.
+docs/
+CLAUDE.md
+README.md
+
+# Generated/output
+dist/
+coverage/
+.angular/

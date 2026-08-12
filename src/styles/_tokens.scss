@@ -1,0 +1,238 @@
+// =============================================================================
+// AccessIssue — Design tokens
+//
+// Source: docs/DESIGN.md
+// Boundary rule (docs/ARCHITECTURE.md §12.2): frame tokens and simulation
+// tokens are separate sets. Frame tokens are all verified at WCAG 2.2 AA or
+// better. Some simulation tokens deliberately fail. Never reference a --sim-*
+// token from frame code, or a --wi-* token from inside the simulation region.
+//
+// All contrast ratios in comments are measured, not estimated.
+// =============================================================================
+
+// Self-hosted Poppins — no third-party font requests (docs/ARCHITECTURE.md §16).
+// Adjust the url() paths to wherever the WOFF2 files actually live in the build
+// output (e.g. Angular 20's `public/` asset folder). Latin subset covers the
+// German alphabet including ä/ö/ü/ß.
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/poppins-latin-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/poppins-latin-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/poppins-latin-700.woff2') format('woff2');
+}
+
+:root {
+  // ---------------------------------------------------------------------------
+  // FRAME — WERTE.IT corporate design
+  // Values taken from the project logo, the Moodle deck and werte.it theme-color.
+  // Do not invent new brand colours here.
+  // ---------------------------------------------------------------------------
+
+  --wi-navy: #172c3f; // 14.30:1 on white · 12.72:1 on mist
+  --wi-navy-deep: #01192a; // large areas only, gradient partner for navy
+  --wi-blue: #0004ff; // 8.53:1 on white — links, focus, active controls
+  --wi-indigo: #051869; // 15.66:1 on white — headings, resolved state
+  --wi-magenta: #da0983; // SURFACES AND ICONS ONLY — see --wi-magenta-text
+  --wi-magenta-text: #ab0767; // 7.10:1 on white · 6.31:1 on mist — text use
+  --wi-pink: #ff70fb; // 6.10:1 on navy — DECORATIVE, NAVY SURFACES ONLY
+
+  --wi-mist: #f1f1f8; // page background
+  --wi-card: #eef5fe; // card and panel surfaces
+  --wi-rose: #fdeff8; // tinted surface behind barrier-active items
+  --wi-white: #ffffff;
+
+  // Surface permissions — each accent belongs to exactly one surface family.
+  // FORBIDDEN, all measured failures:
+  //   --wi-blue    on --wi-navy   1.68:1
+  //   --wi-magenta on --wi-navy   2.96:1
+  //   --wi-magenta on --wi-mist   4.30:1  (body text)
+  //   --wi-pink    on white       2.34:1
+
+  // Semantic aliases — components reference these, not the raw palette.
+  --wi-surface-page: var(--wi-mist);
+  --wi-surface-card: var(--wi-card);
+  --wi-surface-content: var(--wi-white);
+  --wi-surface-inverse: var(--wi-navy);
+
+  --wi-text-primary: var(--wi-navy);
+  --wi-text-heading: var(--wi-indigo);
+  --wi-text-on-inverse: var(--wi-white);
+  --wi-text-link: var(--wi-blue);
+
+  // Barrier state. Never colour alone — every state also carries a text label
+  // and a symbol shape (docs/DESIGN.md §3.3). WCAG 1.4.1.
+  --wi-state-active: var(--wi-magenta); // barrier active — surface
+  --wi-state-active-text: var(--wi-magenta-text); // barrier active — text
+  --wi-state-active-surface: var(--wi-rose);
+  --wi-state-resolved: var(--wi-indigo); // deliberately not green
+  --wi-state-partial: var(--wi-indigo); // paired with --wi-rose surface
+
+  // Focus. Never `outline: none`. The only exception is the programmatic h1
+  // focus on route change (docs/ARCHITECTURE.md §9), which is not user-initiated.
+  --wi-focus-ring: var(--wi-blue);
+  --wi-focus-ring-inverse: var(--wi-white);
+  --wi-focus-width: 3px;
+  --wi-focus-offset: 2px;
+
+  // Minimum interactive target size — WCAG 2.2 SC 2.5.8 (new in 2.2, level AA).
+  // Applies to the clickable area, which may exceed the visible control. Watch the
+  // nested part checkboxes of combined barriers: indentation must not shrink them.
+  --wi-target-min: 24px;
+  --wi-target-comfortable: 44px; // preferred where layout allows (2.5.5, level AAA)
+
+  // ---------------------------------------------------------------------------
+  // TYPOGRAPHY
+  // Poppins is set by the corporate design and is self-hosted (no CDN —
+  // docs/ARCHITECTURE.md §16 forbids third-party runtime requests).
+  // Sizes in rem so browser text-size settings apply. Nothing below 1rem.
+  // ---------------------------------------------------------------------------
+
+  --wi-font-family: 'Poppins', system-ui, sans-serif;
+
+  --wi-size-display: 2.5rem; // 40px / 700
+  --wi-size-h1: 2rem; // 32px / 700
+  --wi-size-h2: 1.5rem; // 24px / 600
+  --wi-size-h3: 1.1875rem; // 19px / 600
+  --wi-size-body: 1.0625rem; // 17px / 400
+  --wi-size-control: 1rem; // 16px / 600
+  --wi-size-meta: 0.9375rem; // 15px / 400 — absolute floor
+
+  --wi-leading-tight: 1.15;
+  --wi-leading-heading: 1.3;
+  --wi-leading-body: 1.65; // generous: Poppins is geometric, not a reading face
+
+  // Only these three are loaded as WOFF2 (docs/DESIGN.md §4). Do not introduce a
+  // 500 token: an unloaded weight is synthesised by the browser, and faux-bold
+  // Poppins is visibly wrong on exactly the small text where it would be used.
+  --wi-weight-regular: 400;
+  --wi-weight-semibold: 600;
+  --wi-weight-bold: 700;
+
+  --wi-measure: 70ch; // cap on line length for running text
+
+  // ---------------------------------------------------------------------------
+  // SPACING, RADIUS, ELEVATION — 4px base scale
+  // ---------------------------------------------------------------------------
+
+  --wi-space-1: 0.25rem;
+  --wi-space-2: 0.5rem;
+  --wi-space-3: 0.75rem;
+  --wi-space-4: 1rem;
+  --wi-space-6: 1.5rem;
+  --wi-space-8: 2rem;
+  --wi-space-12: 3rem;
+  --wi-space-16: 4rem;
+
+  --wi-radius-sm: 4px;
+  --wi-radius-md: 8px;
+  --wi-radius-lg: 16px; // cards, matching the deck's rounded tiles
+  --wi-radius-pill: 999px;
+
+  --wi-shadow-card: 0 1px 2px rgb(23 44 63 / 8%), 0 4px 12px rgb(23 44 63 / 6%);
+
+  --wi-layout-panel: 20rem; // barrier panel column
+  --wi-layout-breakpoint: 64rem; // 1024px — single column below this
+
+  // Frame motion only. State transitions, nothing ambient.
+  --wi-motion-fast: 120ms;
+  --wi-motion-base: 200ms;
+  --wi-motion-ease: cubic-bezier(0.2, 0, 0.2, 1);
+
+  // ===========================================================================
+  // SIMULATION — Elbwerk, a fictional company
+  //
+  // These must NOT look like WERTE.IT. The visual anonymity is the didactic
+  // point (docs/DESIGN.md §2): a participant should recognise the barrier from
+  // the behaviour, not from the styling.
+  //
+  // Base values pass AA so the accessible variant is genuinely accessible.
+  // ===========================================================================
+
+  --sim-font-family: Arial, Helvetica, sans-serif; // deliberately not Poppins
+  --sim-size-body: 1rem;
+  --sim-leading-body: 1.5;
+
+  --sim-brand: #1f3a5f; // 11.48:1 on white
+  --sim-text: #33475b; // 9.58:1 on white
+  --sim-muted: #5a6b7b; // 5.49:1 on white
+  --sim-surface: #f5f6f7;
+  --sim-border: #d8dde2;
+  --sim-white: #ffffff;
+
+  // Focus inside the simulation. NOT a --wi-* token: the boundary rule at the top of
+  // this file forbids crossing, and a distinct ring reinforces the visual boundary.
+  //
+  // An invisible focus ring is NOT an admissible barrier. The exit link (docs/
+  // ARCHITECTURE.md §5.1) is the safety-critical path and must always be locatable,
+  // in every barrier state. 11.48:1 on white, 10.61:1 on --sim-surface.
+  --sim-focus-ring: var(--sim-brand);
+  --sim-focus-width: 2px;
+  --sim-focus-offset: 2px;
+
+  // The resolved variant must be genuinely accessible, so 2.5.8 applies here too.
+  --sim-target-min: 24px;
+
+  // ---------------------------------------------------------------------------
+  // DELIBERATE FAILURES
+  //
+  // These tokens exist to fail. They are used only while a contrast barrier is
+  // active, and they are kept in their own block so that no automated contrast
+  // fix can quietly repair a barrier, and so that auditing the frame tokens
+  // above remains meaningful on its own (docs/ARCHITECTURE.md §12.2).
+  //
+  // Do not "fix" these values. Do not reuse them anywhere in the frame.
+  // ---------------------------------------------------------------------------
+
+  --sim-fail-text: #8a99a8; // 2.92:1 on white — fails 1.4.3 by design
+  --sim-fail-faint: #b7c2cc; // 1.81:1 on white — fails by design
+}
+
+// =============================================================================
+// SYSTEM PREFERENCES
+// The user's settings override any simulated barrier, without exception
+// (docs/ARCHITECTURE.md §5.5). Whenever a barrier is suppressed this way, the
+// frame shows a note in the simulation bar explaining what would otherwise
+// happen — a lecturer taking a screenshot needs to know why it differs.
+// =============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --wi-motion-fast: 0ms;
+    --wi-motion-base: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :root {
+    // Let the user agent supply colour. Only the focus ring is restated, since
+    // its visibility is a hard requirement rather than a stylistic preference.
+    --wi-focus-ring: Highlight;
+    --wi-focus-ring-inverse: Highlight;
+  }
+}

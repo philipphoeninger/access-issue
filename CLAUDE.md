@@ -1,0 +1,233 @@
+# CLAUDE.md
+
+Guidance for Claude Code when working in this repository.
+
+---
+
+## What this project is
+
+AccessIssue is a static Angular application that simulates real company interfaces
+containing **deliberate accessibility barriers**. Each barrier can be toggled between
+*barrierebehaftet* (active) and *barrierefrei* (resolved). It is teaching material for the
+WERTE.IT qualification module on digital accessibility, commissioned in the context of the
+BSVH (Blinden- und Sehbehindertenverein Hamburg).
+
+The application therefore does two opposite things at once, and the split between them is
+the whole architecture:
+
+- the **frame** — navigation, barrier panel, explanations — is WCAG 2.2 AA, always, no
+  exceptions
+- the **simulation region** is deliberately non-conforming while a barrier is active
+
+If you only remember one thing from this file: **never let a barrier escape the simulation
+region.**
+
+---
+
+## Language convention
+
+| Where | Language |
+| --- | --- |
+| Code, comments, commit messages, `CLAUDE.md`, `ARCHITECTURE.md`, `SPEC_v1.md`, `TESTING.md` | English |
+| `PRD.md`, `UX-COPY.md`, user-facing documentation, all UI strings | German |
+| Conversation with the maintainer | German |
+
+UI strings are German; the keys that hold them are English. `DESIGN.md` is English;
+`UX-COPY.md` is German because WERTE.IT reviews it editorially.
+
+No i18n layer. The application is German-only by decision (`PRD.md` §4).
+
+---
+
+## Commands
+
+```bash
+npm start              # dev server
+npm run build          # production build
+npm test               # unit + component tests (Karma/Jasmine)
+npm run lint           # angular-eslint, template a11y rules as errors
+npx prettier --check . # formatting (printWidth 100, singleQuote)
+npx playwright test    # e2e + accessibility suites
+```
+
+`npm test` resolves Chromium via Puppeteer (`karma.conf.js`), not via a system install or
+`CHROME_BIN`. **`karma.conf.js` only takes effect if `angular.json`'s `test` architect
+target references it via `karmaConfig`** — Angular's test builder otherwise builds its
+Karma config in memory and silently ignores the file. If `npm test` ever reports it can't
+find a browser, check that wiring before touching the file itself.
+
+This project uses the **esbuild-based test builder** (`@angular/build`, not
+`@angular-devkit/build-angular` — that package is intentionally absent, see
+`ARCHITECTURE.md` §7). `karma.conf.js` must therefore stay plain Karma + Jasmine: no
+`'@angular-devkit/build-angular'` framework entry, no
+`@angular-devkit/build-angular/plugins/karma` plugin. Adding either back throws
+`Cannot find module`, or is silently ignored if the package happens to be present.
+
+`karma.conf.js`'s exported config function is `async`, because Puppeteer's
+`executablePath()` returns a Promise rather than a string as of a breaking change. If it
+is ever rewritten as a plain synchronous function, `CHROME_BIN` silently becomes the
+string `"[object Promise]"` and every test run fails to find a browser — a regression
+that is easy to reintroduce and non-obvious to diagnose from the error alone.
+
+Playwright runs Chromium on pull requests. Firefox and WebKit run weekly and on release
+tags (`TESTING.md` §15).
+
+---
+
+## Documents, and which one answers what
+
+Read the relevant one before changing behaviour. Do not re-derive a decision that is
+already recorded.
+
+| Question | Document |
+| --- | --- |
+| Why does this exist, who is it for, what ships | `docs/PRD.md` |
+| How is it built, why this way, what are the invariants | `docs/ARCHITECTURE.md` |
+| Colours, type, layout, focus, target size | `docs/DESIGN.md` |
+| Every German string, terminology, Elbwerk copy | `docs/UX-COPY.md` |
+| What is tested and how | `docs/TESTING.md` |
+| What to build next, in what order | `docs/SPEC_v1.md` |
+| How this project is run | `ai_development_process.md` |
+
+---
+
+## Hard rules
+
+These are not style preferences. Breaking one is a defect, and most of them are invisible
+in a screenshot.
+
+### Boundary
+
+1. **The simulation region never contains an `h1`.** Page `h1` is the scenario title
+   (frame), the region's own heading is `h2`, **all scenario content starts at `h3`**.
+   Broken heading structure is not an admissible barrier.
+2. **Every `id` inside the simulation region carries the `sim-` prefix.** Duplicate ids
+   across the boundary break `for` and `aria-labelledby` in the panel.
+3. **The region declares no `lang` other than the document language**, unless a future
+   barrier deliberately targets SC 3.1.2 — scoped to one element, documented.
+4. **Frame code never reads barrier state to change its own accessibility.** The panel and
+   explanation read state to render *text*; nothing in the frame changes how it is
+   focusable, labelled, or styled because a barrier is active.
+5. **Never use a `--wi-*` token inside the simulation, or a `--sim-*` token in the frame.**
+
+### Barriers
+
+6. **Barriers are implemented by omission, never by interception.** Omit the label, omit
+   the `tabindex`, omit the caption track, use a `<div>` where a `<button>` belongs. Never
+   add a global handler that fights the user agent — no `preventDefault` on `Tab`, no
+   document-level key capture. A real broken page does not intercept; it just fails.
+7. **The exit link always works.** First focusable element in the region, in every barrier
+   state. This is the one safety-critical path in the application.
+8. **A missing focus indicator is never a barrier.** Use `--sim-focus-ring` inside the
+   region. `outline: none` is forbidden everywhere.
+9. **System preferences beat simulated barriers.** `prefers-reduced-motion` and
+   `forced-colors` always win, and the frame shows a note saying what was suppressed and
+   what would otherwise happen.
+10. **Write both variants honestly.** The accessible variant is authored as a competent
+    developer would write it — not as a repair layer bolted onto the broken one. A "fix"
+    applied on top teaches that accessibility is a patch, which is the misconception the
+    module exists to dispel.
+
+### URL contract
+
+11. **`urlKey` values are public API.** They appear in module slides. Add freely; never
+    rename, never reuse, never delete. The snapshot test guards this — when it fails,
+    restore the key rather than update the snapshot.
+12. **`alle` is reserved** and may not be used as a `urlKey`.
+13. **The URL is the source of truth.** Toggling navigates; it does not mutate local
+    state. `replaceUrl: true` on toggles and explanation selection, push on step
+    navigation.
+
+### Content and copy
+
+14. **Do not invent editorial content.** Barrier explanations (problem, affected, standards,
+    solution) come from the WERTE.IT team. Scaffolding text is marked
+    `contentStatus: 'placeholder'` and blocks release, not merge.
+15. **Use the exact strings from `UX-COPY.md`.** If a string is missing, add it there
+    first. Follow the terminology canon (§3): *Barriere*, *aktiv*, *behoben*,
+    *barrierefrei*, *Simulation*, *Szenario*, *Schritt*, *Panel* — one term, one meaning.
+16. **Address the user as "Du" in the frame.** Elbwerk (the fictional company) uses "Sie".
+    The contrast is an intentional boundary signal.
+17. **One counter only**, in the simulation bar, counting *active* barriers. A partially
+    resolved combined barrier counts as active.
+
+---
+
+## Stack and conventions
+
+- **Angular 20**, standalone components, signals, `OnPush`
+- **State**: plain signals in injectable services. No NgRx Store — removed deliberately
+  (`ARCHITECTURE.md` §7). `@ngrx/signals` is present but unused.
+- **Angular Material in the frame only.** Simulation components are hand-written plain
+  HTML and CSS with a system font stack — Material resists being made inaccessible, and
+  fighting it would produce unrealistic markup.
+- **Barrier panel uses checkboxes throughout**, not slide toggles. Combined barriers are a
+  `fieldset` + `legend` + indeterminate parent. `role="switch"` does not accept
+  `aria-checked="mixed"`.
+- **No third-party runtime requests.** Fonts self-hosted, video self-hosted, social embeds
+  simulated with local markup. No analytics, no tracking.
+- **No backend.** Nothing is submitted, stored, or transmitted.
+- **No browser storage** — no `localStorage`, no `sessionStorage`. State lives in the URL.
+- Prettier: `printWidth: 100`, `singleQuote: true`.
+
+---
+
+## Testing expectations
+
+Tests are part of the slice, not a follow-up.
+
+- **Frame gate**: axe scoped to the frame, excluding the simulation region — zero
+  violations, no allowlist, ever.
+- **Barrier assertion**: axe scoped *to* the region — the expected violation must appear
+  when the barrier is active and disappear when resolved. Only for barriers marked
+  `automatedDetection: 'axe'`.
+- **Page-level run**: whole document, restricted to `heading-order`, `duplicate-id-*`,
+  `landmark-*`, `html-has-lang` — this is what enforces the boundary rules above.
+- **Keyboard tests use real key events.** `page.keyboard.press('Tab')` in a loop, reading
+  `document.activeElement`. A simulated trap that a test bypasses with `.focus()` is not
+  being tested.
+- **Never `waitForTimeout`.** Use `page.clock` for the countdown and carousel.
+- **Branch coverage ≥ 95 %** on `url-state.ts`, `barrier-state.service.ts`,
+  `scenario-registry.service.ts`. No global threshold elsewhere.
+
+Roughly **seven of twelve planned barriers are invisible to axe** (`TESTING.md` §2). A
+green pipeline means no regression in the automatable subset — it does not mean the
+application is accessible. Manual passes with NVDA and VoiceOver are the primary evidence.
+
+---
+
+## Lint override you will encounter
+
+`src/app/scenarios/**` disables the template accessibility rules. This is intentional:
+those components contain deliberate barriers, and the linter would otherwise make them
+unbuildable. The override is scoped as narrowly as possible and carries a comment
+explaining why. **Do not widen it, and do not remove it.** Everything outside that path is
+linted with the a11y rules as errors.
+
+---
+
+## Commits
+
+[Conventional Commits](https://www.conventionalcommits.org/), in English:
+
+```
+feat(panel): add indeterminate state for combined barriers
+fix(url-state): ignore keys from other scenarios
+test(exit-link): assert focus leaves region under keyboard trap
+docs(architecture): record zoneless change detection decision
+```
+
+Scopes follow the folder structure: `core`, `frame`, `panel`, `simulation`, `scenarios`,
+`content`, `tokens`, `e2e`.
+
+---
+
+## When something here is wrong
+
+These rules encode decisions made in the documents listed above, each with a recorded
+rationale. If a rule blocks something that seems right, the rule may genuinely be wrong —
+several already changed during review.
+
+Say so and explain the conflict. Do not quietly work around it: an undocumented exception
+to a boundary rule is exactly the kind of defect this project cannot afford, because the
+people it would fail are the people it exists to serve.
