@@ -3,3 +3,37 @@
 html {
   font-family: var(--wi-font-family);
 }
+
+body {
+  margin: 0;
+  background: var(--wi-surface-page);
+  color: var(--wi-text-primary);
+  font-size: var(--wi-size-body);
+  line-height: var(--wi-leading-body);
+  // German compound words ("Bewerbungsprozess") are long, single unbroken
+  // tokens with no soft-wrap opportunity — without this, a heading at 320px
+  // width overflows instead of wrapping (docs/DESIGN.md §8: reflow at 320px
+  // without horizontal scrolling). Inherited, so this covers the whole frame.
+  overflow-wrap: break-word;
+}
+
+// Visible keyboard focus on every frame element (DESIGN.md §5). Explicitly
+// excludes [data-simulation-region] — the boundary marker SimulationRegionComponent
+// will render (slice 4) and the selector docs/TESTING.md §5 run 1 excludes —
+// so a --wi-* ring can never bleed into the simulation by default. The
+// simulation gets its own --sim-focus-ring instead (docs/ARCHITECTURE.md
+// §12.2 token boundary): never rely on component-style specificity alone to
+// keep the two apart.
+a:focus-visible:not([data-simulation-region] *),
+button:focus-visible:not([data-simulation-region] *),
+[tabindex]:focus-visible:not([data-simulation-region] *) {
+  outline: var(--wi-focus-width) solid var(--wi-focus-ring);
+  outline-offset: var(--wi-focus-offset);
+}
+
+// The only programmatic focus allowed to suppress the visible ring: the page
+// h1 focused by FocusManager on route change, which is not user-initiated
+// (docs/ARCHITECTURE.md §9, docs/DESIGN.md §5).
+h1[tabindex='-1']:focus {
+  outline: none;
+}

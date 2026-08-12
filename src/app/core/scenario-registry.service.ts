@@ -4,8 +4,13 @@ import { CSR_CAMPAIGN_SCENARIO } from '../content/csr-campaign/csr-campaign.scen
 import { SOFTWARE_PROCUREMENT_SCENARIO } from '../content/software-procurement/software-procurement.scenario';
 import type { Barrier, Scenario, ScenarioStep } from '../models/domain.model';
 
-/** All scenarios known to the application — available and planned alike. */
-const SCENARIOS: readonly Scenario[] = [
+/**
+ * All scenarios known to the application — available and planned alike.
+ * Exported (not just wrapped by the service below) because route generation
+ * (core/scenario-routes.ts) needs the list before the router — and therefore
+ * DI — exists.
+ */
+export const SCENARIOS: readonly Scenario[] = [
   APPLICATION_PROCESS_SCENARIO,
   CSR_CAMPAIGN_SCENARIO,
   SOFTWARE_PROCUREMENT_SCENARIO,

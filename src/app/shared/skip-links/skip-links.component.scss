@@ -1,0 +1,27 @@
+// Off-screen until focused, not display:none — the links stay in the tab
+// order at all times, and only become visible when a keyboard user reaches
+// them (docs/DESIGN.md §5, §8: visible keyboard focus on every element).
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: var(--wi-space-4);
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--wi-target-min);
+  padding: var(--wi-space-2) var(--wi-space-4);
+  background: var(--wi-navy);
+  color: var(--wi-text-on-inverse);
+  font-family: var(--wi-font-family);
+  font-size: var(--wi-size-control);
+  font-weight: var(--wi-weight-semibold);
+  text-decoration: none;
+  border-radius: var(--wi-radius-sm);
+  transition: top var(--wi-motion-fast) var(--wi-motion-ease);
+
+  &:focus-visible {
+    top: var(--wi-space-4);
+    outline: var(--wi-focus-width) solid var(--wi-focus-ring-inverse);
+    outline-offset: var(--wi-focus-offset);
+  }
+}

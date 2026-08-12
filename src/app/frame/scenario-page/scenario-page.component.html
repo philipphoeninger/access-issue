@@ -1,0 +1,18 @@
+<h1>{{ scenario().title }}</h1>
+<p class="step-indicator">{{ stepIndicator() }}</p>
+
+@if (hasMultipleSteps()) {
+  <nav class="step-nav" aria-label="Schritte in diesem Szenario">
+    @if (previousStep(); as prev) {
+      <a [routerLink]="stepLink(prev)">Zurück zu: {{ prev.title }}</a>
+    }
+    @if (nextStep(); as next) {
+      <a [routerLink]="stepLink(next)">Weiter zu: {{ next.title }}</a>
+    }
+  </nav>
+}
+
+<div class="scenario-layout">
+  <div class="panel-column" id="panel"></div>
+  <div class="simulation-column"></div>
+</div>

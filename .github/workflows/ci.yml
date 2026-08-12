@@ -39,8 +39,22 @@ jobs:
         # on that option in karma.conf.js for why it cannot work here.
         run: node scripts/check-coverage.js
 
-      # The Playwright suites (frame gate, barrier assertions, page-level rules, exit
-      # link) land with the slices that give them something to test — SPEC_v1.md slice 0.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # Frame gate and page-level rules only at this point (docs/SPEC_v1.md
+      # Slice 3). Barrier assertions and the exit-link suite land with the
+      # slices that give them something to test (Slice 4 onward).
+      - name: Playwright
+        run: npx playwright test --project=chromium
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 
   # Release gate, not a merge gate (docs/SPEC_v1.md §4.1). Runs only on a
   # version tag push, so ordinary PRs and main-branch pushes are unaffected.

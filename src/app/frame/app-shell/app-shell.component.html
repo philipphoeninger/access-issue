@@ -1,0 +1,22 @@
+<app-skip-links [hasPanel]="hasPanel()" />
+
+<header class="site-header">
+  <div class="brand">
+    <p class="project-name">WERTE.IT</p>
+    <p class="tool-name">AccessIssue</p>
+    <p class="tagline">Barrieren sehen, verstehen, beheben</p>
+  </div>
+
+  <nav class="scenario-nav" aria-label="Szenarien">
+    <a routerLink="/">Startseite</a>
+    @for (scenario of availableScenarios(); track scenario.id) {
+      <a [routerLink]="scenarioLink(scenario)">{{ scenario.title }}</a>
+    }
+  </nav>
+</header>
+
+<main id="content">
+  <router-outlet />
+</main>
+
+<div appVisuallyHidden aria-live="polite" aria-atomic="true">{{ announcer.message() }}</div>

@@ -1,0 +1,44 @@
+<h1>AccessIssue: Barrieren sichtbar machen</h1>
+<p class="intro">
+  Nachgebaute Oberflächen aus dem Unternehmensalltag, wie es sie tausendfach gibt. In jeder stecken
+  Barrieren. Du kannst sie einzeln abschalten und siehst sofort, was sich ändert — und für wen.
+</p>
+
+<section aria-labelledby="how-it-works-h2">
+  <h2 id="how-it-works-h2">So funktioniert es</h2>
+  <ol>
+    <li>Wähle ein Szenario. Du siehst die Website eines fiktiven Unternehmens.</li>
+    <li>Im Barriere-Panel steht jeder Eintrag für eine Barriere, die gerade aktiv ist.</li>
+    <li>
+      Schalte eine Barriere auf barrierefrei. Die Oberfläche ändert sich, und du erfährst, worum es
+      ging.
+    </li>
+  </ol>
+</section>
+
+<section aria-labelledby="note-h2">
+  <h2 id="note-h2">Was du hier siehst</h2>
+  <p>
+    Die simulierten Seiten sehen bewusst unauffällig aus. Genau das ist der Punkt: Barrieren erkennt
+    man einer Website meistens nicht an. Wer nicht betroffen ist, bemerkt sie nicht.
+  </p>
+</section>
+
+<section aria-labelledby="scenarios-h2">
+  <h2 id="scenarios-h2">Szenarien</h2>
+  <ul class="scenario-list">
+    @for (scenario of scenarios(); track scenario.id) {
+      <li class="scenario-card">
+        <h3>{{ scenario.title }}</h3>
+        <p>{{ scenario.summary }}</p>
+        @if (isAvailable(scenario)) {
+          <p class="barrier-count">{{ barrierCountLabel(scenario) }}</p>
+          <a [routerLink]="openLink(scenario)">Szenario öffnen</a>
+        } @else {
+          <p class="planned-badge">In Vorbereitung</p>
+          <p>Dieses Szenario wird gerade erarbeitet und ist noch nicht verfügbar.</p>
+        }
+      </li>
+    }
+  </ul>
+</section>

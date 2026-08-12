@@ -153,4 +153,19 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     const paths = scenarios.map((scenario) => scenario.path);
     expect(new Set(paths).size).toBe(paths.length);
   });
+
+  // core/scenario-routes.ts (firstStepPath, buildScenarioRoutes) reads
+  // scenario.steps[0] unconditionally for every 'available' scenario — an
+  // available scenario with an empty steps array would crash routing and
+  // the home page's scenario list. ARCHITECTURE.md §6 already documents the
+  // invariant ("a single-page scenario is modelled as a scenario with one
+  // step"); this test is what actually enforces it.
+  it('gives every available scenario at least one step', () => {
+    for (const scenario of scenarios) {
+      if (scenario.status !== 'available') {
+        continue;
+      }
+      expect(scenario.steps.length).withContext(scenario.path).toBeGreaterThan(0);
+    }
+  });
 });
