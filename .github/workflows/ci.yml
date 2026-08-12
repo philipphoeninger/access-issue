@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+    tags: ['v*']
 
 jobs:
   build-and-test:
@@ -28,7 +29,36 @@ jobs:
         run: npm run build
 
       - name: Unit and component tests
-        run: npx ng test --watch=false --browsers=ChromeHeadless
+        # --code-coverage generates coverage/access-issue/lcov.info.
+        # The content-release-gate spec stays pending here on purpose — it is
+        # a release gate, not a merge gate (docs/SPEC_v1.md §4.1).
+        run: npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
+
+      - name: Branch-coverage gate (docs/TESTING.md §14)
+        # Not karma-coverage's own coverageReporter.check — see the comment
+        # on that option in karma.conf.js for why it cannot work here.
+        run: node scripts/check-coverage.js
 
       # The Playwright suites (frame gate, barrier assertions, page-level rules, exit
       # link) land with the slices that give them something to test — SPEC_v1.md slice 0.
+
+  # Release gate, not a merge gate (docs/SPEC_v1.md §4.1). Runs only on a
+  # version tag push, so ordinary PRs and main-branch pushes are unaffected.
+  # Fails loudly if any barrier's editorial prose is still WERTE.IT
+  # scaffolding (`contentStatus: 'placeholder'`) — see
+  # src/app/content/content-release-gate.spec.ts.
+  content-release-gate:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Content release gate
+        run: npm run test:release-gate

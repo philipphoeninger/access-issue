@@ -8,6 +8,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:release-gate": "CONTENT_RELEASE_GATE=1 ng test --watch=false",
+    "test:coverage-gate": "ng test --watch=false --code-coverage && node scripts/check-coverage.js",
     "lint": "ng lint",
     "e2e": "playwright test"
   },
