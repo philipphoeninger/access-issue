@@ -17,6 +17,16 @@ describe('ScenarioRegistry', () => {
     );
   });
 
+  // The home page renders scenarios in registry order, and that order is the
+  // module deck's presentation order — application process, software
+  // procurement, CSR campaign (docs/ARCHITECTURE.md §21). Without this
+  // assertion, appending or re-sorting SCENARIOS silently puts the home page
+  // out of step with the slides lecturers are reading from.
+  it('keeps scenarios in the module deck presentation order', () => {
+    const paths = registry.getAll().map((scenario) => scenario.path);
+    expect(paths).toEqual(['bewerbung', 'softwarebeschaffung', 'csr-kampagne']);
+  });
+
   it('looks up a scenario by path', () => {
     expect(registry.getScenario('bewerbung')?.id).toBe('application-process');
     expect(registry.getScenario('unbekannt')).toBeUndefined();

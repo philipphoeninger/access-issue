@@ -10,10 +10,13 @@ import type { Barrier, Scenario, ScenarioStep } from '../models/domain.model';
  * (core/scenario-routes.ts) needs the list before the router — and therefore
  * DI — exists.
  */
+// Order is the module deck's presentation order, which the home page renders
+// verbatim (docs/ARCHITECTURE.md §21): application process, software
+// procurement, CSR campaign — not implementation order.
 export const SCENARIOS: readonly Scenario[] = [
   APPLICATION_PROCESS_SCENARIO,
-  CSR_CAMPAIGN_SCENARIO,
   SOFTWARE_PROCUREMENT_SCENARIO,
+  CSR_CAMPAIGN_SCENARIO,
 ];
 
 /**

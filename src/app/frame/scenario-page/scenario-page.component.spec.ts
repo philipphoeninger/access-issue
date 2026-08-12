@@ -35,7 +35,7 @@ describe('ScenarioPageComponent (docs/SPEC_v1.md Slice 3)', () => {
     const fixture = setup({ scenarioPath: 'bewerbung', stepPath: 'formular', hasPanel: true });
 
     const indicator: HTMLElement = fixture.nativeElement.querySelector('.step-indicator');
-    expect(indicator.textContent?.trim()).toBe('Schritt 2 von 2');
+    expect(indicator.textContent?.trim()).toBe('Schritt 2 von 4');
   });
 
   it('links forward from step 1 and has no back link', () => {
@@ -53,13 +53,13 @@ describe('ScenarioPageComponent (docs/SPEC_v1.md Slice 3)', () => {
   });
 
   it('links back from the last step and has no forward link', () => {
-    const fixture = setup({ scenarioPath: 'bewerbung', stepPath: 'formular', hasPanel: true });
+    const fixture = setup({ scenarioPath: 'bewerbung', stepPath: 'rueckmeldung', hasPanel: true });
 
     const links: HTMLAnchorElement[] = Array.from(
       fixture.nativeElement.querySelectorAll('.step-nav a'),
     );
     expect(links.length).toBe(1);
-    expect(links[0].textContent?.trim()).toBe('Zurück zu: Stellenanzeige');
+    expect(links[0].textContent?.trim()).toBe('Zurück zu: Unterlagen hochladen');
   });
 
   it('renders a panel-column skip target for SkipLinksComponent', () => {

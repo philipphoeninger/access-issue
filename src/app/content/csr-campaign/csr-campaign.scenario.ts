@@ -8,8 +8,9 @@ export const CSR_CAMPAIGN_SCENARIO: Scenario = {
   id: 'csr-campaign',
   path: 'csr-kampagne',
   title: 'CSR-Kampagne',
+  // docs/UX-COPY.md §5.2 `scenario.csr.summary`.
   summary:
-    'Die Spendenkampagne eines Unternehmens: Video, Fortschrittsbalken, Countdown, Spendenformular. Die Barrieren stecken überwiegend in Medien und Bewegung.',
+    'Die Kampagne „Inklusiv. Nachhaltig. Sichtbar." mit Video, Spendenaufruf, Social Media und Event. Die Barrieren stecken überwiegend in Medien, Sprache und Bewegung.',
   status: 'planned',
   steps: [],
   barriers: [],

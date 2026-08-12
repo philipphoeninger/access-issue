@@ -17,8 +17,11 @@ function wcag(
   return { standard: 'WCAG_2_2', criterion, level, title };
 }
 
+export const WCAG_1_1_1 = wcag('1.1.1', 'A', 'Nicht-Text-Inhalte');
 export const WCAG_1_3_1 = wcag('1.3.1', 'A', 'Info und Beziehungen');
 export const WCAG_1_3_2 = wcag('1.3.2', 'A', 'Sinnvolle Reihenfolge');
+export const WCAG_1_4_1 = wcag('1.4.1', 'A', 'Benutzung von Farbe');
+export const WCAG_1_4_5 = wcag('1.4.5', 'AA', 'Bilder eines Textes');
 export const WCAG_2_1_1 = wcag('2.1.1', 'A', 'Tastatur');
 export const WCAG_2_1_2 = wcag('2.1.2', 'A', 'Keine Tastaturfalle');
 export const WCAG_3_1_5 = wcag('3.1.5', 'AAA', 'Lesbarkeit');

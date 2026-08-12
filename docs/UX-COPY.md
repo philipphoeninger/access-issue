@@ -2,7 +2,7 @@
 
 **Projekt:** AccessIssue
 **Grundlagen:** `docs/PRD.md` (v1.1), `docs/ARCHITECTURE.md` (v1.1), `docs/DESIGN.md` (v1)
-**Status:** Entwurf v1.2 — nachgeführt nach dem Barrierefreiheits-Review
+**Status:** Entwurf v2.0 — überarbeitet nach der fertigen Modulpräsentation
 **Stand:** August 2026
 
 > **Sprache dieses Dokuments.** Deutsch, abweichend von `ARCHITECTURE.md`, `TESTING.md`
@@ -138,11 +138,11 @@ betreten zu haben, will praktisch niemand — der Link ist dafür da, einen Bere
 | Schlüssel | Text |
 | --- | --- |
 | `scenario.application.title` | Bewerbungsprozess |
-| `scenario.application.summary` | Eine Stellenanzeige und ein Bewerbungsformular. Die Barrieren summieren sich über zwei Schritte auf, bis die Bewerbung scheitert. |
-| `scenario.csr.title` | CSR-Kampagne |
-| `scenario.csr.summary` | Die Spendenkampagne eines Unternehmens: Video, Fortschrittsbalken, Countdown, Spendenformular. Die Barrieren stecken überwiegend in Medien und Bewegung. |
+| `scenario.application.summary` | Eine Stellenanzeige, ein Bewerbungsformular, der Upload der Unterlagen und die Rückmeldung. Die Barrieren summieren sich über vier Schritte auf, bis die Bewerbung scheitert. |
 | `scenario.procurement.title` | Softwarebeschaffung |
-| `scenario.procurement.summary` | Wie Barrierefreiheit beim Einkauf von Software verloren geht. Dieses Szenario ist in Vorbereitung. |
+| `scenario.procurement.summary` | Ein Ticketsystem wird eingekauft — nach Funktionsumfang, Bedienbarkeit und Preis. Erst im Arbeitsalltag zeigt sich, wer es nicht nutzen kann. |
+| `scenario.csr.title` | CSR-Kampagne |
+| `scenario.csr.summary` | Die Kampagne „Inklusiv. Nachhaltig. Sichtbar." mit Video, Spendenaufruf, Social Media und Event. Die Barrieren stecken überwiegend in Medien, Sprache und Bewegung. |
 | `scenario.barrierCount` | {count} Barrieren |
 
 **Keine Zahlen im Fließtext.** Ein früherer Entwurf schrieb „Fünf Barrieren" und „Sechs
@@ -165,6 +165,10 @@ für aufgezählte URLs beschreibt, nur in der Copy.
 | `scenario.stepsNavLabel` | Schritte in diesem Szenario |
 | `application.step1.title` | Stellenanzeige |
 | `application.step2.title` | Bewerbungsformular |
+| `application.step3.title` | Unterlagen hochladen |
+| `application.step4.title` | Rückmeldung |
+| `procurement.stepA.title` | Vergabeunterlagen |
+| `procurement.stepB.title` | Das eingeführte Ticketsystem |
 
 Die Schrittbeschriftung nennt immer das Ziel, nie nur die Richtung. „Weiter" allein ist
 für Screenreader-Nutzer wertlos, wenn mehrere Links auf einer Seite so heißen.
@@ -215,27 +219,97 @@ abgekürzt: „Verlassen" allein sagt nicht, wohin.
 | `panel.explainLink` | Was bedeutet das? |
 | `panel.combinedHint` | Diese Barriere hat zwei Teile. Erst wenn beide behoben sind, ist der Inhalt barrierefrei. |
 
-**Beschriftungen der Kontrollkästchen** — Zustandsform nach Abschnitt 4:
+**Beschriftungen der Kontrollkästchen** — Zustandsform nach Abschnitt 4, gruppiert nach
+Schritt, mit Fachbereich als Kennzeichnung (`ARCHITECTURE.md` §12.1.1):
 
-| Barriere | Beschriftung |
-| --- | --- |
-| PDF-Stellenanzeige | Stellenanzeige als Text auf der Seite |
-| Komplexe Sprache | Stellenbeschreibung in klarer Sprache |
-| Fehlende Labels | Formularfelder mit Beschriftungen |
-| Keine Tastaturbedienung | Formular per Tastatur bedienbar |
-| Kein Fehler-Feedback | Verständliche Fehlermeldungen |
-| Video (Sammelbegriff) | Video barrierefrei |
-| → Teil: Untertitel | Untertitel vorhanden |
-| → Teil: Transkript | Transkript vorhanden |
-| Fortschrittsbalken | Spendenstand als Text lesbar |
-| Social-Media-Einbettung | Bilder mit Alternativtexten und gutem Kontrast |
-| Countdown | Countdown wird vorgelesen |
-| Spenden-Slider | Betrag auch als Eingabefeld |
-| Karussell | Karussell mit Pause-Schaltfläche |
+*Bewerbungsprozess — Schritt 1: Stellenanzeige*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Textgrafik | Gehalt und Leistungen als Text, nicht als Bild | Kommunikation |
+| Komplexe Sprache | Stellenbeschreibung in klarer Sprache | Kommunikation |
+
+*Schritt 2: Bewerbungsformular*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Fehlende Labels | Formularfelder mit Beschriftungen | IT |
+| Keine Tastaturbedienung | Formular per Tastatur bedienbar | IT |
+| Pflichtfeld-Kennzeichnung | Pflichtfelder erkennbar benannt | Personal |
+| Kein Fehler-Feedback | Verständliche Fehlermeldungen | IT |
+
+*Schritt 3: Dokumente*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| PDF-Stellenanzeige | Stellenanzeige als Text auf der Seite | Personal |
+| Upload-Formate | Zulässige Dateiformate und Größen angegeben | Personal |
+
+*Schritt 4: Rückmeldung*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Bestätigungstext | Bestätigung in verständlicher Sprache | Kommunikation |
+| Ansprechperson | Ansprechperson mit Namen und Kontakt genannt | Personal |
+| Inklusionshinweis | Hinweis, dass Anpassungen möglich sind | Personal |
+
+*Softwarebeschaffung — Teil A: Vergabe*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Lastenheft | Barrierefreiheit im Lastenheft gefordert | Beschaffung |
+| Nachweispflicht | Nachweis der Barrierefreiheit verlangt | Beschaffung |
+| Praxistest | Praxistest mit Nutzern von Hilfsmitteln | Beschaffung |
+| Zuständigkeit | Zuständigkeit für Barrierefreiheit benannt | Management |
+
+*Teil B: Ticketsystem*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Tastatur im System | Alle Bedienelemente per Tastatur erreichbar | IT |
+| Screenreader-Erfassung | Tabellen und Status für Screenreader lesbar | IT |
+| Kontrast im System | Ausreichende Farbkontraste | IT |
+
+*CSR-Kampagne*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Video (Sammelbegriff) | Video barrierefrei | Kommunikation |
+| → Teil: Untertitel | Untertitel vorhanden | Kommunikation |
+| → Teil: Transkript | Transkript vorhanden | Kommunikation |
+| Anglizismen | Kampagnentext verständlich, mit Leichter Sprache | Kommunikation |
+| Emojis | Emojis ergänzen den Text, statt ihn zu ersetzen | Kommunikation |
+| Social-Media-Einbettung | Bilder mit Alternativtexten und gutem Kontrast | Kommunikation |
+| Event-Angaben | Angaben zu Zugang und Dolmetschung beim Event | CSR |
+| Fortschrittsbalken | Spendenstand als Text lesbar | IT |
+| Countdown | Countdown wird vorgelesen | IT |
+| Spenden-Slider | Betrag auch als Eingabefeld | IT |
+| Karussell | Karussell mit Pause-Schaltfläche | IT |
 
 Die Beschriftung benennt jeweils die **barrierefreie** Eigenschaft, weil das der Zustand
 ist, den der Haken herstellt. Sie beschreibt keine Handlung und keinen Normverstoß —
 die Einordnung leistet der Erklärungsbereich.
+
+**Bereichs-Zusammenfassung unter dem Panel.** Ein Satz, immer sichtbar, der die Kernaussage
+von Kapitel 3 trägt:
+
+| Schlüssel | Text |
+| --- | --- |
+| `panel.areaSummary` | Diese {count} Barrieren stammen aus {areaCount} Bereichen: {areas}. |
+| `panel.areaSummary.single` | Alle {count} Barrieren stammen aus einem Bereich: {area}. |
+| `panel.groupLabel` | Barrieren in diesem Schritt |
+| `area.personal` | Personal |
+| `area.kommunikation` | Kommunikation |
+| `area.it` | IT |
+| `area.beschaffung` | Beschaffung |
+| `area.management` | Management |
+| `area.csr` | CSR |
+
+Beispiel: „Diese 11 Barrieren stammen aus 3 Bereichen: Personal, Kommunikation, IT."
+
+Der Satz steht bewusst als Fließtext und nicht als Gruppierung. Wer eine nach Bereichen
+gruppierte Liste sieht, muss die Überschriften selbst zählen, um die Aussage zu bemerken.
+Ein Satz sagt sie.
 
 **Es gibt genau einen Zähler, und er zählt aktive Barrieren.** Ein früherer Entwurf hatte
 zwei: im Panel „{resolved} von {total} behoben", in der Simulationsleiste „{active} von
@@ -288,6 +362,15 @@ Teil, der zählt.
 | `explanation.currentlyActive` | Diese Barriere ist gerade aktiv. |
 | `explanation.currentlyResolved` | Diese Barriere ist behoben. |
 | `explanation.standardLevel` | Stufe {level} |
+| `explanation.noStandard.h3` | Was sagen die Normen? |
+| `explanation.noStandard.body` | Zu dieser Barriere gibt es kein passendes Erfolgskriterium. Sie verstößt gegen keine Norm — und schließt trotzdem Menschen aus. Barrierefreiheit ist mehr als das Erfüllen von Vorgaben. |
+| `explanation.responsibleArea` | Zuständiger Bereich: {area} |
+
+**Barrieren ohne Normbezug behalten die Rubrik.** Fünf der 27 Barrieren verletzen kein
+WCAG-Kriterium (`PRD.md` §6.1, §6.2, §6.3). Die Rubrik „Was sagen die Normen?" wird bei
+ihnen nicht weggelassen, sondern beantwortet — mit der Feststellung, dass es keinen
+Normbezug gibt. Das Weglassen würde wie ein Redaktionsversehen wirken; die ausdrückliche
+Antwort ist der Lerninhalt.
 
 Der Fragesatz als Rubriktitel ist Absicht: Er benennt, was der Abschnitt beantwortet, und
 liest sich in der Screenreader-Überschriftenliste als sinnvolle Einheit. „Problem",
@@ -508,6 +591,116 @@ Fehlermeldungen. Nur eine sagt, was zu tun ist.
 
 ---
 
+### 8.6 Schritt 1 — Barriere „Textgrafik"
+
+**Aktiv:** Gehalt, Leistungen und Ablauf stehen ausschließlich in einer Grafik, ohne
+Alternativtext oder mit einem nichtssagenden (`grafik_benefits_final.png`).
+
+**Behoben:** dieselben Angaben als Text mit Überschrift und Liste; die Grafik bleibt als
+`aria-hidden` Dekoration erhalten.
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.job.benefits.h3` | Was wir bieten |
+| `elbwerk.job.benefits.items` | 30 Urlaubstage · Gleitzeit · Jobrad · Zuschuss zum Deutschlandticket · Betriebliche Altersvorsorge |
+| `elbwerk.job.salary` | Vergütung nach Haustarif, Entgeltgruppe 8 (44.000 – 52.000 € brutto/Jahr) |
+| `elbwerk.job.graphicAlt` | Übersicht der Leistungen: 30 Urlaubstage, Gleitzeit, Jobrad, Zuschuss zum Deutschlandticket, betriebliche Altersvorsorge. |
+
+Die Gehaltsangabe ist Absicht: Wenn ausgerechnet sie in einer Grafik steckt, ist die
+Auswirkung unmittelbar einleuchtend.
+
+### 8.7 Schritt 2 — Barriere „Pflichtfelder"
+
+**Aktiv:** Pflichtfelder sind nur durch ein rotes Sternchen markiert, ohne Legende, ohne
+`required`, ohne Erwähnung im Beschriftungstext.
+
+**Behoben:** Legende über dem Formular, das Wort „Pflichtfeld" in der Beschriftung,
+`required` gesetzt.
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.form.requiredLegend` | Mit „Pflichtfeld" gekennzeichnete Felder müssen ausgefüllt werden. |
+| `elbwerk.form.requiredSuffix` | (Pflichtfeld) |
+
+Der Kontrast: `Vorname *` gegen `Vorname (Pflichtfeld)`. Ein Screenreader liest im ersten
+Fall „Vorname Stern" oder gar nichts.
+
+### 8.8 Schritt 3 — Unterlagen hochladen
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.upload.h2` | Unterlagen hochladen |
+| `elbwerk.upload.intro` | Bitte laden Sie Ihre vollständigen Bewerbungsunterlagen hoch. |
+| `elbwerk.upload.cvLabel` | Lebenslauf |
+| `elbwerk.upload.certLabel` | Zeugnisse |
+| `elbwerk.upload.submit` | Unterlagen übermitteln |
+
+**Barriere „Upload-Formate" aktiv:** keine Angabe, welche Formate und Größen zulässig sind;
+Fehlermeldung erst nach dem Absenden, ohne Nennung des Grundes.
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.upload.errorGeneric` | Upload fehlgeschlagen. Bitte versuchen Sie es erneut. |
+
+**Behoben:** Formate, Größe und Hinweis zur Struktur stehen vor dem Auswahlfeld.
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.upload.formatHint` | Zulässig sind PDF, DOCX und ODT bis 10 MB je Datei. |
+| `elbwerk.upload.structureHint` | Bitte verwenden Sie in Ihren Dokumenten echte Überschriften statt vergrößerter Textzeilen. Das erleichtert uns die Auswertung — und Ihnen die Wiederverwendung. |
+| `elbwerk.upload.error.format` | Die Datei „{name}" hat das Format {ext}. Zulässig sind PDF, DOCX und ODT. |
+| `elbwerk.upload.error.size` | Die Datei „{name}" ist {size} groß. Erlaubt sind bis zu 10 MB. |
+
+`elbwerk.upload.structureHint` ist die einzige Stelle, an der Elbwerk im behobenen Zustand
+selbst etwas über Barrierefreiheit sagt. Das ist bewusst: Es zeigt, dass ein Unternehmen
+Zugänglichkeit auch nach außen weitergeben kann, ohne belehrend zu wirken.
+
+### 8.9 Schritt 4 — Rückmeldung
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.confirm.h2` | Ihre Bewerbung ist eingegangen |
+
+**Barriere „Bestätigungstext" aktiv** — Textbaustein-Deutsch, zentrale Angaben nur in einer
+Bildsignatur:
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.confirm.bodyComplex` | Wir bestätigen den Eingang Ihrer Bewerbungsunterlagen und danken Ihnen für Ihr Interesse an einer Tätigkeit in unserem Hause. Nach Abschluss der Sichtung sämtlicher eingegangener Bewerbungen werden wir uns unaufgefordert mit Ihnen in Verbindung setzen. Von zwischenzeitlichen Rückfragen zum Bearbeitungsstand bitten wir abzusehen. |
+| `elbwerk.confirm.signatureImageAlt` | *(fehlt bei aktiver Barriere)* |
+
+**Behoben** — klare Sprache, Angaben als Text:
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.confirm.bodyPlain` | Vielen Dank für Ihre Bewerbung. Wir haben Ihre Unterlagen erhalten. Wir sichten alle Bewerbungen bis zum 15. September und melden uns danach bei Ihnen. Sie müssen nichts weiter tun. |
+| `elbwerk.confirm.nextSteps.h3` | Wie es weitergeht |
+| `elbwerk.confirm.nextSteps.items` | Wir prüfen Ihre Unterlagen · Bei einer Einladung erhalten Sie eine E-Mail mit Terminvorschlägen · Das Gespräch dauert etwa eine Stunde und findet in Wilhelmsburg oder online statt |
+
+**Barriere „Ansprechperson"** — aktiv: nur ein Verweis auf `bewerbung@elbwerk.de`, kein
+Name, kein Telefon. Behoben:
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.confirm.contact.h3` | Ihre Ansprechperson |
+| `elbwerk.confirm.contact.body` | Miriam Kessler, Personalabteilung. Telefon 040 555 0123, erreichbar montags bis donnerstags von 9 bis 15 Uhr. E-Mail: m.kessler@elbwerk.de |
+
+**Barriere „Inklusionshinweis"** — aktiv: fehlt ersatzlos. Behoben:
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.confirm.inclusion.h3` | Sie brauchen etwas anderes? |
+| `elbwerk.confirm.inclusion.body` | Wenn Sie für das Bewerbungsgespräch eine Anpassung benötigen — etwa Unterlagen in einem bestimmten Format, mehr Zeit, eine Gebärdensprachdolmetschung oder einen barrierefreien Zugang — sagen Sie uns einfach Bescheid. Das hat keinen Einfluss auf die Bewertung Ihrer Bewerbung. |
+
+Der letzte Satz ist der wichtigste im ganzen Szenario. Ohne ihn ist der Hinweis eine Falle:
+Wer nicht sicher ist, ob eine Anfrage ihm schadet, fragt nicht.
+
+Beide Barrieren dieses Schritts verletzen **kein** WCAG-Kriterium. Der Erklärungsbereich
+muss das ausdrücklich benennen (Abschnitt 5.8) — dass eine Seite normkonform sein und
+trotzdem ausschließen kann, ist der Kern dieses Schritts.
+
+---
+
 ## 9. Elbwerk-Texte: CSR-Kampagne
 
 ### 9.1 Seitenrahmen
@@ -630,6 +823,80 @@ der automatische Wechsel unterbleibt.
 
 ---
 
+### 9.8 Barriere „Anglizismen und Leichte Sprache"
+
+**Aktiv** — Kampagnentext im Marketing-Jargon:
+
+> Mit unserem Purpose-driven Impact-Programm committen wir uns zu nachhaltigem
+> Stakeholder-Value. Unsere Diversity-&-Inclusion-Roadmap adressiert Barrieren im
+> Community-Umfeld und schafft messbare Social Impact-KPIs entlang der gesamten
+> Wertschöpfungskette.
+
+**Behoben** — verständliche Fassung plus eigenständige Fassung in Leichter Sprache:
+
+> Wir unterstützen Projekte in unserem Stadtteil. In diesem Jahr sammeln wir Geld für den
+> Nachbarschaftstreff an der Veringstraße. Dort treffen sich Menschen aus dem Viertel, es
+> gibt Hausaufgabenhilfe und einen Mittagstisch.
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.plainLanguage.toggle` | Diesen Text in Leichter Sprache lesen |
+| `csr.plainLanguage.h3` | Die Aktion in Leichter Sprache |
+| `csr.plainLanguage.body` | Elbwerk ist eine Firma in Hamburg. Elbwerk sammelt Geld. Das Geld ist für den Nachbarschafts-Treff. Der Treff ist ein Haus im Stadt-Teil Wilhelmsburg. Dort treffen sich Menschen. Kinder bekommen Hilfe bei den Haus-Aufgaben. Es gibt jeden Tag ein warmes Mittag-Essen. Der Treff braucht neue Stühle und Tische. Dafür sammeln wir 12.000 Euro. |
+
+Leichte Sprache ist kein vereinfachter Fließtext, sondern ein eigenes Regelwerk: kurze
+Sätze, ein Gedanke pro Satz, Bindestriche in zusammengesetzten Wörtern, keine Metaphern.
+Die Fassung oben folgt diesen Regeln annähernd — sie ist ein Platzhalter und **muss** vor
+Veröffentlichung von einer Fachstelle für Leichte Sprache geprüft werden. Eine schlecht
+gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine.
+
+### 9.9 Barriere „Emojis"
+
+**Aktiv** — Emojis tragen die Information, statt sie zu begleiten:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.social.emojiPost` | Aktionstag im Treff 🎉🎉🎉 Schon 8️⃣0️⃣% 🙌 Jetzt mitmachen 👉 Link in Bio ❤️♿ |
+
+Ein Screenreader liest daraus: *„Party-Popper, Party-Popper, Party-Popper, Schon,
+Ziffer acht, Ziffer null, Prozent, erhobene Hände, Jetzt mitmachen, nach rechts zeigende
+Hand, Link in Bio, rotes Herz, Rollstuhlsymbol."* Die Prozentzahl ist verloren, das
+Rollstuhlsymbol soll Inklusion signalisieren und ist nicht einmal beschriftet.
+
+**Behoben:**
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.social.plainPost` | Aktionstag im Nachbarschaftstreff: Wir haben 80 Prozent des Spendenziels erreicht. Machen Sie mit — der Link steht in unserem Profil. 🎉 |
+
+Ein Emoji bleibt stehen. Das ist Absicht: Die Lehre ist nicht „Emojis sind schlecht",
+sondern „Emojis dürfen keine Information tragen". Ein schmückendes Emoji nach einem
+vollständigen Satz ist unproblematisch.
+
+### 9.10 Barriere „Event-Angaben"
+
+**Aktiv** — die Einladung nennt Ort und Zeit, sonst nichts:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.h3` | Podiumsdiskussion „Inklusiv. Nachhaltig. Sichtbar." |
+| `csr.event.basics` | Donnerstag, 24. September 2026, 18 Uhr, Nachbarschaftstreff Veringstraße, Hamburg-Wilhelmsburg |
+| `csr.event.registration` | Anmeldung bis zum 20. September per E-Mail an event@elbwerk.de |
+
+**Behoben** — die Angaben, die über eine Teilnahme entscheiden:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.access.h4` | Barrierefreiheit der Veranstaltung |
+| `csr.event.access.items` | Stufenloser Zugang über den Haupteingang, Aufzug vorhanden · Barrierefreie Toilette im Erdgeschoss · Gebärdensprachdolmetschung (DGS) durchgehend · Schriftdolmetschung auf einer Leinwand neben dem Podium · Induktive Höranlage im Saal · Reservierte Plätze in der ersten Reihe für Rollstuhlnutzende und für Menschen, die auf gute Sicht zur Dolmetschung angewiesen sind |
+| `csr.event.access.contact` | Sie brauchen etwas, das hier nicht steht? Melden Sie sich bei Torben Kruse, Telefon 040 555 0188. Wir versuchen es möglich zu machen. |
+
+Dies ist die zweite organisatorische Barriere im Werkzeug und die anschaulichste: Es fehlt
+keine Zeile Code. Es fehlt eine Information, die jemand hätte aufschreiben müssen — und
+ohne die eine gehörlose Person nicht weiß, ob sie hingehen kann.
+
+---
+
 ## 10. Offene Punkte
 
 | Punkt | Wer entscheidet |
@@ -639,6 +906,8 @@ der automatische Wechsel unterbleibt.
 | Prüfung „Elbwerk GmbH" gegen Handelsregister und DPMA (`DESIGN.md` §2.1) | Philipp |
 | Sind die Personennamen in den Testimonials unbedenklich, oder sollen sie neutraler werden? | WERTE.IT-Team |
 | Transkripttext des Kampagnenvideos — hängt am Videomaterial (`PRD.md` §10) | WERTE.IT-Team |
+| **Prüfung der Fassung in Leichter Sprache (Abschnitt 9.8) durch eine Fachstelle.** Der Entwurf folgt den Regeln nur annähernd. Eine schlecht gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine. | WERTE.IT-Team / Fachstelle |
+| Namen und Kontaktdaten der fiktiven Ansprechpersonen (Miriam Kessler, Torben Kruse) — sollen sie so bleiben oder neutraler werden? | WERTE.IT-Team |
 | Soll die Stellenanzeige eine reale BSVH-nahe Tätigkeit abbilden oder bewusst neutral bleiben? | WERTE.IT-Team |
 
 **Ein Hinweis zur Prüfung.** Die beiden Sprachfassungen in Abschnitt 8.3 sind der einzige
@@ -655,4 +924,5 @@ Absätzen wertvoller als jedes weitere Review durch Fachleute.
 - `docs/DESIGN.md` §7 — Textprinzipien, hier ausformuliert und in Abschnitt 4 präzisiert
 - `docs/ARCHITECTURE.md` §5 — Grenze zwischen Rahmen und Simulation
 - `docs/TESTING.md` §6 — die strukturellen Prüfungen, die auf diesen Varianten aufsetzen
-- `docs/PRD.md` §8.1 E — Anforderung an die Erklärtexte
+- `docs/PRD.md` §8.1 F — Anforderung an die Erklärtexte
+- `docs/SPEC_v1.md` — Umsetzungsschnitte für Phase 1

@@ -7,8 +7,9 @@ export const SOFTWARE_PROCUREMENT_SCENARIO: Scenario = {
   id: 'software-procurement',
   path: 'softwarebeschaffung',
   title: 'Softwarebeschaffung',
+  // docs/UX-COPY.md §5.2 `scenario.procurement.summary`.
   summary:
-    'Wie Barrierefreiheit beim Einkauf von Software verloren geht. Dieses Szenario ist in Vorbereitung.',
+    'Ein Ticketsystem wird eingekauft — nach Funktionsumfang, Bedienbarkeit und Preis. Erst im Arbeitsalltag zeigt sich, wer es nicht nutzen kann.',
   status: 'planned',
   steps: [],
   barriers: [],

@@ -2,6 +2,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ScenarioRegistry } from '../core/scenario-registry.service';
 import { AXE_RULE_FIXTURES } from './axe-rule-fixtures';
+import { RESPONSIBLE_AREAS } from '../models/domain.model';
 import type { Barrier, Scenario } from '../models/domain.model';
 
 // Data contract tests, docs/TESTING.md §8. These run over the real scenario
@@ -35,6 +36,11 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     scenarios = registry.getAll();
   });
 
+  // Deliberately unfiltered: organisational barriers are covered here too.
+  // They are exempt from citing a standard, never from being explained —
+  // docs/PRD.md §6.1 requires them "auch ohne Normbezug vollständig erklärt".
+  // Do not narrow this to non-organisational barriers; that is precisely the
+  // shortcut the `organisational` flag must not open.
   it('gives every barrier non-empty problem, affected and solution prose', () => {
     forEachBarrier(scenarios, (scenario, barrier) => {
       expect(barrier.explanation.problem.trim().length)
@@ -49,11 +55,60 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     });
   });
 
-  it('gives every barrier at least one StandardReference', () => {
+  // This is the guard docs/TESTING.md §8 calls "the inverse guard: without it,
+  // 'organisational' becomes a way to skip editorial work". Only this direction
+  // is asserted — an empty `standards` array requires `organisational: true`.
+  //
+  // The converse is deliberately NOT asserted. docs/ARCHITECTURE.md §6 says
+  // standards "may be empty if and only if organisational is true" and
+  // docs/TESTING.md §8 says "at least one StandardReference unless
+  // organisational is true": both permit an organisational barrier to cite a
+  // standard, neither requires it to cite none. docs/PRD.md §6.2 is the case
+  // that makes the difference real — the procurement Lastenheft and
+  // Nachweispflicht barriers are process omissions that still carry EN 301 549
+  // and BFSG references. A strict biconditional here would force whoever writes
+  // that content to delete those references to keep the suite green.
+  it('allows an empty standards array only when the barrier is organisational', () => {
     forEachBarrier(scenarios, (scenario, barrier) => {
-      expect(barrier.standards.length)
-        .withContext(`${scenario.path}/${barrier.urlKey}`)
-        .toBeGreaterThan(0);
+      if (barrier.standards.length > 0) {
+        return;
+      }
+      expect(barrier.organisational)
+        .withContext(
+          `${scenario.path}/${barrier.urlKey}: empty standards requires organisational: true`,
+        )
+        .toBeTrue();
+    });
+  });
+
+  it('gives every barrier a valid responsibleArea (docs/TESTING.md §8)', () => {
+    const validAreas: readonly string[] = RESPONSIBLE_AREAS;
+    forEachBarrier(scenarios, (scenario, barrier) => {
+      expect(validAreas)
+        .withContext(`${scenario.path}/${barrier.urlKey}: "${barrier.responsibleArea}"`)
+        .toContain(barrier.responsibleArea);
+    });
+  });
+
+  // `organisational` waives the standards reference and nothing else. The prose
+  // requirement is already enforced for these barriers by the unfiltered test
+  // above, so it is not restated here — a test that only re-checks a subset of
+  // what another test already covers cannot fail on its own and gives false
+  // confidence.
+  //
+  // The detection mode does need its own assertion. An organisational barrier
+  // is by definition one with "nothing a checker could see"
+  // (models/domain.model.ts), so marking it axe-detectable is a contradiction:
+  // it would demand an AXE_RULE_FIXTURES entry and send the Playwright run-2
+  // suite (docs/TESTING.md §5) hunting for a violation that can never appear.
+  it('never marks an organisational barrier as axe-detectable', () => {
+    forEachBarrier(scenarios, (scenario, barrier) => {
+      if (!barrier.organisational) {
+        return;
+      }
+      expect(barrier.automatedDetection)
+        .withContext(`${scenario.path}/${barrier.urlKey} is organisational`)
+        .toBe('manual');
     });
   });
 
@@ -90,11 +145,21 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
   // entry here if a maintainer has confirmed by hand that the key was never
   // published anywhere (docs/TESTING.md §8).
   const PROTECTED_URL_KEYS: ReadonlyArray<{ scenarioPath: string; urlKey: string }> = [
-    { scenarioPath: 'bewerbung', urlKey: 'pdf' },
+    // The four-step application-process barrier set (docs/PRD.md §6.1). Keys are
+    // append-only: the original five (pdf, sprache, labels, tastatur, fehler)
+    // survived the two-step → four-step migration unchanged, and the six added
+    // then are locked here going forward (docs/ARCHITECTURE.md §8, §18).
+    { scenarioPath: 'bewerbung', urlKey: 'grafik' },
     { scenarioPath: 'bewerbung', urlKey: 'sprache' },
     { scenarioPath: 'bewerbung', urlKey: 'labels' },
     { scenarioPath: 'bewerbung', urlKey: 'tastatur' },
+    { scenarioPath: 'bewerbung', urlKey: 'pflichtfeld' },
     { scenarioPath: 'bewerbung', urlKey: 'fehler' },
+    { scenarioPath: 'bewerbung', urlKey: 'pdf' },
+    { scenarioPath: 'bewerbung', urlKey: 'upload' },
+    { scenarioPath: 'bewerbung', urlKey: 'bestaetigung' },
+    { scenarioPath: 'bewerbung', urlKey: 'ansprechperson' },
+    { scenarioPath: 'bewerbung', urlKey: 'inklusionshinweis' },
   ];
 
   it('keeps every previously published {scenarioPath, urlKey} pair (add here on release)', () => {

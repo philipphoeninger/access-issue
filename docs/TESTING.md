@@ -2,7 +2,7 @@
 
 **Project:** AccessIssue
 **Source documents:** `docs/PRD.md` (v1.1), `docs/ARCHITECTURE.md` (v1.1)
-**Status:** Draft v1.2 — extended after design critique and accessibility review
+**Status:** Draft v2.0 — revised after the finished module deck
 **Date:** August 2026
 
 ---
@@ -30,22 +30,34 @@ barrier, so that adding a barrier automatically adds its tests.
 ## 2. The Automation Ceiling
 
 This is the most important number in this document, and it should be stated before any
-tooling: **of the eleven barriers planned for v1, roughly five are detectable by axe.**
+tooling: **of the twenty-seven barriers across three scenarios, roughly nine are detectable
+by axe.** Two thirds are not.
 
-| Barrier | Scenario | axe rule | Detectable |
-| --- | --- | --- | --- |
-| Missing form labels | Application | `label` | ✅ |
-| Social embed without alt text | CSR | `image-alt` | ✅ |
-| Low-contrast text overlay | CSR | `color-contrast` | ✅ |
-| Video without captions | CSR | `video-caption` | ✅ |
-| Progress bar as pure graphic | CSR | `svg-img-alt` / `aria-progressbar-name` | ✅ |
-| Job posting only as untagged PDF | Application | — | ❌ manual |
-| Overly complex language | Application | — | ❌ manual |
-| No keyboard operation (`div` with click handler) | Application | — | ❌ manual |
-| No error feedback on invalid input | Application | — | ❌ manual |
-| Countdown without live region | CSR | — | ❌ manual |
-| Slider without keyboard equivalent | CSR | — | ❌ manual |
-| Carousel without pause control | CSR | — | ❌ manual |
+| Detectable by axe | Scenario | axe rule |
+| --- | --- | --- |
+| Salary/benefits as unlabelled image | Application | `image-alt` |
+| Missing form labels | Application | `label` |
+| Image signature without alt | Application | `image-alt` |
+| Social embed without alt text | CSR | `image-alt` |
+| Low-contrast text overlay | CSR | `color-contrast` |
+| Progress bar as pure graphic | CSR | `svg-img-alt` |
+| Video without captions | CSR | `video-caption` |
+| Ticket system: tables without header cells | Procurement | `th-has-data-cells` |
+| Ticket system: insufficient contrast | Procurement | `color-contrast` |
+
+**Not detectable — the majority.** Untagged PDF, overly complex language, no keyboard
+operation, required fields marked by colour alone, no error feedback, missing upload format
+information, boilerplate confirmation text, no named contact, no note that adjustments are
+possible, anglicisms and missing plain-language version, emojis carrying information,
+missing event accessibility details, countdown without live region, slider without keyboard
+equivalent, carousel without pause, no accessibility criteria in the tender, no proof
+required, no practical test, no assigned responsibility, keyboard traps in the purchased
+system.
+
+Two of these are worth calling out separately, because they are invisible to *every*
+tool: **no named contact person** and **no note that adjustments are possible**
+(`PRD.md` §6.1). They violate no success criterion at all. Nothing automated can find them,
+and no conformance audit would flag them — which is precisely why the module includes them.
 
 The `automatedDetection` field in the domain model (`ARCHITECTURE.md` §6) records this
 per barrier and drives which test path each one takes.
@@ -53,8 +65,11 @@ per barrier and drives which test path each one takes.
 Two things follow.
 
 **For the test strategy:** manual passes are not a nice-to-have appended after the
-automated suite. They are the primary evidence for the majority of barriers. The
-automated suite is a regression net, not a proof.
+automated suite. They are the primary evidence for two thirds of the barriers. The
+automated suite is a regression net, not a proof. Barriers marked
+`automatedDetection: 'manual'` get structural assertions instead (§6), which verify that
+the expected markup is present or absent — necessary, but weaker evidence than a tool that
+independently recognises the defect.
 
 **For the module itself:** this table is teaching material. A company that runs an
 automated checker, sees green, and declares itself compliant has verified less than half
@@ -101,8 +116,8 @@ would spend the project's limited time on tooling instead of coverage.
 
 ## 4. State Space
 
-Full combinations are not worth testing: six barriers give 64 states per scenario, and
-the barriers are independent by construction. The tested set per scenario is **n + 2**:
+Full combinations are not worth testing: nine barriers give 512 states in the CSR scenario
+alone, and the barriers are independent by construction. The tested set per scenario is **n + 2**:
 
 - all barriers active (the default state, and the pedagogical entry point)
 - all barriers resolved
@@ -114,14 +129,30 @@ transcript, and with transcript but no captions.
 
 Concrete counts for v1:
 
-| Scenario | Barriers | Tested states | Note |
+| Scenario | Step | Barriers | Tested states |
 | --- | --- | --- | --- |
-| Application process, step 1 | 2 | 4 | state carries across steps, so step transitions are tested separately |
-| Application process, step 2 | 3 | 5 | |
-| CSR campaign | 6 (one combined, 2 parts) | 8 + 2 partial = 10 | |
+| Application | 1 Job posting | 2 | 4 |
+| Application | 2 Form | 4 | 6 |
+| Application | 3 Documents | 2 | 4 |
+| Application | 4 Response | 3 | 5 |
+| Procurement | A Tender | 4 | 6 |
+| Procurement | B Ticket system | 3 | 5 |
+| CSR | (single page) | 9, one combined with 2 parts | 11 + 2 partial = 13 |
+| **Total** | | **27** | **43** |
 
-Roughly nineteen states, each running three axe passes plus structural assertions. On
-Chromium this is a suite of a few minutes, which keeps it viable as a merge gate.
+State carries across steps, so step transitions are tested separately from the per-step
+matrix.
+
+Forty-three states, each running three axe passes plus structural assertions. That is
+roughly double the earlier estimate and pushes the suite past the point where it stays
+comfortably inside an eight-minute pull-request budget on Chromium.
+
+Two mitigations, in this order: shard the Playwright suite by scenario across parallel CI
+jobs (cheap, no loss of coverage), and only if that is not enough, move the per-barrier
+matrix of the *completed* scenarios to a nightly job while pull requests run the frame
+gate, the page-level run and the scenario under active development. Do not reach for
+reducing the state set — n + 2 is already the minimum that covers each barrier in
+isolation.
 
 **Why not the full power set.** Barriers are implemented independently and share no
 state; an interaction bug between two of them would be a defect in the state service, not
@@ -269,8 +300,10 @@ real scenario registry, so they scale automatically with content.
 
 | Test | Rationale |
 | --- | --- |
-| Every barrier has non-empty `problem`, `affected`, `solution` | `PRD.md` §8.1 E requires all four parts; missing prose ships as a blank panel |
-| Every barrier has at least one `StandardReference` | Same requirement |
+| Every barrier has non-empty `problem`, `affected`, `solution` | `PRD.md` §8.1 F requires all four parts; missing prose ships as a blank panel |
+| Every barrier has at least one `StandardReference` **unless** `organisational` is true | `PRD.md` §6.1 — five barriers legitimately have none; an unconditional rule would have made them unbuildable |
+| No barrier has an empty `standards` array while `organisational` is false | The inverse guard: without it, "organisational" becomes a way to skip editorial work |
+| Every barrier has a valid `responsibleArea` | Drives the panel grouping label and the area summary line |
 | `urlKey` unique within a scenario | Collisions silently merge two barriers into one toggle |
 | No `urlKey` equals `alle` | Reserved word, `ARCHITECTURE.md` §8 |
 | `urlKey` matches `/^[a-z0-9-]+$/` | Commas, spaces and umlauts would break the comma-separated grammar or force encoding that lecturers cannot hand-edit |
@@ -323,6 +356,11 @@ navigation (`ARCHITECTURE.md` §10). That single assertion protects the Back but
   and a partially resolved combined barrier counts as active (`UX-COPY.md` §5.6). The last
   clause is the one worth asserting: it is a judgement call that a later refactor could
   silently invert
+- Area summary — the line under the panel names the distinct `responsibleArea` values of
+  the current scenario, correctly pluralised, and updates when the scenario changes. Assert
+  the *set*, not a hard-coded sentence: the whole point is that it reflects the data
+- Step grouping — one `fieldset` per flow step, each with a `legend`; a single-step scenario
+  renders one group rather than none
 - `SimulationRegionComponent` — `role="region"`, an `aria-label`, the exit link as the
   first focusable child, `aria-describedby` pointing at a frame-owned element that exists
   and whose text does **not** change with barrier state (`ARCHITECTURE.md` §5.1); the
@@ -379,7 +417,7 @@ would pass the reduced-motion test and quietly remove a barrier from the module.
 
 ## 12. Deep-Link Tests
 
-Directly covers `PRD.md` §8.1 F. For every tested state:
+Directly covers `PRD.md` §8.1 G. For every tested state:
 
 1. reach the state by activating panel controls
 2. read `page.url()`
@@ -520,7 +558,8 @@ not automation, and pretending otherwise would let a release slip through on a g
 Stated plainly because this project of all projects should not overclaim.
 
 - **Automated accessibility testing catches a minority of WCAG issues.** For this
-  application specifically, seven of twelve planned barriers are invisible to axe (§2). A
+  application specifically, roughly two thirds of the 27 barriers are invisible to axe, and
+two violate no success criterion at all (§2). A
   green pipeline means no regression in the automatable subset. It does not mean the frame
   is accessible.
 - **Screen reader behaviour is not standardised.** NVDA, JAWS and VoiceOver differ in what

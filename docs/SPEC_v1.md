@@ -5,7 +5,7 @@
 application process scenario
 **Source documents:** `PRD.md` (v1.2), `ARCHITECTURE.md` (v1.3), `DESIGN.md` (v1.2),
 `TESTING.md` (v1.2), `UX-COPY.md` (v1.2)
-**Status:** Draft v1
+**Status:** Draft v2.0 — re-sliced after the finished module deck
 **Date:** August 2026
 
 ---
@@ -26,6 +26,13 @@ negotiable in two places, called out where they occur.
 deliberate: if the frame/simulation boundary does not hold, the project has a problem
 worth discovering now rather than after three scenarios exist (`PRD.md` §12).
 
+**Scope grew after the module deck was finished.** The application process went from two
+steps and five barriers to four steps and eleven, following the deck's own process graphic
+(`PRD.md` §6.1). Phase 1 is correspondingly larger — thirteen slices rather than eleven —
+and the four scenario slices (7–10) are each smaller than the two they replace, which keeps
+them reviewable in one session. The change is content-driven, not scope creep: the deck is
+the authority on what chapter 3 teaches, and the tool has to match it.
+
 ---
 
 ## 2. In Scope
@@ -38,18 +45,20 @@ worth discovering now rather than after three scenarios exist (`PRD.md` §12).
 | D | App shell: routing, focus, announcements, skip links, home page | `ARCHITECTURE.md` §9, §12 |
 | E | Simulation region and simulation bar | `ARCHITECTURE.md` §5, `DESIGN.md` §6 |
 | F | Barrier panel | `ARCHITECTURE.md` §12.1, `UX-COPY.md` §5.6 |
-| G | Explanation view | `PRD.md` §8.1 E, `UX-COPY.md` §5.8 |
+| G | Explanation view | `PRD.md` §8.1 F, `UX-COPY.md` §5.8 |
 | H | Application process, step 1 — job posting, 2 barriers | `PRD.md` §6.1 |
-| I | Application process, step 2 — form, 3 barriers | `PRD.md` §6.1 |
-| J | Error and special states | `ARCHITECTURE.md` §17 |
-| K | Phase 1 acceptance: manual passes | `TESTING.md` §13 |
+| I | Application process, step 2 — form, 4 barriers | `PRD.md` §6.1 |
+| J | Application process, step 3 — documents, 2 barriers | `PRD.md` §6.1 |
+| K | Application process, step 4 — response, 3 barriers | `PRD.md` §6.1 |
+| L | Error and special states | `ARCHITECTURE.md` §17 |
+| M | Phase 1 acceptance: manual passes | `TESTING.md` §13 |
 
 ## 3. Out of Scope for v1
 
 | Not in this spec | Why | Where it goes |
 | --- | --- | --- |
-| CSR campaign scenario | Blocked on video, caption file and transcript (`PRD.md` §10) | `SPEC_v2.md` |
-| Software procurement scenario | Content undefined by WERTE.IT | `SPEC_v3.md` |
+| Software procurement scenario | Now fully specified (`PRD.md` §6.2) but out of phase 1 scope | `SPEC_v2.md` |
+| CSR campaign scenario | Blocked on video, caption file and transcript (`PRD.md` §10) | `SPEC_v3.md` |
 | Corporate design polish, funding notices | Assets pending; tokens already carry the palette | Phase 4 |
 | Hosting and deployment configuration | Host undecided; build stays host-agnostic | Phase 4 |
 | Cross-browser suite on Firefox and WebKit | Weekly job, not a merge gate (`TESTING.md` §15) | Phase 4 |
@@ -68,7 +77,7 @@ the work, so each gets a default that is cheap to reverse.
 
 ### 4.1 Editorial placeholders must not ship silently
 
-`PRD.md` §8.1 E requires four text parts per barrier, authored by WERTE.IT. Those texts do
+`PRD.md` §8.1 F requires four text parts per barrier, authored by WERTE.IT. Those texts do
 not exist yet. `UX-COPY.md` §8 supplies usable Elbwerk copy, but *not* the explanation
 prose — that is explicitly editorial.
 
@@ -346,7 +355,7 @@ gets the same learning content as a sighted one.
 
 - Four rubrics per `UX-COPY.md` §5.8, as question headings
 - Standards references rendered from structured data, never prose
-  (`PRD.md` §8.1 E)
+  (`PRD.md` §8.1 F)
 - Current-state line: active or resolved
 - Empty state, direction-neutral
 - Driven by the `erklaerung` parameter; content changes announce through the frame's
@@ -372,14 +381,15 @@ gets the same learning content as a sighted one.
 
 - Elbwerk page frame per `UX-COPY.md` §8.1, plain HTML and CSS, system font stack, no
   Angular Material inside the region (`ARCHITECTURE.md` §11)
-- Barrier `pdf` — pattern A (variant): download-only vs. posting as HTML text with the
-  PDF still offered (`UX-COPY.md` §8.2). `automatedDetection: 'manual'`
+- Barrier `grafik` — pattern A: salary and benefits as an unlabelled image vs. as text with
+  a heading and list (`UX-COPY.md` §8.6). `automatedDetection: 'axe'`, rule `image-alt`
 - Barrier `sprache` — pattern A: bureaucratic vs. plain-language variant, identical
   substance (`UX-COPY.md` §8.3). `automatedDetection: 'manual'`
 - Step navigation to step 2, carrying `frei` forward, pushing a history entry
 
 **Acceptance criteria.**
 - [ ] Structural assertions from `TESTING.md` §6 for both barriers, active and resolved
+- [ ] axe run 2 reports `image-alt` when `grafik` is active and not when resolved
 - [ ] All four tested states (n + 2) pass axe runs 1 and 3
 - [ ] Deep link reproduces every state exactly (`TESTING.md` §12)
 - [ ] Headings inside the region start at `h3` and nest correctly
@@ -393,8 +403,7 @@ gets the same learning content as a sighted one.
 
 ### Slice 8 — Application process, step 2: application form
 
-**Delivers.** The remaining three barriers, including the two that are hardest to
-implement honestly.
+**Delivers.** Four barriers, including the two that are hardest to implement honestly.
 
 - Form per `UX-COPY.md` §8.4, eight fields, simulation note always present
 - Barrier `labels` — pattern B: `<label for>` vs. adjacent `<div>`.
@@ -402,6 +411,8 @@ implement honestly.
 - Barrier `tastatur` — pattern B: submit as `<div>` with click handler vs. `<button>`.
   **By omission, never by interception** (`ARCHITECTURE.md` §5.3).
   `automatedDetection: 'manual'`
+- Barrier `pflichtfeld` — pattern B: red asterisk only vs. legend plus „(Pflichtfeld)" in
+  the label plus `required` (`UX-COPY.md` §8.7). `automatedDetection: 'manual'`
 - Barrier `fehler` — pattern A: opaque `Code 422` message vs. error summary with jump
   links, `aria-invalid`, field association, focus to first error (`UX-COPY.md` §8.5).
   `automatedDetection: 'manual'`
@@ -415,7 +426,9 @@ implement honestly.
       leaves the region — the trap detector passes
 - [ ] With `fehler` resolved: invalid submission produces `role="alert"`, `aria-invalid`,
       programmatic association, and focus on the first error
-- [ ] All five tested states of step 2 pass runs 1 and 3
+- [ ] With `pflichtfeld` active: no `required`, no textual marker — the asterisk carries the
+      meaning alone
+- [ ] All six tested states of step 2 pass runs 1 and 3
 - [ ] Toggle state survives navigation between steps in both directions
 
 **Depends on.** Slice 7.
@@ -427,7 +440,56 @@ is a finding to record, not a rule to bend.
 
 ---
 
-### Slice 9 — Error and special states
+### Slice 9 — Application process, step 3: document upload
+
+**Delivers.** The upload step and the PDF barrier, relocated here from step 1 to match the
+module deck (`PRD.md` §6.1).
+
+- Upload page per `UX-COPY.md` §8.8
+- Barrier `pdf` — pattern A: posting available only as an untagged PDF download vs. as HTML
+  text with the PDF still offered alongside. `automatedDetection: 'manual'`
+- Barrier `upload` — pattern A: no format or size information plus an opaque failure
+  message vs. formats, size limit, structure hint and specific error messages.
+  `automatedDetection: 'manual'`
+
+**Acceptance criteria.**
+- [ ] Structural assertions for both barriers, active and resolved
+- [ ] The resolved `pdf` variant still offers the download — the accessible state is "also
+      as text", not "PDF removed"
+- [ ] All four tested states pass runs 1 and 3
+- [ ] Deep link reproduces every state
+
+**Depends on.** Slice 8.
+
+---
+
+### Slice 10 — Application process, step 4: response
+
+**Delivers.** The three barriers of the final step, two of which have no standards
+reference at all — the first time the application renders that case.
+
+- Confirmation page per `UX-COPY.md` §8.9
+- Barrier `bestaetigung` — pattern A: boilerplate German with key details in an image
+  signature vs. plain language with details as text. `automatedDetection: 'axe'` when the
+  image lacks alt (`image-alt`), otherwise manual
+- Barrier `ansprechperson` — pattern A: generic mailbox vs. named person with phone and
+  hours. `organisational: true`, empty `standards`, `automatedDetection: 'manual'`
+- Barrier `inklusionshinweis` — pattern A: absent vs. present, including the sentence that
+  asking has no bearing on the application. `organisational: true`, empty `standards`
+
+**Acceptance criteria.**
+- [ ] Explanation view renders `explanation.noStandard` for both organisational barriers
+      rather than an empty rubric (`UX-COPY.md` §5.8)
+- [ ] Contract test permits an empty `standards` array **only** when `organisational` is
+      true, and fails when it is empty otherwise
+- [ ] All five tested states pass runs 1 and 3
+- [ ] The flow is completable end to end from step 1 to step 4 with state carried through
+
+**Depends on.** Slice 9.
+
+---
+
+### Slice 11 — Error and special states
 
 **Delivers.** The defined behaviour for everything that is not a happy path
 (`ARCHITECTURE.md` §17).
@@ -443,16 +505,16 @@ is a finding to record, not a rule to bend.
 - [ ] Every error page has an `h1`, receives focus on navigation, and offers a way back
 - [ ] axe runs 1 and 3 green on every error state
 
-**Depends on.** Slice 3 (can run in parallel with 7 and 8).
+**Depends on.** Slice 3 (can run in parallel with 7–10).
 
 ---
 
-### Slice 10 — Phase 1 acceptance
+### Slice 12 — Phase 1 acceptance
 
 **Delivers.** The evidence that automation cannot produce (`TESTING.md` §13).
 
-- NVDA + Firefox, VoiceOver + Safari, VoiceOver iOS — full pass on both scenario steps in
-  both extreme states
+- NVDA + Firefox, VoiceOver + Safari, VoiceOver iOS — full pass on all four scenario steps
+  in both extreme states
 - Keyboard-only run, mouse unplugged
 - Zoom 200 % and 400 %, width 320 px
 - Manual measurement of the smallest targets, including nested part checkboxes
@@ -460,26 +522,28 @@ is a finding to record, not a rule to bend.
 
 **Acceptance criteria.**
 - [ ] Region announced as a region and identified as a simulation
-- [ ] Combined-barrier grouping and indeterminate state comprehensible in German on both
-      screen readers
+- [ ] Panel step grouping and the area summary line are comprehensible on both screen
+      readers; the summary states the correct areas for the current scenario
 - [ ] Exit link announced and functional from inside the region, in every barrier state
 - [ ] **A barrier explanation read while the barrier is active delivers the same learning
       content as the visual experience** — the criterion that decides whether phase 1 met
       its purpose
+- [ ] The two organisational barriers are understandable as barriers, despite having no
+      standards reference to point at
 - [ ] `PRD.md` §9 release criteria checked off for the phase 1 surface
 
-**Depends on.** Slices 8 and 9.
+**Depends on.** Slices 10 and 11.
 
 ---
 
 ## 6. Sequencing
 
 ```
-0 ── 1 ── 2 ── 3 ── 4 ── 5 ── 6 ── 7 ── 8 ── 10
-               └────────────────── 9 ─────────┘
+0 ── 1 ── 2 ── 3 ── 4 ── 5 ── 6 ── 7 ── 8 ── 9 ── 10 ── 12
+               └───────────────────── 11 ─────────────┘
 ```
 
-Only slice 9 parallelises. Everything else is a genuine dependency chain, because each
+Only slice 11 parallelises. Everything else is a genuine dependency chain, because each
 layer needs the one beneath it to exist before it can be tested — and testing is part of
 each slice.
 

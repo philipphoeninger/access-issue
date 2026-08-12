@@ -14,6 +14,8 @@ export function simpleBarrier(urlKey: string): Barrier {
     shortTitle: urlKey,
     categories: ['visual'],
     affectedGroups: [],
+    responsibleArea: 'it',
+    organisational: false,
     standards: [{ standard: 'WCAG_2_2', criterion: '1.1.1', title: urlKey }],
     explanation: { problem: 'Problem', affected: 'Betroffene', solution: 'Lösung' },
     automatedDetection: 'manual',
@@ -52,7 +54,13 @@ export function makeScenario(
   };
 }
 
-/** Mirrors the real application-process scenario's five simple barriers (urlKeys only). */
+// A fixed, representative set of simple barrier keys for the scenario-agnostic
+// parser tests (docs/TESTING.md §9). These five are all still real
+// application-process urlKeys, but this fixture deliberately does NOT track the
+// scenario's full barrier list — the file header explains why it stays
+// decoupled from editorial content. The application process now has eleven
+// barriers (docs/PRD.md §6.1); the parser does not care how many, so this
+// stays a small subset rather than growing with the content.
 export const BEWERBUNG_BARRIERS: Barrier[] = ['pdf', 'sprache', 'labels', 'tastatur', 'fehler'].map(
   simpleBarrier,
 );

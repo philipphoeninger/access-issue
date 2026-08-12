@@ -158,7 +158,12 @@ describe('round-trip property (docs/TESTING.md §9)', () => {
     return new Set(parseResolvedKeys(serialised === '' ? null : serialised, barriers));
   }
 
-  it('round-trips every subset of the application-process scenario barriers', () => {
+  // A representative five-key set, not the full application-process barrier
+  // list — that scenario has eleven barriers (docs/PRD.md §6.1), and this
+  // fixture stays decoupled from editorial content on purpose (see
+  // testing/barrier-fixtures.ts). The round-trip property is independent of how
+  // many barriers a scenario has; 2^5 subsets exercise it.
+  it('round-trips every subset of a representative barrier set', () => {
     const leafKeys = ['pdf', 'sprache', 'labels', 'tastatur', 'fehler'];
     for (const subset of powerSet(leafKeys)) {
       expect(roundTrip(subset, BEWERBUNG_BARRIERS))

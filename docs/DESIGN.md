@@ -2,7 +2,7 @@
 
 **Project:** AccessIssue
 **Source documents:** `docs/PRD.md` (v1.1), `docs/ARCHITECTURE.md` (v1.1)
-**Status:** Draft v1.2 — revised after design critique and accessibility review
+**Status:** Draft v1.3 — revised after the finished module deck
 **Date:** August 2026
 
 ---
@@ -221,15 +221,17 @@ Broken heading structure is not an admissible barrier here.
 ├────────────────────┬─────────────────────────────────────────┤
 │ BARRIEREN          │  ─ simulation bar ─────────────────────  │
 │                    │   Simulation · elbwerk.de/karriere       │  ← signature
-│ ☐ Anzeige als Text │   4 von 5 Barrieren aktiv   ← only counter│
-│ ☐ Beschriftungen   │  ┌──────────────────────────────────────┐│
-│ ☐ Tastatur         │  │ [Simulation verlassen] (focus-first) ││
-│ ▣ Video            │  │                                      ││
-│   ☑ Untertitel     │  │   Elbwerk: other typeface, muted      ││
-│   ☐ Transkript     │  │   blue, ordinary in every respect    ││
-│                    │  │                                      ││
-│ [Alle beheben]     │  └──────────────────────────────────────┘│
-│ [Alle aktivieren]  │                                          │
+│ ┌ Schritt 2 ─────┐ │   9 von 11 Barrieren aktiv  ← only counter│
+│ │☐ Beschriftungen│ │  ┌──────────────────────────────────────┐│
+│ │  · IT          │ │  │ [Simulation verlassen] (focus-first) ││
+│ │☐ Tastatur · IT │ │  │                                      ││
+│ │☐ Pflichtfelder │ │  │   Elbwerk: other typeface, muted      ││
+│ │  · Personal    │ │  │   blue, ordinary in every respect    ││
+│ └────────────────┘ │  │                                      ││
+│ Diese 11 Barrieren │  └──────────────────────────────────────┘│
+│ stammen aus 3      │                                          │
+│ Bereichen: …       │                                          │
+│ [Alle beheben]     │                                          │
 ├────────────────────┴─────────────────────────────────────────┤
 │ ERKLÄRUNG ZUR AUSGEWÄHLTEN BARRIERE                          │  white
 │ Problem · Betroffene · Normbezug · Lösung                    │
@@ -243,7 +245,7 @@ Broken heading structure is not an admissible barrier here.
 defect this tool exists to teach about, and it would be indefensible here.
 
 **Reflow.** The layout collapses to one column below 1024 px and at 400 % zoom, with no
-horizontal scrolling and no loss of function (PRD §8.1 G). The panel stays above the
+horizontal scrolling and no loss of function (PRD §8.1 H). The panel stays above the
 simulation in the single-column order, so the controls are always encountered before the
 thing they control.
 
@@ -292,6 +294,13 @@ A narrow navy band immediately above the simulation region, carrying three thing
 panel deliberately carries no progress figure of its own: two counters running in opposite
 directions on one screen ("1 of 5 resolved" beside "4 of 5 barriers active") would turn a
 status display into arithmetic. Reasoning in `docs/UX-COPY.md` §5.6.
+
+**The panel groups by flow step and labels by responsible area** (`ARCHITECTURE.md`
+§12.1.1). The area label sits under the barrier name in meta type, quiet enough not to
+compete with the checkbox label but present on every row. The summary line beneath the
+panel — *„Diese 11 Barrieren stammen aus 3 Bereichen: Personal, Kommunikation, IT."* — is
+set in body type, not meta: it is the sentence the whole chapter is built around, and
+setting it as fine print would bury it.
 
 **Why this is the signature.** It is the one place where the load-bearing architectural
 idea — the boundary between frame and simulation (`ARCHITECTURE.md` §5) — becomes visible.
@@ -364,5 +373,6 @@ Not negotiable, and not announced in the UI:
 - `docs/PRD.md` — audiences, goals, the deceptively-real decision
 - `docs/ARCHITECTURE.md` — frame/simulation boundary, token split, boundary invariants
 - `docs/TESTING.md` — contrast and focus verification
+- `docs/SPEC_v1.md` — phase 1 implementation slices
 - `src/styles/_tokens.scss` — the implementation of §3 and §4
 - `docs/UX-COPY.md` — the strings this design has to accommodate

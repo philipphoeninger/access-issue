@@ -2,7 +2,7 @@
 
 **Project:** AccessIssue
 **Source document:** `docs/PRD.md` (v1)
-**Status:** Draft v1.3 — revised after architecture review, design critique and accessibility review
+**Status:** Draft v2.0 — revised after the finished module deck
 **Date:** August 2026
 
 ---
@@ -28,14 +28,16 @@ or the test plan (`docs/TESTING.md`).
 | ID | Requirement | PRD ref |
 | --- | --- | --- |
 | F1 | Home page introducing the tool, linking into scenarios | 8.1 A |
-| F2 | Application process scenario, two-step flow, five barriers | 8.1 B |
-| F3 | CSR campaign scenario, single landing page, six barriers | 8.1 C |
-| F4 | Barrier panel: per-barrier toggles plus bulk actions | 8.1 D |
-| F5 | Per-barrier explanation with standards references | 8.1 E |
-| F6 | Full toggle state encoded in the URL | 8.1 F |
-| F7 | Frame accessible at all times; simulation region announced | 8.1 G |
-| F8 | Combined barriers whose partial repair does not fully resolve them | 6.4 |
-| F9 | Third scenario (procurement) addable without structural change | 6.3, 8.2 |
+| F2 | Application process, four-step flow, eleven barriers | 8.1 B |
+| F3 | Software procurement, two parts, seven barriers | 8.1 C |
+| F4 | CSR campaign, single landing page, nine barriers | 8.1 D |
+| F5 | Barrier panel: per-barrier toggles, bulk actions, grouping | 8.1 E |
+| F6 | Per-barrier explanation with standards references | 8.1 F |
+| F7 | Full toggle state encoded in the URL | 8.1 G |
+| F8 | Frame accessible at all times; simulation region announced | 8.1 H |
+| F9 | Combined barriers whose partial repair does not fully resolve them | 6.4 |
+| F10 | Every barrier carries a responsible business area, shown in the panel | 6.0 |
+| F11 | Barriers without a standards reference are supported as first-class | 6.1 |
 
 ### 2.2 Non-Functional
 
@@ -264,6 +266,15 @@ of them. They belong in `CLAUDE.md` verbatim.
 type DisabilityCategory =
   | 'visual' | 'auditory' | 'motor' | 'cognitive' | 'situational';
 
+/**
+ * The business area whose decision created the barrier. Central to the module's
+ * message (PRD §6.0): barriers arise between departments, not inside one.
+ * Rendered in the panel so the user sees that resolving a scenario takes
+ * several areas, not one.
+ */
+type ResponsibleArea =
+  | 'personal' | 'kommunikation' | 'it' | 'beschaffung' | 'management';
+
 type Standard = 'WCAG_2_2' | 'BITV_2_0' | 'EN_301_549' | 'BFSG';
 
 interface StandardReference {
@@ -306,11 +317,26 @@ interface Barrier {
   shortTitle: string;          // panel label
   categories: DisabilityCategory[];
   affectedGroups: string[];
+  responsibleArea: ResponsibleArea;
+  /**
+   * True when the barrier is an organisational omission rather than a technical
+   * defect — no missing labels, no failing contrast, nothing a checker could see.
+   * Examples: no named contact person, no note that adjustments are possible,
+   * no accessibility criteria in a tender.
+   *
+   * These barriers legitimately have an EMPTY `standards` array, and that is the
+   * point: a WCAG-conformant page can still exclude people. A model that forced
+   * every barrier to cite a criterion would quietly teach that accessibility and
+   * conformance are the same thing.
+   */
+  organisational: boolean;
+  /** May be empty if and only if `organisational` is true. */
   standards: StandardReference[];
   explanation: BarrierExplanation;
   /** Present only for combined barriers; each part toggles independently. */
   parts?: BarrierPart[];
   automatedDetection: AutomatedDetection;
+  contentStatus: 'placeholder' | 'approved';
 }
 
 interface ScenarioStep {
@@ -341,7 +367,13 @@ Notes on the shape:
   part is resolved. Panel representation is covered in §12.1 — the earlier plan to use an
   indeterminate slide toggle was invalid ARIA and has been replaced.
 - `standards` is an array, deliberately. One barrier maps to several WCAG success
-  criteria and to BITV/EN/BFSG references in parallel.
+  criteria and to BITV/EN/BFSG references in parallel — or, for organisational barriers,
+  to none at all.
+- `responsibleArea` and `organisational` both arrive from the finished module deck. They
+  are not bookkeeping: `responsibleArea` carries chapter 3's actual thesis, and
+  `organisational` is what lets the two most interesting barriers in the application
+  process — no named contact, no note that adjustments are possible — exist at all. Five
+  of the twenty-seven barriers are organisational.
 - `automatedDetection` replaces an earlier `implementation: 'variant' | 'attribute'`
   field. That field described how a template was written but no runtime code read it, so
   it would have silently drifted out of date. `automatedDetection` is consumed by the
@@ -496,8 +528,11 @@ lands on the German side despite being technical.
 /                                        Home
 /szenario/bewerbung/stellenanzeige       Application, step 1
 /szenario/bewerbung/formular             Application, step 2
+/szenario/bewerbung/dokumente            Application, step 3
+/szenario/bewerbung/rueckmeldung         Application, step 4
+/szenario/softwarebeschaffung/vergabe    Procurement, part A
+/szenario/softwarebeschaffung/system     Procurement, part B
 /szenario/csr-kampagne                   CSR landing page
-/szenario/softwarebeschaffung            (later)
 /**                                      Not found → link back to home
 ```
 
@@ -532,7 +567,7 @@ inputs and signals, avoiding manual subscription plumbing.
 **Decision: toggling a barrier and selecting an explanation both use `replaceUrl: true`.
 Step navigation pushes.**
 
-**Context.** PRD 8.1 F leaves the history behaviour to this phase.
+**Context.** PRD 8.1 G leaves the history behaviour to this phase.
 
 **Rationale.** A user who flips six toggles and then presses Back expects to return to
 the previous *page*, not to walk backwards through six intermediate toggle states. Push
@@ -616,6 +651,33 @@ point of combined barriers (PRD §6.4), and a flat list of switches would have h
 Trade-off: a checkbox reads as "pending until submitted" to some users, while these
 changes apply instantly. Mitigated by the live-region announcement on every change
 (§12.2) and by the absence of any submit affordance in the panel.
+
+### 12.1.1 Grouping and responsible areas
+
+Twenty-seven barriers across three scenarios crosses the threshold §21 anticipated: a flat
+list is no longer scannable. Two groupings compete, and they cannot both be primary.
+
+- **By step** — matches where the user is in the flow, and answers "what is broken on the
+  screen in front of me"
+- **By responsible area** — carries the module's thesis, and answers "who could have
+  prevented this"
+
+**Decision: group by step, label by area.** The panel groups barriers under the flow step
+they belong to (a `fieldset` per step, `legend` naming it), and each barrier carries its
+responsible area as a short label. Grouping by area instead would scatter the barriers of
+the screen currently on display across four groups, which makes the panel harder to use for
+the task it exists for.
+
+The area message is then carried by a **summary line under the panel**, not by the
+grouping: *„Diese 11 Barrieren stammen aus 3 Bereichen: Personal, Kommunikation, IT."* One
+sentence, always visible, and it states the point more directly than a grouping ever could
+— a user reading a grouped list has to count the group headings themselves to notice.
+
+For single-step scenarios (CSR campaign) the step grouping collapses to one group; the
+summary line still applies and does the work.
+
+An area filter is explicitly **not** in scope. It would let a user hide everything outside
+their own department — the exact reflex the chapter argues against.
 
 ### 12.2 Frame services
 
@@ -759,7 +821,7 @@ category (cognitive load, language complexity) that automated tools cannot see �
 knowing which is which is itself worth encoding in the barrier metadata.
 
 **Deep-link tests.** For every tested state: serialise to URL, reload, assert the DOM
-matches. This covers PRD 8.1 F directly.
+matches. This covers PRD 8.1 G directly.
 
 **Manual passes** (NVDA, VoiceOver, keyboard-only) cannot be automated away and are
 listed as release criteria in the PRD.
@@ -860,27 +922,17 @@ Small, time-boxed investigations to run before or early in Phase 1 implementatio
 | Combined-barrier panel UX | Design settled in §12.1 (fieldset + indeterminate parent checkbox). Remaining question is comprehension: verify with NVDA and VoiceOver that the group relationship and the indeterminate state read clearly in German. | half a day |
 | Exit link behaviour | Confirm the in-region exit link (§5.1) stays reachable in every barrier state, including the simulated keyboard trap, on both NVDA and VoiceOver. This is the single safety-critical path in the application. | half a day |
 
-**Zoneless change detection — resolved, Slice 0.** `provideZonelessChangeDetection()` is
-enabled. A test mounts a `mat-button` bound to a signal and asserts the DOM updates after
-a real `click()`, with no manual `detectChanges()` call and no zone.js in the test
-environment (`src/app/zoneless-material.spec.ts`) — green on Angular 20.3 /
-Material 20.2. Material's own event bindings go through Angular's renderer, which
-notifies the zoneless change-detection scheduler the same way a native `(click)` on a
-plain element would; nothing about `mat-button` depends on zone.js patching. The test
-stays in the suite as the regression check for this decision, not as a demo. Zoneless is
-therefore the default going forward; the zone-based fallback is only reconsidered if a
-*future* Material component regresses — overlay-based ones (menu, dialog, autocomplete)
-are the ones worth re-checking first, since they attach listeners outside the component
-tree Angular already tracks. None has shown a problem so far.
-
 ---
 
 ## 21. What to Revisit as the System Grows
 
 - **A fourth or fifth scenario.** The registry and data model absorb these without
   change. If scenario count passes roughly six, the home page needs grouping or filtering.
-- **Barrier count per scenario above ten.** The panel becomes a scanning problem; expect
-  to need grouping by step or by disability category.
+  Scenario order on the home page follows the module deck (application process, software
+  procurement, CSR campaign) — it is presentation order, not implementation order.
+- **Barrier count per scenario above ten.** Already reached — the application process has
+  eleven. Grouping is specified in §12.1.1. Past roughly fifteen in one scenario, the
+  summary line stops being scannable and the panel likely needs collapsible step groups.
 - **State beyond booleans.** If a future barrier needs a value rather than a flag
   (a contrast ratio, a timeout duration), the `frei` grammar needs extending —
   `key:value` pairs would be the minimal change, and the parser should be written so
@@ -897,4 +949,5 @@ tree Angular already tracks. None has shown a problem so far.
 - `docs/TESTING.md` — test strategy, coverage targets, CI pipeline
 - `docs/DESIGN.md` — design direction, token system, frame/simulation styling split
 - `docs/UX-COPY.md` — German interface strings, terminology canon, Elbwerk placeholder copy
+- `docs/SPEC_v1.md` — phase 1 implementation slices
 - `ai_development_process.md` — development process
