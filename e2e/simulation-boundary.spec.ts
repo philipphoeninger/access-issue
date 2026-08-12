@@ -6,6 +6,7 @@
 // what "the counter is the only counter in the document" means in practice.
 import { expect, test } from '@playwright/test';
 import { frameGate, pageLevelRules } from './support/axe-runs';
+import { gotoRendered } from './support/goto';
 
 const PATH = '/szenario/bewerbung/stellenanzeige';
 
@@ -15,7 +16,7 @@ const COUNTER_PATTERN =
 
 test.describe('The simulation region on the page', () => {
   test('renders exactly one region, labelled and described from the frame', async ({ page }) => {
-    await page.goto(PATH);
+    await gotoRendered(page, PATH);
 
     const region = page.locator('[data-simulation-region]');
     await expect(region).toHaveCount(1);
@@ -36,7 +37,7 @@ test.describe('The simulation region on the page', () => {
   });
 
   test('contains no h1, and its first heading is an h2 (rule 1)', async ({ page }) => {
-    await page.goto(PATH);
+    await gotoRendered(page, PATH);
 
     const headings = await page.evaluate(() => {
       const region = document.querySelector('[data-simulation-region]')!;
@@ -48,7 +49,7 @@ test.describe('The simulation region on the page', () => {
   });
 
   test('prefixes every id inside the region with sim- (rule 2)', async ({ page }) => {
-    await page.goto(PATH);
+    await gotoRendered(page, PATH);
 
     const unprefixed = await page.evaluate(() => {
       const region = document.querySelector('[data-simulation-region]')!;
@@ -61,7 +62,7 @@ test.describe('The simulation region on the page', () => {
   });
 
   test('declares no lang of its own (rule 3)', async ({ page }) => {
-    await page.goto(PATH);
+    await gotoRendered(page, PATH);
 
     const langs = await page.evaluate(() => {
       const region = document.querySelector('[data-simulation-region]')!;
@@ -76,7 +77,7 @@ test.describe('The simulation region on the page', () => {
 
 test.describe('The simulation bar (docs/DESIGN.md §6)', () => {
   test('holds the only counter in the document, counting active barriers', async ({ page }) => {
-    await page.goto(PATH);
+    await gotoRendered(page, PATH);
 
     const counters = await page.evaluate((source) => {
       const pattern = new RegExp(source);
@@ -98,15 +99,15 @@ test.describe('The simulation bar (docs/DESIGN.md §6)', () => {
   });
 
   test('reflects the resolved state carried in the URL', async ({ page }) => {
-    await page.goto(`${PATH}?frei=alle`);
+    await gotoRendered(page, `${PATH}?frei=alle`);
     await expect(page.locator('.counter')).toHaveText('Keine Barriere aktiv');
 
-    await page.goto(`${PATH}?frei=grafik,sprache`);
+    await gotoRendered(page, `${PATH}?frei=grafik,sprache`);
     await expect(page.locator('.counter')).toHaveText('9 von 11 Barrieren aktiv');
   });
 
   test('writes the chip as "Simulation" and uppercases it in CSS only', async ({ page }) => {
-    await page.goto(PATH);
+    await gotoRendered(page, PATH);
 
     const chip = page.locator('.chip');
     await expect(chip).toHaveText('Simulation');
@@ -118,7 +119,7 @@ test.describe('Skipping the simulation region (docs/UX-COPY.md §5.1)', () => {
   test('the skip link sits immediately before the region and moves focus past it', async ({
     page,
   }) => {
-    await page.goto(PATH);
+    await gotoRendered(page, PATH);
 
     const skipLink = page.locator('a[href$="#simulation-end"]');
     await expect(skipLink).toHaveText('Simulationsbereich überspringen');
@@ -147,13 +148,13 @@ test.describe('Skipping the simulation region (docs/UX-COPY.md §5.1)', () => {
 // states that exist before the first barrier lands.
 test.describe('axe — scenario route with every barrier resolved', () => {
   test('run 1: frame gate reports zero violations', async ({ page }) => {
-    await page.goto(`${PATH}?frei=alle`);
+    await gotoRendered(page, `${PATH}?frei=alle`);
     const results = await frameGate(page).analyze();
     expect(results.violations).toEqual([]);
   });
 
   test('run 3: page-level rules report zero violations', async ({ page }) => {
-    await page.goto(`${PATH}?frei=alle`);
+    await gotoRendered(page, `${PATH}?frei=alle`);
     const results = await pageLevelRules(page).analyze();
     expect(results.violations).toEqual([]);
   });

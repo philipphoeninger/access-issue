@@ -1,6 +1,12 @@
 // docs/SPEC_v1.md Slice 3 acceptance: "Every interactive target >= 24 x 24 px,
 // asserted over all focusable frame elements" (docs/DESIGN.md §5, WCAG 2.5.8).
+//
+// Slice 5 added the case docs/DESIGN.md §5 calls out as the easiest to get
+// wrong: the indented part checkboxes of a combined barrier, where the
+// indentation must reduce the offset and never the target. Form controls were
+// not in the original selector because the frame had none; they are now.
 import { expect, test } from '@playwright/test';
+import { gotoRendered } from './support/goto';
 
 const PAGES = ['/', '/szenario/bewerbung/stellenanzeige'];
 const MIN_TARGET_PX = 24;
@@ -14,7 +20,7 @@ interface UndersizedTarget {
 test.describe('Interactive target size >= 24x24px', () => {
   for (const path of PAGES) {
     test(`every focusable frame element on ${path}`, async ({ page }) => {
-      await page.goto(path);
+      await gotoRendered(page, path);
 
       const undersized = await page.evaluate((min): UndersizedTarget[] => {
         // The h1 carries tabindex="-1" for programmatic route-change focus
@@ -22,7 +28,7 @@ test.describe('Interactive target size >= 24x24px', () => {
         // target and 2.5.8 does not apply to it.
         const elements = Array.from(
           document.querySelectorAll<HTMLElement>(
-            'a[href], button, [tabindex]:not([tabindex="-1"])',
+            'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
           ),
         );
         return elements

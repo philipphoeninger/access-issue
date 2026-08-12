@@ -1,9 +1,9 @@
 // The frame shell around a scenario step: h1, step indicator, step
-// navigation, and the two-column layout from docs/DESIGN.md §5. Slice 4 fills
-// the simulation column with SimulationRegionComponent; the panel column
-// stays empty until BarrierPanelComponent lands in slice 5, and this
-// component does not anticipate its contents beyond leaving the `#panel`
-// skip-link target in place.
+// navigation, and the two-column layout from docs/DESIGN.md §5 — panel column
+// first in the DOM and on the left, so visual order matches reading order.
+// It composes the two halves and owns neither: BarrierPanelComponent renders
+// the controls, SimulationRegionComponent the boundary and (from slice 7) the
+// scenario content.
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -11,11 +11,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { ScenarioRegistry } from '../../core/scenario-registry.service';
 import { scenarioStepPath, type ScenarioRouteData } from '../../core/scenario-routes';
 import type { Scenario, ScenarioStep } from '../../models/domain.model';
+import { BarrierPanelComponent } from '../barrier-panel/barrier-panel.component';
 import { SimulationRegionComponent } from '../simulation-region/simulation-region.component';
 
 @Component({
   selector: 'app-scenario-page',
-  imports: [RouterLink, MatButtonModule, SimulationRegionComponent],
+  imports: [RouterLink, MatButtonModule, BarrierPanelComponent, SimulationRegionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './scenario-page.component.html',
   styleUrl: './scenario-page.component.scss',

@@ -8,6 +8,7 @@
 // slice 7 on — the shape is here so adding a barrier means adding a row, not
 // rewriting the suite.
 import { expect, test, type Page } from '@playwright/test';
+import { gotoRendered } from './support/goto';
 
 const PATH = '/szenario/bewerbung/stellenanzeige';
 
@@ -31,7 +32,7 @@ function focusIsInsideRegion(page: Page): Promise<boolean> {
 for (const { name, query } of STATES) {
   test.describe(`Exit link — ${name}`, () => {
     test('is reached by a single Tab from the element preceding the region', async ({ page }) => {
-      await page.goto(`${PATH}${query}`);
+      await gotoRendered(page, `${PATH}${query}`);
 
       // Step 1 of §7. The element preceding the region is the
       // "Simulationsbereich überspringen" link; focusing it is setup, the
@@ -45,7 +46,7 @@ for (const { name, query } of STATES) {
     test('carries a visible focus indicator and is neither clipped nor overlapped', async ({
       page,
     }) => {
-      await page.goto(`${PATH}${query}`);
+      await gotoRendered(page, `${PATH}${query}`);
       const exitLink = page.locator('.exit-link');
       await exitLink.focus();
 
@@ -75,7 +76,7 @@ for (const { name, query } of STATES) {
     });
 
     test('leads back to the barrier panel and moves focus there', async ({ page }) => {
-      await page.goto(`${PATH}${query}`);
+      await gotoRendered(page, `${PATH}${query}`);
       await page.locator('.exit-link').focus();
 
       // Step 3 of §7 — a real Enter press, and focus has to *land*, not just
@@ -96,7 +97,7 @@ for (const { name, query } of STATES) {
     // never by interception (docs/ARCHITECTURE.md §5.3): a simulated trap may
     // make one control unreachable, never hold the user inside the region.
     test('Tab leaves the region within 50 presses and never cycles inside it', async ({ page }) => {
-      await page.goto(`${PATH}${query}`);
+      await gotoRendered(page, `${PATH}${query}`);
       await page.locator('.exit-link').focus();
 
       let left = false;

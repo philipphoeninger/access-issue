@@ -218,6 +218,14 @@ abgekürzt: „Verlassen" allein sagt nicht, wohin.
 | `panel.statePartial` | Teilweise behoben |
 | `panel.explainLink` | Was bedeutet das? |
 | `panel.combinedHint` | Diese Barriere hat zwei Teile. Erst wenn beide behoben sind, ist der Inhalt barrierefrei. |
+| `panel.combinedHint.many` | Diese Barriere hat {count} Teile. Erst wenn alle behoben sind, ist der Inhalt barrierefrei. |
+
+**`panel.combinedHint.many` ist bei der Umsetzung des Panels ergänzt worden** (Slice 5). Die
+ursprüngliche Fassung sagt „zwei Teile" und „beide", das Datenmodell erlaubt aber beliebig
+viele Teile (`ARCHITECTURE.md` §6, Data Contract: mindestens zwei). Eine dreiteilige
+kombinierte Barriere hätte damit unter drei Kontrollkästchen behauptet, es seien zwei. Die
+zweiteilige Fassung bleibt unverändert die redaktionell geprüfte für den einzigen Fall, den
+es heute gibt; die allgemeine greift erst ab drei Teilen.
 
 **Beschriftungen der Kontrollkästchen** — Zustandsform nach Abschnitt 4, gruppiert nach
 Schritt, mit Fachbereich als Kennzeichnung (`ARCHITECTURE.md` §12.1.1):
@@ -337,12 +345,21 @@ Ein Format, ohne Ausnahme: **Was ist jetzt. Wie viele bleiben.**
 | Barriere behoben | {Barriere}: barrierefrei. Noch {n} von {total} Barrieren aktiv. |
 | Barriere aktiviert | {Barriere}: Barriere aktiv. {n} von {total} Barrieren aktiv. |
 | Teil einer kombinierten Barriere behoben | {Teil}: barrierefrei. {Barriere} ist noch nicht vollständig behoben. |
+| Teil einer kombinierten Barriere aktiviert | {Teil}: Barriere aktiv. {Barriere} ist noch nicht vollständig behoben. |
 | Kombinierte Barriere vollständig behoben | {Barriere}: barrierefrei. Noch {n} von {total} Barrieren aktiv. |
 | Alle behoben | Alle Barrieren behoben. Die Seite ist jetzt barrierefrei. |
 | Alle aktiviert | Alle {total} Barrieren aktiv. |
 | Seitenwechsel | {Seitentitel}. {n} von {total} Barrieren aktiv. |
 
 Beispiel: „Formularfelder mit Beschriftungen: barrierefrei. Noch 4 von 5 Barrieren aktiv."
+
+**Die Zeile „Teil … aktiviert" ist bei der Umsetzung des Panels ergänzt worden** (Slice 5).
+Die Tabelle deckte den Weg zurück nicht ab: Wer bei einer vollständig behobenen kombinierten
+Barriere einen Haken wieder entfernt, hätte keine Ansage bekommen. Der Satz übernimmt die
+erste Hälfte aus „Barriere aktiviert" und die zweite unverändert aus der Zeile darüber —
+keine neue Formulierung, nur die fehlende Kombination. Ein Zählstand steht bewusst nicht
+darin: Die Zahl ändert sich nicht, weil eine teilweise behobene kombinierte Barriere
+ohnehin als aktiv zählt (Abschnitt 5.6).
 
 Zwei Sätze, weil ein Screenreader beim ersten Satz das Wichtige liefert und der zweite
 auch dann nützlich bleibt, wenn der Nutzer schon weiterliest. Länger darf es nicht werden:

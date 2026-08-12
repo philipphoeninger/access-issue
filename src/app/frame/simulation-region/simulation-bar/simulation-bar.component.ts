@@ -71,14 +71,14 @@ export class SimulationBarComponent {
   /**
    * Barriers that are not *fully* resolved. A combined barrier with one part
    * repaired still stands, so it still counts — the partial state shows on
-   * the panel entry and stays out of the counter (docs/UX-COPY.md §5.6).
+   * the panel entry and stays out of the counter (docs/UX-COPY.md §5.6). The
+   * rule lives in BarrierStateService because the panel's announcements name
+   * the same number (docs/UX-COPY.md §5.7); this component is still the only
+   * place it is *rendered*.
    */
-  protected readonly activeCount = computed(() => {
-    const scenario = this.scenario();
-    return scenario.barriers.filter(
-      (barrier) => !this.barrierState.isBarrierResolved(scenario, barrier),
-    ).length;
-  });
+  protected readonly activeCount = computed(() =>
+    this.barrierState.activeBarrierCount(this.scenario()),
+  );
 
   /** docs/UX-COPY.md §5.4 `simBar.counter.none` / `.all` / `.some`. */
   protected readonly counterLabel = computed(() => {

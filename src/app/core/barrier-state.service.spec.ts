@@ -78,6 +78,32 @@ describe('BarrierStateService (docs/ARCHITECTURE.md §7)', () => {
     });
   });
 
+  // The number the simulation bar renders and the panel's announcements
+  // speak (docs/UX-COPY.md §5.4, §5.7). The partial case is the judgement
+  // call worth protecting: a barrier that still stands, even partly, is still
+  // a barrier (docs/UX-COPY.md §5.6).
+  describe('activeBarrierCount', () => {
+    it('counts every barrier while none is resolved', () => {
+      setup();
+      expect(service.activeBarrierCount(scenario)).toBe(scenario.barriers.length);
+    });
+
+    it('counts down as barriers are resolved', () => {
+      setup({ frei: 'labels,fehler' });
+      expect(service.activeBarrierCount(scenario)).toBe(scenario.barriers.length - 2);
+    });
+
+    it('reaches zero once every barrier is resolved', () => {
+      setup({ frei: 'alle' });
+      expect(service.activeBarrierCount(scenario)).toBe(0);
+    });
+
+    it('counts a partially resolved combined barrier as active', () => {
+      setup({ frei: 'video-ut' });
+      expect(service.activeBarrierCount(videoScenario)).toBe(videoScenario.barriers.length);
+    });
+  });
+
   describe('explainedUrlKey', () => {
     it('is undefined when erklaerung is absent', () => {
       setup();

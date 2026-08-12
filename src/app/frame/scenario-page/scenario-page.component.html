@@ -17,9 +17,10 @@
        link and the simulation region's exit link — actually move focus here.
        Without it the browser only sets a sequential-navigation starting point
        and `document.activeElement` stays on <body>, which is precisely the
-       half-working exit docs/TESTING.md §7 exists to catch.
-       BarrierPanelComponent (slice 5) renders into this column. -->
-  <div class="panel-column" id="panel" tabindex="-1"></div>
+       half-working exit docs/TESTING.md §7 exists to catch. -->
+  <div class="panel-column" id="panel" tabindex="-1">
+    <app-barrier-panel [scenario]="scenario()" />
+  </div>
   <div class="simulation-column">
     <!-- `simulatedPath` stays unset until the step components exist: the
          Elbwerk address is simulation content (docs/UX-COPY.md §8), and the

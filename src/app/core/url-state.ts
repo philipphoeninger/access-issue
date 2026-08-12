@@ -10,21 +10,36 @@
 // instrumenter does not register optional chaining as a branch, which would
 // make the ≥95% branch-coverage gate on this file (docs/TESTING.md §14) a
 // no-op.
-import type { Barrier } from '../models/domain.model';
+import type { Barrier, BarrierPart } from '../models/domain.model';
 
 /** Reserved `frei` value meaning "every barrier in the scenario resolved" (ARCHITECTURE.md §8). */
 export const RESOLVE_ALL_KEY = 'alle';
 
 /**
- * A combined barrier's part urlKeys, or `undefined` for a simple barrier.
- * The single place that decides "is this barrier combined" — every other
- * function in this file and in barrier-state.service.ts goes through this
- * rather than re-checking `barrier.parts` itself, so the two files cannot
- * silently disagree on the definition.
+ * A combined barrier's parts, or `undefined` for a simple barrier. **The
+ * single place that decides "is this barrier combined"** — this file,
+ * barrier-state.service.ts and the barrier panel all go through it rather
+ * than re-checking `barrier.parts` themselves, so they cannot silently
+ * disagree on the definition.
+ *
+ * The distinction that makes this worth centralising: `parts: []` is *not* a
+ * combined barrier. A panel that read the field directly would render a
+ * group promising parts, with a parent checkbox, for a barrier the state
+ * layer treats as simple — the two halves of the screen disagreeing about
+ * what the user is looking at.
  */
-export function combinedBarrierPartUrlKeys(barrier: Barrier): readonly string[] | undefined {
+export function combinedBarrierParts(barrier: Barrier): readonly BarrierPart[] | undefined {
   if (barrier.parts && barrier.parts.length > 0) {
-    return barrier.parts.map((part) => part.urlKey);
+    return barrier.parts;
+  }
+  return undefined;
+}
+
+/** The same decision, as urlKeys — what the `frei` grammar works in. */
+export function combinedBarrierPartUrlKeys(barrier: Barrier): readonly string[] | undefined {
+  const parts = combinedBarrierParts(barrier);
+  if (parts) {
+    return parts.map((part) => part.urlKey);
   }
   return undefined;
 }

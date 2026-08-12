@@ -1,0 +1,184 @@
+<section class="panel" [attr.aria-labelledby]="headingId">
+  <h2 [id]="headingId">Barrieren</h2>
+  <p class="intro">
+    Setze ein Häkchen, um eine Barriere zu beheben. Die Simulation ändert sich sofort.
+  </p>
+
+  @for (group of groups(); track group.id) {
+    <!-- One fieldset per flow step, legend naming it (docs/ARCHITECTURE.md
+         §12.1.1). Screen readers announce group membership, so a user hears
+         which step a barrier belongs to without having to reconstruct it. -->
+    <fieldset class="group">
+      <legend>{{ group.legend }}</legend>
+
+      <ul class="barriers">
+        @for (barrier of group.barriers; track barrier.id) {
+          <li class="barrier">
+            @if (partsOf(barrier); as parts) {
+              <!-- Combined barrier: fieldset + legend + indeterminate parent
+                   + one checkbox per part (docs/ARCHITECTURE.md §12.1). The
+                   legend and the parent checkbox carry the same label on
+                   purpose — the legend names the group, the checkbox names
+                   what it toggles, and neither may be dropped. -->
+              <fieldset class="combined">
+                <legend>{{ barrier.shortTitle }}</legend>
+                <p class="hint" [id]="hintId(barrier.urlKey)">{{ combinedHint(parts) }}</p>
+
+                <mat-checkbox
+                  #parentBox
+                  [checked]="isResolved(barrier)"
+                  [indeterminate]="isPartiallyResolved(barrier)"
+                  [aria-describedby]="hintId(barrier.urlKey)"
+                  (change)="onToggle(barrier, barrier.urlKey, parentBox)"
+                >
+                  <span [id]="labelId(barrier.urlKey)">{{ barrier.shortTitle }}</span>
+                </mat-checkbox>
+
+                <ng-container
+                  [ngTemplateOutlet]="stateBadge"
+                  [ngTemplateOutletContext]="{ state: displayState(barrier), barrier }"
+                />
+
+                <ng-container
+                  [ngTemplateOutlet]="explainLink"
+                  [ngTemplateOutletContext]="{ urlKey: barrier.urlKey }"
+                />
+
+                <!-- Indentation lives on this list, never on the controls
+                     inside it: it must reduce the offset, not the target
+                     (docs/DESIGN.md §5, WCAG 2.2 SC 2.5.8). -->
+                <ul class="parts">
+                  @for (part of parts; track part.id) {
+                    <li>
+                      <mat-checkbox
+                        #partBox
+                        [checked]="isPartResolved(part)"
+                        (change)="onToggle(barrier, part.urlKey, partBox)"
+                      >
+                        <span [id]="labelId(part.urlKey)">{{ part.title }}</span>
+                      </mat-checkbox>
+
+                      <ng-container
+                        [ngTemplateOutlet]="stateBadge"
+                        [ngTemplateOutletContext]="{ state: partDisplayState(part) }"
+                      />
+
+                      <ng-container
+                        [ngTemplateOutlet]="explainLink"
+                        [ngTemplateOutletContext]="{ urlKey: part.urlKey }"
+                      />
+                    </li>
+                  }
+                </ul>
+              </fieldset>
+            } @else {
+              <mat-checkbox
+                #simpleBox
+                [checked]="isResolved(barrier)"
+                (change)="onToggle(barrier, barrier.urlKey, simpleBox)"
+              >
+                <span [id]="labelId(barrier.urlKey)">{{ barrier.shortTitle }}</span>
+              </mat-checkbox>
+
+              <ng-container
+                [ngTemplateOutlet]="stateBadge"
+                [ngTemplateOutletContext]="{ state: displayState(barrier), barrier }"
+              />
+
+              <ng-container
+                [ngTemplateOutlet]="explainLink"
+                [ngTemplateOutletContext]="{ urlKey: barrier.urlKey }"
+              />
+            }
+          </li>
+        }
+      </ul>
+    </fieldset>
+  }
+
+  <!-- Both are about barriers that exist; a scenario without any gets neither
+       a sentence counting them nor buttons offering to resolve them. -->
+  @if (hasBarriers()) {
+    <p class="area-summary">{{ areaSummary() }}</p>
+
+    <!-- Action labels, not state labels — the resolution of the naming
+         conflict in docs/UX-COPY.md §4. No <form> and no submit control
+         anywhere in this component: nothing here is pending. -->
+    <div class="bulk-actions">
+      <button mat-flat-button type="button" (click)="onResolveAll()">Alle Barrieren beheben</button>
+      <button mat-stroked-button type="button" (click)="onActivateAll()">
+        Alle Barrieren aktivieren
+      </button>
+    </div>
+  }
+</section>
+
+<!-- Three-way state coding: text, symbol shape and colour, never colour
+     alone (docs/DESIGN.md §3.3, WCAG 1.4.1). The symbol is decorative
+     because the text beside it says the same thing; the area label carries a
+     visually hidden prefix so it is not a bare word floating in the reading
+     order. Each symbol is a single-colour shape — no knocked-out fill that
+     depends on the surface behind it, which would disappear under
+     forced-colors. -->
+<ng-template #stateBadge let-state="state" let-barrier="barrier">
+  <p class="meta">
+    <span class="state" [class]="'state--' + state">
+      @switch (state) {
+        @case ('resolved') {
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+            <path
+              d="m7.6 12.3 3 3 5.8-6.4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        }
+        @case ('partial') {
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" />
+          </svg>
+        }
+        @default {
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              fill="currentColor"
+              fill-rule="evenodd"
+              d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1 4.5h2v7h-2v-7Zm0 8.6h2v2.4h-2v-2.4Z"
+            />
+          </svg>
+        }
+      }
+      {{ stateLabel(state) }}
+    </span>
+
+    @if (barrier) {
+      <span class="area">
+        <span appVisuallyHidden>Zuständiger Bereich: </span>{{ areaLabel(barrier) }}
+      </span>
+    }
+  </p>
+</ng-template>
+
+<!-- `[routerLink]="[]"` keeps the current route and only merges `erklaerung`
+     (docs/ARCHITECTURE.md §8). A real link rather than a button: selecting an
+     explanation is a change of view state, it is addressable, and it should
+     survive being opened in a new tab. `replaceUrl` because an explanation
+     selection is not a step in the user's history (docs/ARCHITECTURE.md §10)
+     — the Back button belongs to step navigation. -->
+<ng-template #explainLink let-urlKey="urlKey">
+  <a
+    class="explain"
+    [id]="explainId(urlKey)"
+    [attr.aria-labelledby]="explainLabelledBy(urlKey)"
+    [routerLink]="[]"
+    [queryParams]="explanationParams(urlKey)"
+    queryParamsHandling="merge"
+    [replaceUrl]="true"
+    >Was bedeutet das?</a
+  >
+</ng-template>

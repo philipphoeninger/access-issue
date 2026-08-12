@@ -183,6 +183,25 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     }
   });
 
+  // The barrier panel groups by step and looks its entries up through
+  // `step.barrierIds` (docs/ARCHITECTURE.md §12.1.1), so a barrier that
+  // belongs to no step would simply not be offered — a barrier nobody can
+  // switch off, invisible in every screenshot. Listing one twice would offer
+  // two controls for one piece of state.
+  it('surfaces every barrier in exactly one step', () => {
+    for (const scenario of scenarios) {
+      const stepCounts = new Map(scenario.barriers.map((barrier) => [barrier.id, 0]));
+      for (const step of scenario.steps) {
+        for (const barrierId of step.barrierIds) {
+          stepCounts.set(barrierId, (stepCounts.get(barrierId) ?? 0) + 1);
+        }
+      }
+      for (const [barrierId, count] of stepCounts) {
+        expect(count).withContext(`${scenario.path} → ${barrierId}`).toBe(1);
+      }
+    }
+  });
+
   it('gives every combined barrier at least two parts with unique urlKeys', () => {
     // No combined barrier exists yet in v1 content (the CSR video barrier is
     // still a `status: 'planned'` stub), so this loop currently has nothing

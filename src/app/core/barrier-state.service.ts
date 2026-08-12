@@ -65,6 +65,24 @@ export class BarrierStateService {
     return this.isResolved(scenario, barrier.urlKey);
   }
 
+  /**
+   * How many of the scenario's barriers still stand. A combined barrier with
+   * one part repaired counts as active, because it does still stand — that is
+   * the whole didactic point of the combined case (docs/UX-COPY.md §5.6), and
+   * it is a judgement call a later refactor could silently invert. It lives
+   * here rather than in the simulation bar because two callers now need the
+   * same number: the bar renders it, and the panel speaks it in the
+   * announcements of docs/UX-COPY.md §5.7. Two independent counts would be
+   * one refactor away from disagreeing on screen.
+   *
+   * This is not a second counter. There is exactly one counter in the
+   * application, in the simulation bar (CLAUDE.md rule 17); the panel renders
+   * no number of its own.
+   */
+  activeBarrierCount(scenario: Scenario): number {
+    return scenario.barriers.filter((barrier) => !this.isBarrierResolved(scenario, barrier)).length;
+  }
+
   /** urlKey currently shown in the explanation view; `undefined` for the empty state. */
   explainedUrlKey(scenario: Scenario): string | undefined {
     return parseExplainedKey(this.erklaerung(), scenario.barriers);
@@ -80,8 +98,13 @@ export class BarrierStateService {
    * explanation target for this scenario, the same guarantee `frei` gets
    * from serialiseResolvedKeys (url-state.ts: "a stale or foreign key can
    * never leak into a freshly written URL").
+   *
+   * Returns the navigation's promise so a caller can act on the state the
+   * write produced rather than on a prediction of it — the barrier panel
+   * awaits it before announcing, which keeps the toggle rule in this one
+   * place (docs/UX-COPY.md §5.7).
    */
-  toggle(scenario: Scenario, urlKey: string): void {
+  toggle(scenario: Scenario, urlKey: string): Promise<boolean> {
     const partKeys = this.combinedBarrierPartKeys(scenario, urlKey);
     const keys = partKeys ? partKeys : [urlKey];
     const resolved = new Set(this.resolvedKeys(scenario));
@@ -102,7 +125,7 @@ export class BarrierStateService {
     if (explanationUrlKeys(scenario.barriers).has(urlKey)) {
       queryParams['erklaerung'] = urlKey;
     }
-    this.navigate(queryParams);
+    return this.navigate(queryParams);
   }
 
   /**
@@ -113,13 +136,13 @@ export class BarrierStateService {
    * action is not "about" any one barrier, so leaving a previous explanation
    * selected in the URL would misrepresent it as the reason for the change.
    */
-  resolveAll(): void {
-    this.navigate({ frei: RESOLVE_ALL_KEY, erklaerung: null });
+  resolveAll(): Promise<boolean> {
+    return this.navigate({ frei: RESOLVE_ALL_KEY, erklaerung: null });
   }
 
   /** `panel.activateAll` — every barrier becomes active again (absent `frei`); also clears `erklaerung`. */
-  resetAll(): void {
-    this.navigate({ frei: null, erklaerung: null });
+  resetAll(): Promise<boolean> {
+    return this.navigate({ frei: null, erklaerung: null });
   }
 
   private combinedBarrierPartKeys(
@@ -134,8 +157,8 @@ export class BarrierStateService {
     return undefined;
   }
 
-  private navigate(queryParams: Record<string, string | null>): void {
-    this.router.navigate([], {
+  private navigate(queryParams: Record<string, string | null>): Promise<boolean> {
+    return this.router.navigate([], {
       relativeTo: this.route,
       queryParams,
       queryParamsHandling: 'merge',

@@ -77,6 +77,32 @@ html {
   --mat-card-elevated-container-shape: var(--wi-radius-lg);
   --mat-card-elevated-container-elevation: var(--wi-shadow-card);
 
+  // ---- Checkbox (barrier panel) ----
+  // A ticked box means "this barrier is resolved", so the selected state
+  // takes the resolved-state colour (docs/DESIGN.md §3.3): indigo, which is
+  // deliberately not green — red/green is the most common colour-vision
+  // confusion, and a tool about accessibility should not stake its core state
+  // distinction on it. The unselected border takes the body text colour;
+  // Material's default is a grey that measures ~3.3:1 on the card surface,
+  // which passes SC 1.4.11 by a margin too thin to be worth keeping.
+  // The state is never carried by colour alone — the panel renders a text
+  // label and a symbol beside every box.
+  --mat-checkbox-label-text-size: var(--wi-size-control);
+  --mat-checkbox-label-text-weight: var(--wi-weight-semibold);
+  --mat-checkbox-label-text-color: var(--wi-text-primary);
+  --mat-checkbox-unselected-icon-color: var(--wi-text-primary);
+  --mat-checkbox-unselected-hover-icon-color: var(--wi-text-primary);
+  --mat-checkbox-unselected-pressed-icon-color: var(--wi-text-primary);
+  --mat-checkbox-unselected-focus-icon-color: var(--wi-text-primary);
+  --mat-checkbox-selected-icon-color: var(--wi-state-resolved);
+  --mat-checkbox-selected-hover-icon-color: var(--wi-state-resolved);
+  --mat-checkbox-selected-pressed-icon-color: var(--wi-state-resolved);
+  --mat-checkbox-selected-focus-icon-color: var(--wi-state-resolved);
+  --mat-checkbox-selected-checkmark-color: var(--wi-white);
+  --mat-checkbox-selected-hover-state-layer-color: var(--wi-state-resolved);
+  --mat-checkbox-selected-pressed-state-layer-color: var(--wi-state-resolved);
+  --mat-checkbox-selected-focus-state-layer-color: var(--wi-state-resolved);
+
   // ---- Chips ("In Vorbereitung" badge) ----
   // Used with `disabled` to signal "not interactive", not "content
   // unavailable" — the badge itself must stay fully readable. Material's own
@@ -92,4 +118,29 @@ html {
   --mat-chip-disabled-label-text-color: var(--wi-text-primary);
   --mat-chip-disabled-outline-color: var(--wi-navy);
   --mat-chip-container-shape-radius: var(--wi-radius-pill);
+}
+
+// Multi-line checkbox labels.
+//
+// The barrier panel's labels are whole sentences ("Gehalt und Leistungen als
+// Text, nicht als Bild", docs/UX-COPY.md §5.6) and wrap to two lines in a
+// 20rem panel column. Material lays the checkbox out as an inline-flex row
+// whose height is the 40px control, with the label vertically centred inside
+// it: a two-line label then renders taller than the box it sits in and
+// overlaps the state line below it. No token covers this — it is layout, not
+// colour — so it is a rule rather than a custom-property override, kept here
+// with the rest of the Material customisation instead of hidden in the panel
+// component, where the emulated encapsulation could not reach these elements
+// anyway.
+//
+// The offset lines the first text line up with the checkbox glyph, which sits
+// centred in the 40px control. Both values are geometry, not taste: 40px
+// control, 16px/1.4 label.
+.mat-mdc-checkbox .mdc-form-field {
+  align-items: flex-start;
+}
+
+.mat-mdc-checkbox .mdc-form-field > label {
+  padding-top: 9px;
+  line-height: 1.4;
 }

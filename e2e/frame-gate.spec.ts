@@ -4,6 +4,7 @@
 // keeping it clean from here is far cheaper than cleaning it up later.
 import { expect, test } from '@playwright/test';
 import { frameGate, pageLevelRules } from './support/axe-runs';
+import { gotoRendered } from './support/goto';
 
 const PAGES: Array<{ name: string; path: string }> = [
   { name: 'home', path: '/' },
@@ -16,7 +17,7 @@ const PAGES: Array<{ name: string; path: string }> = [
 for (const { name, path } of PAGES) {
   test.describe(`axe — ${name}`, () => {
     test('run 1: frame gate reports zero violations (docs/TESTING.md §5)', async ({ page }) => {
-      await page.goto(path);
+      await gotoRendered(page, path);
       const results = await frameGate(page).analyze();
       expect(results.violations).toEqual([]);
     });
@@ -24,7 +25,7 @@ for (const { name, path } of PAGES) {
     test('run 3: page-level rules report zero violations (docs/TESTING.md §5)', async ({
       page,
     }) => {
-      await page.goto(path);
+      await gotoRendered(page, path);
       const results = await pageLevelRules(page).analyze();
       expect(results.violations).toEqual([]);
     });
