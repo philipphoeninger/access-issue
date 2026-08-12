@@ -63,9 +63,27 @@
     - Keep slices small enough to review in one session
     - Run standup notes to track progress → skill: `Engineering/standup`
 
-10. **Code review before every push**
+10. **Code review, scoped to risk — not every push at full depth**
     - → skill: `Engineering/code-review`
-    - Focus: security, correctness, N+1s, missing edge cases
+    - The skill is written for typical backend web apps (SQL injection, N+1, auth). In a
+      static, backend-less project like AccessIssue, most of that surface doesn't apply
+      and burns tokens checking things that can't occur — narrow it explicitly:
+      - Invoke on a real diff (`/code-review git diff main`), never on "review the whole
+        thing" — reconstructing a diff from full context is the most expensive path
+      - Give it project context up front so it skips inapplicable dimensions, e.g.:
+        *"Static app, no backend, no database, no auth — skip SQL/N+1/auth checks.
+        Focus on correctness, maintainability, and adherence to CLAUDE.md."*
+    - Depth by slice risk, not uniformly:
+      - **Skip or keep light** for foundational/config slices and simple state pages —
+        their correctness is already covered by the slice's own acceptance criteria and
+        the CI suite (`docs/TESTING.md`)
+      - **Full review with context** for slices a spec's own risk section flags as
+        architecturally sensitive (e.g. `docs/SPEC_v1.md` §8) — logic defects there are
+        often invisible to automated accessibility tooling, because they are reasoning
+        errors, not rendering errors, and no amount of axe or screen-reader testing
+        catches a boundary rule violated in the state layer
+    - This tiering is a standing decision, not a per-slice judgement call — revisit only
+      if a "light" slice turns out to hide a real defect a full review would have caught
 
 11. **Manage tech debt continuously**
     - Flag and categorize debt as it accumulates, don't let it pile up
