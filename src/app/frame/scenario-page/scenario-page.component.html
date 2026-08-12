@@ -2,12 +2,24 @@
 <p class="step-indicator">{{ stepIndicator() }}</p>
 
 @if (hasMultipleSteps()) {
+  <!-- `queryParamsHandling="preserve"` because barrier state is scoped to the
+       *scenario*, not to the step: `frei` lists barriers from all four steps
+       (docs/ARCHITECTURE.md §8), the panel shows all of them grouped by step
+       (§12.1.1), and the counter counts all of them. Without this, walking to
+       the next step silently reset every barrier the user had resolved — and
+       a link shared from step 2 lost the state it was shared for. No
+       `replaceUrl`: step navigation is the one thing that pushes (§10), so
+       Back returns to the previous step with its state intact. -->
   <nav class="step-nav" aria-label="Schritte in diesem Szenario">
     @if (previousStep(); as prev) {
-      <a mat-button [routerLink]="stepLink(prev)">Zurück zu: {{ prev.title }}</a>
+      <a mat-button [routerLink]="stepLink(prev)" queryParamsHandling="preserve"
+        >Zurück zu: {{ prev.title }}</a
+      >
     }
     @if (nextStep(); as next) {
-      <a mat-button [routerLink]="stepLink(next)">Weiter zu: {{ next.title }}</a>
+      <a mat-button [routerLink]="stepLink(next)" queryParamsHandling="preserve"
+        >Weiter zu: {{ next.title }}</a
+      >
     }
   </nav>
 }

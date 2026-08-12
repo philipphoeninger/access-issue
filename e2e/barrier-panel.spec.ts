@@ -84,6 +84,35 @@ test.describe('Barrier panel — keyboard operation', () => {
   });
 });
 
+// Barrier state belongs to the scenario, not to the step (docs/ARCHITECTURE.md
+// §8): `frei` lists barriers from all four steps and the panel shows all of
+// them. Walking through the flow must therefore not reset what the user has
+// already resolved — the defect this suite exists to keep out.
+test.describe('Barrier state across step navigation', () => {
+  test('survives a step change, in both directions', async ({ page }) => {
+    await gotoRendered(page, '/szenario/bewerbung/stellenanzeige?frei=labels,pdf');
+
+    await page.getByRole('link', { name: 'Weiter zu: Bewerbungsformular' }).click();
+    await expect(page).toHaveURL('/szenario/bewerbung/formular?frei=labels,pdf');
+    await expect(page.locator('.counter')).toHaveText('9 von 11 Barrieren aktiv');
+    await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(2);
+
+    await page.getByRole('link', { name: 'Zurück zu: Stellenanzeige' }).click();
+    await expect(page).toHaveURL('/szenario/bewerbung/stellenanzeige?frei=labels,pdf');
+    await expect(page.locator('.counter')).toHaveText('9 von 11 Barrieren aktiv');
+  });
+
+  test('a barrier resolved on one step is still resolved on the next', async ({ page }) => {
+    await gotoRendered(page, '/szenario/bewerbung/stellenanzeige');
+    await panelCheckboxes(page).first().check();
+
+    await page.getByRole('link', { name: 'Weiter zu: Bewerbungsformular' }).click();
+
+    await expect(page).toHaveURL(/frei=grafik/);
+    await expect(panelCheckboxes(page).first()).toBeChecked();
+  });
+});
+
 test.describe('Barrier panel — effect on the rest of the page', () => {
   test('resolving a barrier counts it out of the simulation bar', async ({ page }) => {
     await gotoRendered(page, STEP);

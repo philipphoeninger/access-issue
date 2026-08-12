@@ -554,7 +554,13 @@ screen reader users unaware that the page changed. The frame therefore installs 
 
 1. sets focus to the main heading (`h1`, `tabindex="-1"`, focus outline suppressed only
    for this programmatic case)
-2. announces the new page title through a polite live region
+2. announces the page change through a polite live region, in the format `UX-COPY.md` §5.7
+   gives for it: *„{Seitentitel}. {n} von {total} Barrieren aktiv."* — the title alone on
+   routes that have no barriers (home, not found). An earlier version of this list said
+   "announces the new page title", which is where the implementation stopped until slice 5:
+   a screen reader user arriving on a step heard its name and nothing about how much of it
+   was still broken, while the same number was on screen in the simulation bar. The count is
+   spoken, never rendered here — there is still exactly one counter (§12.2, `UX-COPY.md` §5.6)
 3. resets scroll position
 
 Two kinds of `NavigationEnd` are excluded, and both exclusions are load-bearing rather

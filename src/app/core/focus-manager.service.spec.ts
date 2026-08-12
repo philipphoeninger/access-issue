@@ -1,13 +1,28 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
-import { NavigationEnd, NavigationStart, Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  NavigationStart,
+  Router,
+  convertToParamMap,
+} from '@angular/router';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { Announcer } from './announcer.service';
 import { FocusManager } from './focus-manager.service';
 
 function settle(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+/**
+ * The leaf route snapshot FocusManager walks to when it looks up the current
+ * scenario. `data` carries what core/scenario-routes.ts puts there; an empty
+ * object stands for a non-scenario route (home, not found).
+ */
+function routerStateWith(data: Record<string, unknown>): { snapshot: { root: unknown } } {
+  return { snapshot: { root: { firstChild: { firstChild: null, data } } } };
 }
 
 // docs/ARCHITECTURE.md §9 says FocusManager acts "on every NavigationEnd",
@@ -26,13 +41,34 @@ async function navigateOnce(events: Subject<unknown>, id = 1, url = '/a'): Promi
 describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
   let events: Subject<unknown>;
   let heading: HTMLHeadingElement;
+  let routerState: { snapshot: { root: unknown } };
+  let queryParams: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
+
+  /** Puts the fake router on a scenario step, the way scenario-routes.ts would. */
+  function onScenarioRoute(frei?: string): void {
+    routerState.snapshot.root = routerStateWith({
+      scenarioPath: 'bewerbung',
+      stepPath: 'formular',
+      hasPanel: true,
+    }).snapshot.root;
+    queryParams.next(convertToParamMap(frei === undefined ? {} : { frei }));
+  }
 
   beforeEach(() => {
     events = new Subject();
-    const router = { events } as unknown as Router;
+    // Default: a route with no scenario in its data — the home page.
+    routerState = routerStateWith({});
+    queryParams = new BehaviorSubject(convertToParamMap({}));
+    const router = { events, routerState } as unknown as Router;
 
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection(), { provide: Router, useValue: router }],
+      providers: [
+        provideZonelessChangeDetection(),
+        { provide: Router, useValue: router },
+        // For BarrierStateService, which FocusManager reads the active
+        // barrier count from (docs/UX-COPY.md §5.7).
+        { provide: ActivatedRoute, useValue: { queryParamMap: queryParams } },
+      ],
     });
 
     heading = document.createElement('h1');
@@ -95,13 +131,43 @@ describe('FocusManager (docs/ARCHITECTURE.md §9)', () => {
       expect(heading.getAttribute('tabindex')).toBe('-1');
     });
 
-    it('announces the heading text through the frame live region', async () => {
+    // docs/UX-COPY.md §5.7 "Seitenwechsel". A route with no barriers — the
+    // home page, the not-found page — keeps the bare title, because "0 von 0
+    // Barrieren aktiv" is not a sentence.
+    it('announces the heading text on a route without barriers', async () => {
       TestBed.inject(FocusManager);
       await navigateOnce(events, 1);
-      heading.textContent = 'Bewerbungsformular';
+      heading.textContent = 'AccessIssue: Barrieren sichtbar machen';
       await navigateOnce(events, 2, '/b');
 
-      expect(TestBed.inject(Announcer).message()).toBe('Bewerbungsformular');
+      expect(TestBed.inject(Announcer).message()).toBe('AccessIssue: Barrieren sichtbar machen');
+    });
+
+    it('announces the title and how many barriers are still active on a scenario step', async () => {
+      TestBed.inject(FocusManager);
+      await navigateOnce(events, 1);
+      heading.textContent = 'Bewerbungsprozess';
+      onScenarioRoute();
+      await navigateOnce(events, 2, '/szenario/bewerbung/formular');
+
+      expect(TestBed.inject(Announcer).message()).toBe(
+        'Bewerbungsprozess. 11 von 11 Barrieren aktiv.',
+      );
+    });
+
+    // The count is read after NavigationEnd, so a deep link into a partially
+    // resolved scenario announces what the URL actually says — not the
+    // default all-active state.
+    it('counts the barriers resolved in the URL of the page being entered', async () => {
+      TestBed.inject(FocusManager);
+      await navigateOnce(events, 1);
+      heading.textContent = 'Bewerbungsprozess';
+      onScenarioRoute('labels,pdf,grafik');
+      await navigateOnce(events, 2, '/szenario/bewerbung/formular?frei=labels,pdf,grafik');
+
+      expect(TestBed.inject(Announcer).message()).toBe(
+        'Bewerbungsprozess. 8 von 11 Barrieren aktiv.',
+      );
     });
 
     it('updates the document title', async () => {
