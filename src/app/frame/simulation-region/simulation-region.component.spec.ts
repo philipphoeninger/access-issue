@@ -68,7 +68,7 @@ describe('SimulationRegionComponent (docs/SPEC_v1.md Slice 4)', () => {
       expect(element.getAttribute('role')).toBe('region');
 
       const heading = element.querySelector(`#${element.getAttribute('aria-labelledby')}`);
-      expect(heading!.textContent!.trim()).toBe('Simulation: Website der Elbwerk AG');
+      expect(heading!.textContent!.trim()).toBe('Simulation: Website der Elbwerk GmbH & Co. KG');
     });
 
     it('is described by the frame-owned sentence in the simulation bar, which sits outside it', () => {

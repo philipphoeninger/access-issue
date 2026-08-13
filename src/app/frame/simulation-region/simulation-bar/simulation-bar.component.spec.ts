@@ -119,7 +119,7 @@ describe('SimulationBarComponent (docs/SPEC_v1.md Slice 4)', () => {
         ).textContent!.replace(/\s+/g, ' ');
 
       expect(read('')).toBe(read('alle'));
-      expect(read('')).toContain('Nachbau der Website der fiktiven Elbwerk AG.');
+      expect(read('')).toContain('Nachbau der Website der fiktiven Elbwerk GmbH & Co. KG.');
     });
   });
 

@@ -71,7 +71,7 @@ Ein Tool über digitale Teilhabe, das Teilhabe verweigert, wäre inhaltlich nich
 ## 6. Szenarien
 
 Die drei Szenarien folgen der Reihenfolge des Moduls (Folien 16–32) und spielen alle in
-**derselben Organisation** — der fiktiven Elbwerk AG. Das ist keine Kulisse, sondern die
+**derselben Organisation** — der fiktiven Elbwerk GmbH & Co. KG. Das ist keine Kulisse, sondern die
 Kernaussage von Kapitel 3: Barrierefreiheit ist keine Aufgabe eines Fachbereichs.
 
 ### 6.0 Verantwortungsbereiche

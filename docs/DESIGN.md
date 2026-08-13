@@ -62,18 +62,27 @@ Elbwerk is a mid-sized Hamburg engineering and services firm. The name carries a
 connection to the BSVH without being a real company. Fictional domain: `elbwerk.de`, used
 in the simulation bar only — never as a live link.
 
-The legal form is **AG**, and that is the one part of the name that was not a free choice:
-an `Elbwerk GmbH` turned out to exist. `Elbwerk AG` does not, so the company keeps its name
-— which the module deck and the URL `elbwerk.de` both rely on — and changes only its form.
+The legal form is **GmbH & Co. KG**, and it is the one part of the name that was not a free
+choice: an `Elbwerk GmbH` turned out to exist. The name itself carries the local connection
+and is relied on by the module deck and by `elbwerk.de`, so the company keeps it and changes
+only its form.
+
+`GmbH & Co. KG` rather than `AG`, and the reason is characterisation rather than law. An
+Aktiengesellschaft in Wilhelmsburg would quietly contradict the premise: chapter 3 is about
+the *Mittelstand*, and an AG reads as a listed corporation with a legal department that
+somebody would have asked. `GmbH & Co. KG` is the commonest form for a firm of this size in
+Germany, which keeps Elbwerk in the category the module is actually talking about — and
+keeps the barriers reading as ordinary neglect rather than as corporate malice.
 
 Two consequences worth stating, because both are easy to undo by accident. The legal form
-appears in the logo wordmark, so the logo carries `AG · HAMBURG`; and it appears inside the
-generated benefits graphic, which has to be re-rendered rather than edited
-(`CLAUDE.md`, "Stack and conventions"). A rename that misses either leaves the real
-company's name visible in a picture, where no search finds it.
+appears in the logo wordmark, so the logo carries `GMBH & CO. KG · HAMBURG`; and it appears
+inside the generated benefits graphic, where it is pixels and has to be re-rendered rather
+than edited (`CLAUDE.md`, "Stack and conventions"). A rename that misses either leaves the
+real company's name visible in a picture, where no search finds it — which is exactly how
+this one survived the first pass.
 
-The check that produced this — trade register and DPMA — was the open item here and is now
-closed.
+The check that produced all of this — trade register and DPMA — was the open item here and
+is now closed.
 
 ---
 
