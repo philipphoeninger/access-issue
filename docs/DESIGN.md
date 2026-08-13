@@ -84,9 +84,14 @@ generated benefits graphic, where it is pixels and has to be re-rendered rather 
 visible in a picture, where no search finds it — which is exactly how the first rename
 nearly shipped.
 
-**Still to check:** the register and DPMA search that started this covered `Elbwerk GmbH`.
-`Elbwerk KG` is a third distinct firm name and has not been through it. The check is cheap;
-running it before the slides are printed is the point of this whole item.
+**Checked, August 2026 (Philipp).** Trade register and DPMA: an `Elbwerk GmbH` exists,
+`Elbwerk KG` does not. That is what settled the legal form, and the open item this section
+carried is closed.
+
+The date is recorded rather than a bare "checked", because a register is a moving target: a
+real `Elbwerk KG` could be founded next year. Nothing in the application breaks if that
+happens, but if the name ever has to change again, the two generated images below are where
+a rename hides.
 
 ---
 

@@ -1045,7 +1045,7 @@ ohne die eine gehörlose Person nicht weiß, ob sie hingehen kann.
 | --- | --- |
 | Fachliche Freigabe aller Elbwerk-Texte | WERTE.IT-Team |
 | Erklärtexte je Barriere (Abschnitt 5.8 liefert nur die Rubriken) | WERTE.IT-Team |
-| Prüfung „Elbwerk KG" gegen Handelsregister und DPMA. Die erste Prüfung fand eine `Elbwerk GmbH` — daher die geänderte Rechtsform —, aber `Elbwerk KG` ist ein dritter, eigener Firmenname und wurde noch nicht geprüft (`DESIGN.md` §2.1) | Philipp |
+| ~~Prüfung „Elbwerk" gegen Handelsregister und DPMA~~ — erledigt im August 2026: Eine `Elbwerk GmbH` existiert, eine `Elbwerk KG` nicht. Das hat die Rechtsform entschieden (`DESIGN.md` §2.1) | Philipp — geschlossen |
 | Sind die Personennamen in den Testimonials unbedenklich, oder sollen sie neutraler werden? | WERTE.IT-Team |
 | Transkripttext des Kampagnenvideos — hängt am Videomaterial (`PRD.md` §10) | WERTE.IT-Team |
 | **Prüfung der Fassung in Leichter Sprache (Abschnitt 9.8) durch eine Fachstelle.** Der Entwurf folgt den Regeln nur annähernd. Eine schlecht gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine. | WERTE.IT-Team / Fachstelle |
