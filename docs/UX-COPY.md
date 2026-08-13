@@ -1102,6 +1102,24 @@ Die Fassung oben folgt diesen Regeln annähernd — sie ist ein Platzhalter und 
 Veröffentlichung von einer Fachstelle für Leichte Sprache geprüft werden. Eine schlecht
 gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine.
 
+**Zur Darstellung** (Slice 15): `csr.easyLanguage.body` steht oben als ein Satz je Satz,
+und die Umsetzung setzt jeden Satz in eine eigene Zeile — das verlangt dasselbe Regelwerk,
+und es ist Typografie, keine redaktionelle Änderung. Ein Test hält beide Fassungen
+zusammen: aneinandergehängt ergeben die Zeilen genau die Zeichenkette in der Tabelle
+(`src/app/scenarios/csr-campaign/campaign-texts/`). Wer die Copy ändert, ändert die Zeilen
+mit — oder der Test schlägt fehl.
+
+**Die Aufklappfläche steht vor dem Haupttext** (Slice 15, redaktionell zu bestätigen). Wer
+Leichte Sprache braucht, findet ein Angebot hinter dem schweren Text zu spät; und das
+Sprungziel der Panel-Gruppe ist die Abschnittsüberschrift, hinter der das einzige
+Bedienelement des Abschnitts liegen muss. Dieselbe Überlegung wie bei der
+Bereichsnavigation in Abschnitt 9.1.
+
+**Normbezug des zweiten Teils:** `BITV 2.0 § 4` („Erläuterungen in Deutscher
+Gebärdensprache und Leichter Sprache"), nicht § 3 wie in einer früheren Fassung von
+`PRD.md` §6.2 — § 3 heißt „Anzuwendende Standards" und erwähnt Leichte Sprache nicht. Der
+Erklärungsbereich zeigt bei BITV keine Konformitätsstufe (Abschnitt 5.8).
+
 **Warum das gekoppelt ist:** Wer nur Teil 1 behebt, hat verständliches Deutsch — für viele
 eine echte Verbesserung, für Menschen mit Lernbehinderung aber weiterhin zu schwer. Wer nur
 Teil 2 behebt, bietet Leichte Sprache als Sonderweg neben unverständlichem Haupttext an. Der
@@ -1301,7 +1319,9 @@ der automatische Wechsel unterbleibt.
 | ~~Prüfung „Elbwerk" gegen Handelsregister und DPMA~~ — erledigt im August 2026: Eine `Elbwerk GmbH` existiert, eine `Elbwerk KG` nicht. Das hat die Rechtsform entschieden (`DESIGN.md` §2.1) | Philipp — geschlossen |
 | Sind die Personennamen in den Testimonials unbedenklich, oder sollen sie neutraler werden? | WERTE.IT-Team |
 | Transkripttext des Kampagnenvideos — hängt am Videomaterial (`PRD.md` §10) | WERTE.IT-Team |
-| **Prüfung der Fassung in Leichter Sprache (Abschnitt 9.8) durch eine Fachstelle.** Der Entwurf folgt den Regeln nur annähernd. Eine schlecht gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine. | WERTE.IT-Team / Fachstelle |
+| **Prüfung der Fassung in Leichter Sprache (Abschnitt 9.2) durch eine Fachstelle.** Der Entwurf folgt den Regeln nur annähernd. Eine schlecht gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine. Der Barriereteil `leichte-sprache` trägt `contentStatus: 'placeholder'` und blockiert damit die Veröffentlichung | WERTE.IT-Team / Fachstelle |
+| **Was sagt der Erklärtext zu BITV 2.0 § 4?** Der Paragraf definiert die Anforderung an Leichte Sprache, bindet aber nur öffentliche Stellen — Elbwerk ist ein Unternehmen (`PRD.md` §6.2). Der Text muss die Anforderung benennen, ohne eine Pflicht zu behaupten, die es für Unternehmen so nicht gibt | WERTE.IT-Team |
+| Aufklappfläche und Zeilenumbrüche der Leichten Sprache (Abschnitt 9.2) — in Slice 15 festgelegt, weil die Fassung sonst nicht darstellbar ist | WERTE.IT-Team |
 | Namen und Kontaktdaten der fiktiven Ansprechpersonen (Miriam Kessler, Torben Kruse) — sollen sie so bleiben oder neutraler werden? | WERTE.IT-Team |
 | `csr.text.h3` („Unser Ziel") und die Zuordnung der fünf Menüpunkte zu den Abschnitten (Abschnitt 9, 9.1) — in Slice 14 ergänzt, weil die Bereichsnavigation ohne Ziele nicht baubar ist | WERTE.IT-Team |
 | Soll die Stellenanzeige eine reale BSVH-nahe Tätigkeit abbilden oder bewusst neutral bleiben? | WERTE.IT-Team |

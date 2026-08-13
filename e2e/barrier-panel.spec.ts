@@ -183,9 +183,9 @@ test.describe('Barrier panel — effect on the rest of the page', () => {
 //
 // The cases are generated from the declared groups, so each section of the CSR
 // campaign is covered the moment its slice declares it, without anyone
-// remembering to come back here. Slice 14 declares the first of the five; the
-// negative control below has become a positive one and now asserts that the
-// generator produces cases at all.
+// remembering to come back here. Slices 14 and 15 declare the first two of the
+// five; the negative control below has become a positive one and now asserts
+// that the generator produces cases at all.
 const ANCHORED_GROUPS = SCENARIOS.filter((scenario) => scenario.status === 'available').flatMap(
   (scenario) =>
     scenario.groups

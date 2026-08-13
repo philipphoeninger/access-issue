@@ -119,20 +119,17 @@ test.describe('Query strings that mean nothing here (docs/ARCHITECTURE.md §17)'
     await expect(counter(page)).toHaveText('Alle 11 Barrieren aktiv');
   });
 
-  // docs/TESTING.md §12 also lists "a key from another scenario". That case
-  // is not observable here yet, and saying otherwise would be the worse kind
-  // of green: the CSR campaign is still a stub with `barriers: []`
-  // (src/app/content/csr-campaign/csr-campaign.scenario.ts), so 'video' is
-  // simply a key nobody owns and this URL is indistinguishable from the
-  // unknown-key test above. What *is* observable — and what this asserts —
-  // is that an unusable key costs the valid key beside it nothing.
+  // docs/TESTING.md §12 also lists "a key from another scenario", and this is
+  // now the real thing rather than a stand-in: `jargon` is a part of the CSR
+  // campaign's combined language barrier (docs/SPEC_v2.md slice 15). It is a
+  // key that exists, resolves a barrier on another page, and must do nothing
+  // at all here — while costing the valid key beside it nothing.
   //
-  // The cross-scenario case itself is covered where it can be stated
-  // honestly today: src/app/core/url-state.spec.ts parses `labels` against a
-  // second scenario's real barrier set. It moves here once a second scenario
-  // ships content (SPEC_v2.md), and 'video' is the key it will then own.
-  test('an unusable key costs the valid key beside it nothing', async ({ page }) => {
-    await gotoRendered(page, `${STEP}?frei=labels,video`);
+  // Until slice 15 this URL carried 'video', a key nobody owned, which made
+  // the case indistinguishable from the unknown-key test above. The dropped
+  // campaign video means no barrier will ever own it (docs/PRD.md §10).
+  test('a key from another scenario costs the valid key beside it nothing', async ({ page }) => {
+    await gotoRendered(page, `${STEP}?frei=labels,jargon`);
 
     await expect(counter(page)).toHaveText('10 von 11 Barrieren aktiv');
   });

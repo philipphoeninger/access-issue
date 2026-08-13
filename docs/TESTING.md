@@ -205,11 +205,10 @@ The mapping from barrier to axe rule id lives in a **test fixture**, not in the 
 model:
 
 ```ts
-// e2e/fixtures/expected-violations.ts
-export const EXPECTED_AXE_RULE: Record<string, string> = {
-  'application-form-missing-labels': 'label',
-  'csr-social-embed-no-alt': 'image-alt',
-  // …
+// src/app/content/axe-rule-fixtures.ts — scenario path, then Barrier.id
+export const AXE_RULE_FIXTURES: Record<string, Record<string, string>> = {
+  bewerbung: { labels: 'label', grafik: 'image-alt' },
+  'csr-kampagne': { alt: 'image-alt', kontrast: 'color-contrast' },
 };
 ```
 
@@ -218,8 +217,19 @@ project's; axe renames and splits rules between major versions, and a rename wou
 otherwise force an edit to editorially reviewed content files. The domain model records
 *whether* a barrier is machine-detectable; the test layer records *how*.
 
-A missing entry for a barrier marked `'axe'` fails the suite. That prevents the fixture
-from silently falling behind the content.
+**The key is two-level, and it has to be.** A `Barrier.id` is unique within its scenario
+and nowhere else — `sprache` names a barrier in both the application process and the
+campaign — so a flat map would let one entry answer for two different barriers while the
+"every axe barrier has a fixture entry" check passed for both.
+
+It lives under `src/app/content/` rather than beside the Playwright suite so that the
+contract tests can read it as a Karma unit test, and so it sits with the content it maps
+to; `expectedRuleFor(scenarioPath, barrierId)` in `e2e/support/axe-runs.ts` is the only
+way run 2 obtains a rule id.
+
+A missing entry for a barrier marked `'axe'` fails the suite, and so does an entry naming
+a barrier its scenario does not declare. That prevents the fixture from falling behind the
+content in either direction.
 
 ### Run 3 — Page-level rules (whole document)
 

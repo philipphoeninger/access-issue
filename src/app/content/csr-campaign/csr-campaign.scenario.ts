@@ -8,7 +8,7 @@
 // because routing and the step-view map need something to key on, not because
 // the campaign has a flow.
 import type { Scenario } from '../../models/domain.model';
-import { NAVIGATION_BARRIER } from './csr-campaign.content';
+import { NAVIGATION_BARRIER, SPRACHE_BARRIER } from './csr-campaign.content';
 
 export const CSR_CAMPAIGN_SCENARIO: Scenario = {
   id: 'csr-campaign',
@@ -35,15 +35,17 @@ export const CSR_CAMPAIGN_SCENARIO: Scenario = {
   // declared anchor actually hits something.
   //
   // **Only sections whose barriers exist are declared.** The page renders all
-  // five from this slice on, but a declared group with no barrier is a legend
+  // five from slice 14 on, but a declared group with no barrier is a legend
   // promising controls that are not there, and content/data-contract.spec.ts
-  // rejects it. The remaining four are added by the slice that brings their
-  // barriers (docs/SPEC_v2.md slices 15 to 18), in this order:
+  // rejects it. The remaining three are added by the slice that brings their
+  // barriers (docs/SPEC_v2.md slices 16 to 18), in this order:
   //
-  //   { id: 'texte',  title: 'Texte und Inhalte',           anchorId: 'sim-texte'  }
   //   { id: 'medien', title: 'Medien',                      anchorId: 'sim-medien' }
   //   { id: 'event',  title: 'Event und Podiumsdiskussion',  anchorId: 'sim-event'  }
   //   { id: 'spende', title: 'Spendenaufruf',                anchorId: 'sim-spende' }
-  groups: [{ id: 'kampagnenseite', title: 'Kampagnenseite', anchorId: 'sim-kampagne' }],
-  barriers: [NAVIGATION_BARRIER],
+  groups: [
+    { id: 'kampagnenseite', title: 'Kampagnenseite', anchorId: 'sim-kampagne' },
+    { id: 'texte', title: 'Texte und Inhalte', anchorId: 'sim-texte' },
+  ],
+  barriers: [NAVIGATION_BARRIER, SPRACHE_BARRIER],
 };

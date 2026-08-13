@@ -102,11 +102,10 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
   });
 
   // Same guarantee as for barriers, on the objects the explanation view
-  // actually renders when a part is selected (`?erklaerung=video-ut`). Like
-  // the combined-barrier test further down, this iterates nothing today — the
-  // CSR video barrier is still a `status: 'planned'` stub — and it is written
-  // now precisely so that it is already in place when that content is
-  // authored, which is the moment it can fail.
+  // actually renders when a part is selected (`?erklaerung=leichte-sprache`).
+  // Written in slice 6 against no data at all — the CSR video barrier it was
+  // aimed at was dropped — and first exercised by the campaign's language
+  // barrier in slice 15.
   it('gives every part of a combined barrier non-empty problem, affected and solution prose', () => {
     forEachPart(scenarios, (scenario, barrier, part) => {
       const where = `${scenario.path}/${barrier.urlKey}/${part.urlKey}`;
@@ -225,6 +224,13 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     // complete: `?frei=navigation` is a working deep link from the moment the
     // barrier exists, and that is the moment it can end up on a slide.
     { scenarioPath: 'csr-kampagne', urlKey: 'navigation' },
+    // The combined barrier of slice 15. All three keys are lockable: the
+    // parent is valid in `frei` (sugar for both parts) and in `erklaerung`
+    // (its own explanation), and each part is a deep link of its own — the
+    // partial states are the ones a slide is most likely to show.
+    { scenarioPath: 'csr-kampagne', urlKey: 'sprache' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'jargon' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'leichte-sprache' },
   ];
 
   it('keeps every previously published {scenarioPath, urlKey} pair (add here on release)', () => {
@@ -294,10 +300,9 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
   });
 
   it('gives every combined barrier at least two parts with unique urlKeys', () => {
-    // No combined barrier exists yet in v1 content (the CSR video barrier is
-    // still a `status: 'planned'` stub), so this loop currently has nothing
-    // to iterate — the assertion below keeps the spec meaningful rather than
-    // silently vacuous until that barrier is authored.
+    // The campaign's `sprache` barrier is the first one this iterates
+    // (docs/SPEC_v2.md slice 15); the guard against a vacuous pass stays,
+    // because the set of combined barriers is content and could shrink again.
     expect(scenarios.length).toBeGreaterThan(0);
     forEachBarrier(scenarios, (scenario, barrier) => {
       if (!barrier.parts) {
@@ -313,15 +318,42 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     });
   });
 
+  // The fixture map is keyed by scenario path first, because `Barrier.id` is
+  // unique within a scenario and nowhere else — `sprache` exists in both the
+  // application process and the campaign (docs/SPEC_v2.md slice 15). Looking
+  // it up flat would let one entry satisfy this assertion for two different
+  // barriers while run 2 asserted the wrong rule for one of them.
   it('has an axe fixture entry for every barrier with automatedDetection: axe', () => {
     forEachBarrier(scenarios, (scenario, barrier) => {
       if (barrier.automatedDetection !== 'axe') {
         return;
       }
-      expect(AXE_RULE_FIXTURES[barrier.id])
+      const scenarioFixtures = AXE_RULE_FIXTURES[scenario.path];
+      expect(scenarioFixtures === undefined ? undefined : scenarioFixtures[barrier.id])
         .withContext(`${scenario.path}/${barrier.id} is missing an AXE_RULE_FIXTURES entry`)
         .toBeDefined();
     });
+  });
+
+  // The other direction: a fixture entry naming a barrier that does not exist
+  // is a rule id nothing asserts — dead weight that reads as coverage. It is
+  // also how a scenario-scoped map goes wrong, by filing an entry under the
+  // wrong scenario, which the assertion above cannot see.
+  it('resolves every axe fixture entry to a barrier of that scenario', () => {
+    for (const [scenarioPath, fixtures] of Object.entries(AXE_RULE_FIXTURES)) {
+      const scenario = scenarios.find((candidate) => candidate.path === scenarioPath);
+      expect(scenario).withContext(`AXE_RULE_FIXTURES key "${scenarioPath}"`).toBeDefined();
+
+      for (const barrierId of Object.keys(fixtures)) {
+        const barrier = scenario?.barriers.find((candidate) => candidate.id === barrierId);
+        expect(barrier)
+          .withContext(`AXE_RULE_FIXTURES["${scenarioPath}"]["${barrierId}"]`)
+          .toBeDefined();
+        expect(barrier?.automatedDetection)
+          .withContext(`${scenarioPath}/${barrierId} has a fixture but is not axe-detectable`)
+          .toBe('axe');
+      }
+    }
   });
 
   it('keeps scenario path values unique', () => {

@@ -170,7 +170,7 @@ Die Barrieren folgen den fünf Bereichen, die Folie 29 nennt:
 | Teilbarriere | Bereich | Betroffene Nutzergruppen | Normbezug (vorläufig) |
 | --- | --- | --- | --- |
 | Kampagnentext voller Anglizismen und Marketingjargon | Kommunikation | kognitive Einschränkungen, geringe Literalität, Nicht-Muttersprachler | WCAG 3.1.5 |
-| Keine Fassung in Leichter Sprache | Kommunikation | Menschen mit Lernbehinderung, geringe Literalität | BITV 2.0 § 3 |
+| Keine Fassung in Leichter Sprache | Kommunikation | Menschen mit Lernbehinderung, geringe Literalität | BITV 2.0 § 4 |
 
 Das Beheben nur des ersten Teils erzeugt verständliches Deutsch — das ist **nicht** dasselbe
 wie Leichte Sprache, und für einen Teil der Zielgruppe reicht es nicht. Zwei verschiedene
@@ -226,10 +226,18 @@ ohne Ziehen bedienbar sein. Da das Modul Unternehmen die Rechtslage erklärt, is
 falscher Paragraf ein inhaltlicher Fehler, kein Formalismus. Die übrigen Bezüge sollten bei
 der Redaktion ebenfalls gegen 2.2 geprüft werden, nicht gegen 2.1.
 
-Der Normbezug **BITV 2.0 § 3** für die Leichte-Sprache-Barriere gilt unmittelbar nur für
-öffentliche Stellen. Elbwerk ist ein Unternehmen. Der Erklärtext muss das benennen, statt
-einen Paragrafen zu zitieren, der auf den dargestellten Fall nicht direkt anwendbar ist —
-sonst lehrt das Modul eine Rechtslage, die es so nicht gibt.
+Ein zweiter Punkt ist bei der Umsetzung von Slice 15 korrigiert worden: Die
+Leichte-Sprache-Barriere war **BITV 2.0 § 3** zugeordnet. § 3 heißt „Anzuwendende
+Standards" und erwähnt Leichte Sprache nicht; einschlägig ist **§ 4 „Erläuterungen in
+Deutscher Gebärdensprache und Leichter Sprache"**. Geprüft gegen die konsolidierte Fassung
+auf gesetze-im-internet.de im August 2026; der Normbezug im Code zitiert § 4
+(`src/app/content/standards/bitv.ts`).
+
+Der Normbezug gilt unmittelbar nur für öffentliche Stellen. Elbwerk ist ein Unternehmen.
+Der Erklärtext muss das benennen, statt einen Paragrafen zu zitieren, der auf den
+dargestellten Fall nicht direkt anwendbar ist — sonst lehrt das Modul eine Rechtslage, die
+es so nicht gibt. Das ist die einzige Stelle, an der ein zitierter Paragraf das
+dargestellte Unternehmen nicht bindet, und sie steht in `UX-COPY.md` §10 als offener Punkt.
 
 ### 6.3 Softwarebeschaffung (Priorität 3)
 

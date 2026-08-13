@@ -1,0 +1,73 @@
+// Elbwerk, nicht WERTE.IT: ausschließlich --sim-*-Tokens (CLAUDE.md Regel 5).
+:host {
+  display: block;
+}
+
+.body {
+  margin: 0;
+  // docs/DESIGN.md §4.2: Zeilenlänge auch in der Simulation begrenzt. Der
+  // Unterschied zwischen den beiden Fassungen soll die Sprache sein, nicht der
+  // Satzspiegel — eine Jargonfassung, die zusätzlich über die ganze Breite
+  // läuft, trüge zwei Barrieren, von denen das Panel nur eine erklärt
+  // (CLAUDE.md Regel 18).
+  max-width: 60ch;
+}
+
+.easy-language {
+  margin: 0 0 16px;
+}
+
+.easy-toggle {
+  display: inline-flex;
+  align-items: center;
+  // WCAG 2.2 SC 2.5.8 (docs/DESIGN.md §5): Die behobene Fassung muss echt
+  // barrierefrei sein, Zielgröße eingeschlossen.
+  min-height: var(--sim-target-min);
+  border: 1px solid var(--sim-border);
+  background: var(--sim-white);
+  padding: 4px 12px;
+  color: var(--sim-brand);
+  font: inherit;
+  cursor: pointer;
+
+  &::after {
+    content: ' ▾';
+  }
+
+  &[aria-expanded='true']::after {
+    content: ' ▴';
+  }
+}
+
+.easy-panel {
+  margin: 8px 0 0;
+  border-left: 4px solid var(--sim-border);
+  background: var(--sim-surface);
+  padding: 12px 16px;
+
+  h4 {
+    margin: 0 0 8px;
+    color: var(--sim-brand);
+    font-size: 1.0625rem;
+  }
+}
+
+// `hidden` steuert die Sichtbarkeit, also darf `display` hier nicht
+// dagegenhalten.
+.easy-panel[hidden] {
+  display: none;
+}
+
+// Leichte Sprache: ein Satz je Zeile, großzügiger Zeilenabstand, kurze
+// Zeilenlänge. Das ist Teil des Regelwerks, nicht Geschmack — und es ist der
+// Grund, warum die Fassung als Liste von Sätzen vorliegt und nicht als
+// Fließtext (campaign-texts.component.ts).
+.easy-sentence {
+  margin: 0 0 4px;
+  max-width: 45ch;
+  line-height: 1.6;
+}
+
+// Kein Fokusring in dieser Datei: den zeichnet `[data-simulation-region]
+// :focus-visible` global in src/styles.scss (CLAUDE.md Regel 8). `outline:
+// none` steht hier nirgends.

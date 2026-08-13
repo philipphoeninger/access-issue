@@ -1,10 +1,13 @@
-// The CSR campaign page and its first barrier (docs/SPEC_v2.md slice 14).
+// The CSR campaign page and its barriers (docs/SPEC_v2.md slices 14 and 15).
 //
-// The barrier is `automatedDetection: 'manual'`: axe sees a `<div>` with a
-// click handler as ordinary text, so run 2 has nothing to assert here. What
-// proves this barrier is the keyboard — real `Tab` and `Enter` presses,
-// reading `document.activeElement` (docs/TESTING.md §9). A navigation that a
-// test reaches with `.focus()` is not being tested.
+// Both barriers so far are `automatedDetection: 'manual'`: axe sees a `<div>`
+// with a click handler as ordinary text, and no tool judges whether a sentence
+// is comprehensible or notices that an easy-language version is missing. Run 2
+// therefore has nothing to assert on this page. What proves the navigation is
+// the keyboard — real `Tab` and `Enter` presses, reading
+// `document.activeElement` (docs/TESTING.md §9); what proves the language
+// barrier is that its four states are four different pages and that its
+// disclosure is a real one.
 //
 // The safety-critical path (docs/TESTING.md §7) is not repeated here: the two
 // campaign states are rows in e2e/exit-link.spec.ts, where the trap detector
@@ -17,11 +20,19 @@ import { gotoRendered } from './support/goto';
 
 const PATH = '/szenario/csr-kampagne';
 
-/** docs/TESTING.md §4 — the tested states of this page. Grows with the barriers. */
+/**
+ * docs/TESTING.md §4 — the tested states of this page. Grows with the
+ * barriers, and a combined barrier contributes its partial-repair states as
+ * well: those are where the teaching happens, and they are the states a
+ * repair-layer implementation could not produce at all.
+ */
 const STATES: Array<{ name: string; url: string }> = [
   { name: 'all barriers active (default)', url: PATH },
   { name: 'all barriers resolved', url: `${PATH}?frei=alle` },
   { name: 'only `navigation` resolved', url: `${PATH}?frei=navigation` },
+  { name: 'only `sprache` resolved (both parts)', url: `${PATH}?frei=sprache` },
+  { name: 'partial — only `jargon` resolved', url: `${PATH}?frei=jargon` },
+  { name: 'partial — only `leichte-sprache` resolved', url: `${PATH}?frei=leichte-sprache` },
 ];
 
 /** The five sections of docs/UX-COPY.md §9, in page order. */
@@ -323,16 +334,242 @@ test.describe('The panel anchor of the campaign-page group', () => {
   });
 });
 
+// The combined barrier of docs/SPEC_v2.md slice 15. The panel side of the
+// combined shape — indeterminate parent, `fieldset`/`legend`, one checkbox per
+// part — is covered against fixtures in
+// src/app/frame/barrier-panel/barrier-panel.component.spec.ts. What is asserted
+// here is that shipped content produces it, on a real page, together with the
+// counter rule that only holds across the two of them
+// (docs/UX-COPY.md §5.6).
+test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY.md §9.2)', () => {
+  const PARENT = 'sprache';
+  const JARGON = 'jargon';
+  const EASY = 'leichte-sprache';
+
+  /**
+   * The checkbox belonging to a panel entry, found through the label span the
+   * panel keys off `urlKey` (frame/barrier-panel: `barrier-{urlKey}-label`).
+   * Material renders the `<input>` as a sibling of its `<label>`, so the hop
+   * goes through `mat-checkbox` rather than through the label itself.
+   */
+  function boxFor(page: Page, urlKey: string) {
+    return page.locator(`.panel mat-checkbox:has(#barrier-${urlKey}-label) input[type="checkbox"]`);
+  }
+
+  function isIndeterminate(page: Page, urlKey: string): Promise<boolean> {
+    return boxFor(page, urlKey).evaluate((box) => (box as HTMLInputElement).indeterminate);
+  }
+
+  test('renders as a fieldset with a legend, a parent and two parts', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    const combined = page.locator('.panel fieldset.combined');
+    await expect(combined).toHaveCount(1);
+    await expect(combined.locator('legend')).toHaveText('Texte verständlich');
+    await expect(combined.locator('input[type="checkbox"]')).toHaveCount(3);
+
+    // docs/UX-COPY.md §5.6 `panel.combinedHint`, the two-part wording — and
+    // the sentence has to make clear that resolving one part is not enough.
+    await expect(combined.locator('.hint')).toHaveText(
+      'Diese Barriere hat zwei Teile. Erst wenn beide behoben sind, ist der Inhalt barrierefrei.',
+    );
+  });
+
+  test('shows the parent as indeterminate while exactly one part is resolved', async ({ page }) => {
+    for (const key of [JARGON, EASY]) {
+      await gotoRendered(page, `${PATH}?frei=${key}`);
+
+      expect(await isIndeterminate(page, PARENT)).toBe(true);
+      await expect(boxFor(page, PARENT)).not.toBeChecked();
+      await expect(boxFor(page, key)).toBeChecked();
+
+      // The state badge says the same thing in words, never in a symbol or a
+      // colour alone (docs/DESIGN.md §3.3).
+      await expect(page.locator('.panel fieldset.combined > .meta .state')).toHaveText(
+        'Teilweise behoben',
+      );
+    }
+  });
+
+  test('resolves the parent only once both parts are (docs/ARCHITECTURE.md §6)', async ({
+    page,
+  }) => {
+    await gotoRendered(page, `${PATH}?frei=jargon,leichte-sprache`);
+
+    await expect(boxFor(page, PARENT)).toBeChecked();
+    expect(await isIndeterminate(page, PARENT)).toBe(false);
+    await expect(page.locator('.panel fieldset.combined > .meta .state')).toHaveText(
+      'Barrierefrei',
+    );
+  });
+
+  // The counter rule of docs/UX-COPY.md §5.6, and the reason the combined case
+  // exists at all: a barrier that half stands is a barrier that stands.
+  test('counts a partially resolved barrier as active', async ({ page }) => {
+    await gotoRendered(page, PATH);
+    await expect(page.locator('.counter')).toHaveText('Alle 2 Barrieren aktiv');
+
+    await gotoRendered(page, `${PATH}?frei=jargon`);
+    await expect(page.locator('.counter')).toHaveText('Alle 2 Barrieren aktiv');
+
+    await gotoRendered(page, `${PATH}?frei=sprache`);
+    await expect(page.locator('.counter')).toHaveText('1 von 2 Barrieren aktiv');
+
+    await gotoRendered(page, `${PATH}?frei=alle`);
+    await expect(page.locator('.counter')).toHaveText('Keine Barriere aktiv');
+  });
+
+  // Toggling the parent moves both parts in lockstep (core/url-state.ts), with
+  // real key events rather than `.check()` (docs/TESTING.md §9).
+  test('toggles both parts from the parent checkbox, by keyboard', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    await boxFor(page, PARENT).focus();
+    await page.keyboard.press('Space');
+
+    await expect(boxFor(page, JARGON)).toBeChecked();
+    await expect(boxFor(page, EASY)).toBeChecked();
+    await expect(page.locator('.counter')).toHaveText('1 von 2 Barrieren aktiv');
+    // Focus stays where the user put it (docs/ARCHITECTURE.md §12.2).
+    expect((await focused(page)).id).toBe(await boxFor(page, PARENT).getAttribute('id'));
+  });
+});
+
+test.describe('The texts section in the simulation (docs/UX-COPY.md §9.2)', () => {
+  const MAIN_TEXT = '[data-simulation-region] .body';
+  const TOGGLE = '[data-simulation-region] .easy-toggle';
+
+  test('is jargon with no easy-language version while both parts are active', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    await expect(page.locator(MAIN_TEXT)).toContainText('Purpose-driven Impact-Programm');
+    await expect(page.locator(TOGGLE)).toHaveCount(0);
+  });
+
+  // The state the coupling is about: comprehensible German is a real
+  // improvement and still not easy language (docs/PRD.md §6.2).
+  test('resolving `jargon` alone leaves no easy-language version', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=jargon`);
+
+    await expect(page.locator(MAIN_TEXT)).toContainText('Nachbarschaftstreff an der Veringstraße');
+    await expect(page.locator(MAIN_TEXT)).not.toContainText('Stakeholder-Value');
+    await expect(page.locator(TOGGLE)).toHaveCount(0);
+  });
+
+  // The mirror image: easy language offered as a side door next to a main text
+  // nobody can read.
+  test('resolving `leichte-sprache` alone leaves the jargon main text', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=leichte-sprache`);
+
+    await expect(page.locator(MAIN_TEXT)).toContainText('Purpose-driven Impact-Programm');
+    await expect(page.locator(TOGGLE)).toHaveCount(1);
+  });
+
+  // A real disclosure, operated the way a keyboard user operates one: reached
+  // by Tab, opened with Enter, reporting its state in `aria-expanded`. A
+  // CSS-only toggle would look identical and announce nothing.
+  test('opens the easy-language version by keyboard and reports its state', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=leichte-sprache`);
+
+    const toggle = page.locator(TOGGLE);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#sim-leichte-sprache')).toBeHidden();
+
+    await page.locator(EXIT_LINK).focus();
+    await page.keyboard.press('Tab');
+
+    const stop = await focused(page);
+    expect(stop.tag).toBe('BUTTON');
+    expect(stop.text).toBe('Diesen Text in Leichter Sprache lesen');
+
+    await page.keyboard.press('Enter');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#sim-leichte-sprache')).toBeVisible();
+    await expect(page.locator('#sim-leichte-sprache h4')).toHaveText(
+      'Die Aktion in Leichter Sprache',
+    );
+
+    await page.keyboard.press('Enter');
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#sim-leichte-sprache')).toBeHidden();
+  });
+
+  // Collapsed means collapsed: `[hidden]` keeps the version out of the
+  // accessibility tree and out of the tab order, so the page is not read twice.
+  //
+  // Asserted with real key presses reading `document.activeElement`
+  // (docs/TESTING.md §9), not with a visibility check: a collapse that leaves
+  // the content in the layout — `visibility: hidden`, an off-screen position,
+  // `aria-hidden` over a still-focusable subtree — is exactly the mistake this
+  // has to catch, and only Tab can see it. The visibility assertion stays as
+  // the second half, because being unreachable while still on screen would be
+  // its own defect.
+  test('keeps the collapsed version out of the tab order', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=leichte-sprache`);
+
+    await page.locator(EXIT_LINK).focus();
+    await page.keyboard.press('Tab');
+    expect((await focused(page)).text).toBe('Diesen Text in Leichter Sprache lesen');
+
+    // Twenty presses is well past the end of this page; nothing inside the
+    // collapsed panel may take focus at any point along the way.
+    for (let press = 0; press < 20; press++) {
+      await page.keyboard.press('Tab');
+
+      const insidePanel = await page.evaluate(() => {
+        const panel = document.getElementById('sim-leichte-sprache')!;
+        const active = document.activeElement;
+        return active !== null && panel.contains(active);
+      });
+      expect(insidePanel).toBe(false);
+    }
+
+    expect(
+      await page.evaluate(() => document.getElementById('sim-leichte-sprache')!.checkVisibility()),
+    ).toBe(false);
+  });
+});
+
+// Same claim as for the campaign-page group (see above): the anchor has to land
+// in front of the barrier its group is about, not behind it.
+test.describe('The panel anchor of the texts group', () => {
+  test('lands in front of the disclosure the group is about', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=leichte-sprache`);
+
+    await page.locator('#barrier-group-texte-anchor').focus();
+    await page.keyboard.press('Enter');
+    expect((await focused(page)).id).toBe('sim-texte');
+
+    await page.keyboard.press('Tab');
+    const stop = await focused(page);
+    expect(stop.tag).toBe('BUTTON');
+    expect(stop.text).toBe('Diesen Text in Leichter Sprache lesen');
+  });
+});
+
 // docs/SPEC_v2.md slice 14: „Deep link reproduces state."
 test.describe('Deep links into the campaign', () => {
   test('reproduce the barrier state the URL names', async ({ page }) => {
     await gotoRendered(page, `${PATH}?frei=navigation`);
     await expect(page.locator('nav.section-nav')).toHaveCount(1);
-    await expect(page.locator('.counter')).toHaveText('Keine Barriere aktiv');
+    await expect(page.locator('.counter')).toHaveText('1 von 2 Barrieren aktiv');
     await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(1);
 
     await gotoRendered(page, PATH);
     await expect(page.locator('nav.section-nav')).toHaveCount(0);
     await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(0);
+  });
+
+  // A part is a deep link in its own right, and the parent key is sugar for
+  // both parts (docs/ARCHITECTURE.md §8). Both appear on slides, so both are
+  // locked in content/data-contract.spec.ts.
+  test('reproduce a partial state from a part key', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=leichte-sprache`);
+
+    await expect(page.locator('[data-simulation-region] .easy-toggle')).toHaveCount(1);
+    await expect(page.locator('[data-simulation-region] .body')).toContainText(
+      'Purpose-driven Impact-Programm',
+    );
+    await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(1);
   });
 });

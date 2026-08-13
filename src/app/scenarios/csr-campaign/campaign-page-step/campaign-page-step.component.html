@@ -41,14 +41,21 @@
     <app-campaign-nav />
   </section>
 
-  <!-- Die vier folgenden Abschnitte tragen vorerst nur Überschrift und
-       Sprungziel. Ihre Inhalte und Barrieren bringen die Schnitte 15 bis 18
-       (docs/SPEC_v2.md §5): Texte, Medien, Event, Spendenaufruf — je ein
-       Schnitt, je ein Abschnitt. Erfundener Fülltext stünde hier nur so lange,
-       bis ihn jemand für redaktionell geprüft hält (CLAUDE.md Regel 14). -->
+  <!-- Der Abschnitt „Texte und Inhalte" mit der kombinierten Barriere
+       `sprache` (docs/UX-COPY.md §9.2, docs/SPEC_v2.md Slice 15). Wie die
+       Bereichsnavigation liegt der Inhalt in einer eigenen Komponente, weil er
+       Verhalten hat: die Fassung in Leichter Sprache ist eine echte
+       Aufklappfläche. -->
   <section class="campaign-section">
     <h3 id="sim-texte" tabindex="-1">Unser Ziel</h3>
+    <app-campaign-texts />
   </section>
+
+  <!-- Die drei folgenden Abschnitte tragen vorerst nur Überschrift und
+       Sprungziel. Ihre Inhalte und Barrieren bringen die Schnitte 16 bis 18
+       (docs/SPEC_v2.md §5): Medien, Event, Spendenaufruf — je ein Schnitt, je
+       ein Abschnitt. Erfundener Fülltext stünde hier nur so lange, bis ihn
+       jemand für redaktionell geprüft hält (CLAUDE.md Regel 14). -->
 
   <section class="campaign-section">
     <h3 id="sim-medien" tabindex="-1">Aus unserem Instagram-Feed</h3>

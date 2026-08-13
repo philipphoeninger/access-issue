@@ -28,7 +28,7 @@ const STATES: Array<{ name: string; query: string; labelsResolved: boolean }> = 
 ];
 
 /** The rule id comes from the fixture, never from a literal (docs/TESTING.md §5). */
-const LABEL_RULE = expectedRuleFor('labels');
+const LABEL_RULE = expectedRuleFor('bewerbung', 'labels');
 
 function ruleIds(violations: Array<{ id: string }>): string[] {
   return violations.map((violation) => violation.id);

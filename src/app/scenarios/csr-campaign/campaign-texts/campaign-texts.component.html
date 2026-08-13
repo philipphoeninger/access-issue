@@ -1,0 +1,65 @@
+<!-- Kombinierte Barriere `sprache`, zwei Teile, beide Muster A
+     (docs/UX-COPY.md §9.2). Die Teile schalten unabhängig; alle vier
+     Kombinationen sind ausgeschriebene Zustände, keiner ist eine Reparatur
+     eines anderen. -->
+
+<!-- Teil `leichte-sprache`. Behoben: eine echte Aufklappfläche — Schaltfläche,
+     `aria-expanded`, fokussierbar, mit der Tastatur bedienbar. Kein reiner
+     CSS-Umschalter über ein verstecktes Kontrollkästchen: Der wäre optisch
+     dasselbe und für einen Screenreader eine Fläche ohne Zustand, also eine
+     zweite, unerklärte Barriere (CLAUDE.md Regel 18).
+
+     Aktiv steht hier nichts. Das ist die Barriere: Die Fassung fehlt, sie ist
+     nicht versteckt (CLAUDE.md Regel 6).
+
+     **Die Fläche steht vor dem Haupttext, nicht hinter ihm.** Zwei Gründe,
+     dieselbe Richtung: Wer Leichte Sprache braucht, findet ein Angebot hinter
+     dem schweren Text zu spät; und das Sprungziel der Panel-Gruppe ist die
+     Abschnittsüberschrift, hinter der das einzige Bedienelement dieses
+     Abschnitts liegen muss — sonst landet der Sprung hinter dem, was er
+     zeigen soll (dieselbe Überlegung wie bei der Bereichsnavigation, siehe
+     campaign-page-step.component.html). -->
+@if (easyLanguage()) {
+  <div class="easy-language">
+    <button
+      type="button"
+      class="easy-toggle"
+      [attr.aria-expanded]="expanded()"
+      [attr.aria-controls]="panelId"
+      (click)="toggle()"
+    >
+      {{ toggleLabel }}
+    </button>
+
+    <!-- `[hidden]` statt `@if`, damit `aria-controls` auch im zugeklappten
+         Zustand auf ein Element zeigt, das es gibt. Ausgeblendete Inhalte sind
+         nicht fokussierbar und werden nicht vorgelesen — zugeklappt ist
+         zugeklappt. -->
+    <div class="easy-panel" [id]="panelId" [hidden]="!expanded()">
+      <h4>{{ easyHeading }}</h4>
+
+      <!-- Ein Satz je Absatz: Leichte Sprache setzt jeden Satz in eine eigene
+           Zeile. Aneinandergehängt sind es genau die Worte aus
+           docs/UX-COPY.md §9.2 (campaign-texts.component.ts). -->
+      @for (sentence of sentences; track sentence) {
+        <p class="easy-sentence">{{ sentence }}</p>
+      }
+    </div>
+  </div>
+}
+
+<!-- Teil `jargon`. Zwei ausgeschriebene Fassungen desselben Anliegens: Die
+     eine sagt nicht, wofür gesammelt wird, die andere sagt es. -->
+@if (plainLanguage()) {
+  <p class="body">
+    Wir unterstützen Projekte in unserem Stadtteil. In diesem Jahr sammeln wir Geld für den
+    Nachbarschaftstreff an der Veringstraße. Dort treffen sich Menschen aus dem Viertel, es gibt
+    Hausaufgabenhilfe und einen Mittagstisch.
+  </p>
+} @else {
+  <p class="body">
+    Mit unserem Purpose-driven Impact-Programm committen wir uns zu nachhaltigem Stakeholder-Value.
+    Unsere Diversity-&-Inclusion-Roadmap adressiert Barrieren im Community-Umfeld und schafft
+    messbare Social-Impact-KPIs entlang der gesamten Wertschöpfungskette.
+  </p>
+}

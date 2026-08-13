@@ -31,16 +31,22 @@ export function barrierAssertion(page: Page): AxeBuilder {
  * content layer owns (docs/TESTING.md §5: rule ids are axe's vocabulary, not
  * the project's, so they stay out of the domain model).
  *
+ * Takes the scenario path first, the same way every other lookup in this
+ * application does (ScenarioRegistry.getBarrier): a `Barrier.id` is unique
+ * within its scenario and nowhere else — `sprache` exists in both the
+ * application process and the campaign (docs/SPEC_v2.md slice 15).
+ *
  * Throws rather than skips when an `'axe'` barrier has no entry — a silently
  * skipped barrier assertion is a green suite that proves nothing. The data
  * contract test in src/app/content/data-contract.spec.ts catches the same
  * omission earlier; this is the backstop for anyone who reads only this file.
  */
-export function expectedRuleFor(barrierId: string): string {
-  const rule = AXE_RULE_FIXTURES[barrierId];
+export function expectedRuleFor(scenarioPath: string, barrierId: string): string {
+  const scenarioFixtures = AXE_RULE_FIXTURES[scenarioPath];
+  const rule = scenarioFixtures === undefined ? undefined : scenarioFixtures[barrierId];
   if (rule === undefined) {
     throw new Error(
-      `No axe rule fixture for barrier "${barrierId}". Add one in ` +
+      `No axe rule fixture for barrier "${scenarioPath}/${barrierId}". Add one in ` +
         `src/app/content/axe-rule-fixtures.ts — see docs/TESTING.md §5, run 2.`,
     );
   }

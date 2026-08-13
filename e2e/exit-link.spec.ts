@@ -71,6 +71,16 @@ const STATES: Array<{ name: string; path: string; query: string }> = [
   // nobody can Tab into must still be a page anybody can Tab out of.
   { name: 'campaign — all barriers active (default)', path: CAMPAIGN_PATH, query: '' },
   { name: 'campaign — all barriers resolved', path: CAMPAIGN_PATH, query: '?frei=alle' },
+  // Slice 15's combined barrier. Its resolved half puts a disclosure button
+  // into the region — a control that hides and shows content underneath the
+  // exit link, which is exactly the shape that can leave focus on an element
+  // that is no longer visible.
+  {
+    name: 'campaign — only `leichte-sprache` resolved',
+    path: CAMPAIGN_PATH,
+    query: '?frei=leichte-sprache',
+  },
+  { name: 'campaign — only `jargon` resolved', path: CAMPAIGN_PATH, query: '?frei=jargon' },
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

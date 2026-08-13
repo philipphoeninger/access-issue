@@ -40,7 +40,7 @@ const STATES: Array<{ name: string; query: string; confirmationResolved: boolean
 ];
 
 /** The rule id comes from the fixture, never from a literal (docs/TESTING.md §5). */
-const SIGNATURE_RULE = expectedRuleFor('bestaetigung');
+const SIGNATURE_RULE = expectedRuleFor('bewerbung', 'bestaetigung');
 
 function ruleIds(violations: Array<{ id: string }>): string[] {
   return violations.map((violation) => violation.id);
