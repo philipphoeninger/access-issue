@@ -1,0 +1,110 @@
+// Frame tokens only — never a --sim-* token in here (docs/ARCHITECTURE.md
+// §12.2, CLAUDE.md rule 5).
+:host {
+  display: block;
+}
+
+// White, full width under both columns (docs/DESIGN.md §5). The panel and the
+// simulation bar sit on card and page surfaces; this is the one place on a
+// scenario page that asks for sustained reading, so it gets the plainest
+// surface and the widest measure the layout allows.
+//
+// The margin sits here rather than on `:host` so that it disappears with the
+// section: a scenario without barriers renders nothing at all, and a host box
+// carrying 2rem of margin around nothing would still push the page footer
+// down. Same step as `.scenario-layout`'s own `margin-top`, so the three
+// blocks of a scenario page keep one rhythm.
+.explanation {
+  margin-top: var(--wi-space-8);
+  background: var(--wi-surface-content);
+  border-radius: var(--wi-radius-lg);
+  box-shadow: var(--wi-shadow-card);
+  padding: var(--wi-space-6) var(--wi-space-4);
+}
+
+h2 {
+  margin: 0;
+  color: var(--wi-text-heading);
+  font-size: var(--wi-size-h2);
+  line-height: var(--wi-leading-heading);
+  font-weight: var(--wi-weight-semibold);
+}
+
+h3 {
+  margin: var(--wi-space-6) 0 var(--wi-space-2);
+  color: var(--wi-text-heading);
+  font-size: var(--wi-size-h3);
+  line-height: var(--wi-leading-heading);
+  font-weight: var(--wi-weight-semibold);
+}
+
+p {
+  margin: 0;
+  // Poppins is geometric and merely acceptable for sustained reading, so the
+  // settings carry the load: 17 px at 1.65, capped at 70 characters
+  // (docs/DESIGN.md §4).
+  max-width: var(--wi-measure);
+  font-size: var(--wi-size-body);
+  line-height: var(--wi-leading-body);
+}
+
+.barrier-name {
+  margin-top: var(--wi-space-2);
+  font-size: var(--wi-size-h3);
+  line-height: var(--wi-leading-heading);
+  font-weight: var(--wi-weight-semibold);
+}
+
+.state,
+.area {
+  margin-top: var(--wi-space-1);
+  font-size: var(--wi-size-meta);
+  line-height: var(--wi-leading-heading);
+}
+
+.standards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: var(--wi-measure);
+}
+
+.standards > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--wi-space-1) var(--wi-space-2);
+  padding: var(--wi-space-2) 0;
+  font-size: var(--wi-size-meta);
+  line-height: var(--wi-leading-heading);
+}
+
+.standards > li + li {
+  border-top: 1px solid var(--wi-surface-page);
+}
+
+.standard-name {
+  font-weight: var(--wi-weight-semibold);
+}
+
+a.criterion {
+  // 24 px minimum interactive target (SC 2.5.8); the padding extends the
+  // clickable area past the text, which is allowed and is the point.
+  display: inline-block;
+  min-height: var(--wi-target-min);
+  padding: var(--wi-space-1) 0;
+  color: var(--wi-text-link);
+}
+
+// A tinted chip rather than a colour: „Stufe AA" is text, and the surface is
+// decoration behind it.
+.level {
+  border-radius: var(--wi-radius-pill);
+  background: var(--wi-surface-page);
+  padding: 0 var(--wi-space-2);
+}
+
+.no-standard,
+.empty {
+  margin-top: var(--wi-space-2);
+}

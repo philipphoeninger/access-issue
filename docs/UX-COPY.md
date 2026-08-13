@@ -377,6 +377,19 @@ keine neue Formulierung, nur die fehlende Kombination. Ein Zählstand steht bewu
 darin: Die Zahl ändert sich nicht, weil eine teilweise behobene kombinierte Barriere
 ohnehin als aktiv zählt (Abschnitt 5.6).
 
+**Für „Was bedeutet das?" gibt es bewusst keine Ansage** (entschieden im Review zu Slice 6).
+Ein Entwurf hatte hier eine Zeile „Erklärung: {Barriere}. {Zustand}", weil der Link einen
+Bereich weit weg von sich ändert. Der eigentliche Mangel war aber, dass der Link nirgendwo
+ankam: Er setzt nur einen Query-Parameter, also blieb die Ansicht stehen, wo sie war, und
+sehende Nutzer sahen einen Link, der scheinbar nichts tut. Der Fokus wandert jetzt in den
+Erklärungsbereich, die Ansicht scrollt mit — derselbe Weg wie bei den Sprunglinks —, und
+der Screenreader liest den Bereich beim Ankommen ohnehin vor. Eine Live-Region zusätzlich
+würde nur über die Fokusansage reden.
+
+Beim Umschalten bleibt der Fokus dagegen auf dem Kontrollkästchen (`ARCHITECTURE.md`
+§12.2), und die Ansage macht das Panel: Umschalten wählt die Barriere implizit mit aus
+(§8), sagt aber Zustand und Zählstand in einem Satz.
+
 Zwei Sätze, weil ein Screenreader beim ersten Satz das Wichtige liefert und der zweite
 auch dann nützlich bleibt, wenn der Nutzer schon weiterliest. Länger darf es nicht werden:
 Ansagen, die überschrieben werden, bevor sie zu Ende gesprochen sind, verlieren genau den
@@ -398,6 +411,28 @@ Teil, der zählt.
 | `explanation.noStandard.h3` | Was sagen die Normen? |
 | `explanation.noStandard.body` | Zu dieser Barriere gibt es kein passendes Erfolgskriterium. Sie verstößt gegen keine Norm — und schließt trotzdem Menschen aus. Barrierefreiheit ist mehr als das Erfüllen von Vorgaben. |
 | `explanation.responsibleArea` | Zuständiger Bereich: {area} |
+
+**Normnamen als Anzeigetext.** Normbezüge werden aus strukturierten Daten gerendert, nie
+als Fließtext (`PRD.md` §8.1 F). Ein Eintrag setzt sich aus vier Feldern des
+`StandardReference` zusammen — Normname, Kriteriumsnummer, Titel, Stufe — und wird in
+dieser Reihenfolge dargestellt:
+
+| Schlüssel | Text |
+| --- | --- |
+| `standard.wcag22` | WCAG 2.2 |
+| `standard.bitv20` | BITV 2.0 |
+| `standard.en301549` | EN 301 549 |
+| `standard.bfsg` | BFSG |
+
+Beispiel, drei Felder in einer Zeile: „WCAG 2.2", „1.4.5 Bilder eines Textes", „Stufe AA".
+Kriteriumsnummer und Titel stehen zusammen, weil die Nummer allein vorgelesen nichts sagt
+und der Titel allein über Normen hinweg mehrdeutig ist.
+
+Die vier Namen sind Eigennamen der Normen und keine redaktionelle Formulierung. Sie stehen
+trotzdem hier, weil sie angezeigte Strings sind und dieser Abschnitt der Ort ist, an dem
+eine prüfende Person nachsieht, was der Erklärungsbereich sagt. `explanation.standardLevel`
+entfällt bei Normen ohne Stufen: BITV und BFSG kennen keine Konformitätsstufen, und
+„Stufe undefined" ist kein Text.
 
 **Barrieren ohne Normbezug behalten die Rubrik.** Fünf der 27 Barrieren verletzen kein
 WCAG-Kriterium (`PRD.md` §6.1, §6.2, §6.3). Die Rubrik „Was sagen die Normen?" wird bei

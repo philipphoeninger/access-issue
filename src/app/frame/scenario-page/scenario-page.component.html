@@ -46,3 +46,10 @@
     <app-simulation-region [scenario]="scenario()" />
   </div>
 </div>
+
+<!-- Full width under both columns (docs/DESIGN.md §5), and last in the DOM:
+     the explanation answers a question the user asks about something they
+     have already seen or switched. It lives in the frame, never inside the
+     region — an explanation subject to the barrier it explains is the failure
+     mode of most accessibility demos (docs/ARCHITECTURE.md §5.4). -->
+<app-explanation-view [scenario]="scenario()" />

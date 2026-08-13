@@ -361,6 +361,19 @@ navigation (`ARCHITECTURE.md` §10). That single assertion protects the Back but
   the *set*, not a hard-coded sentence: the whole point is that it reflects the data
 - Step grouping — one `fieldset` per flow step, each with a `legend`; a single-step scenario
   renders one group rather than none
+- `ExplanationViewComponent` — all four rubrics render for every barrier in the registry,
+  in the order of `UX-COPY.md` §5.8; standards render criterion, level and title from the
+  `StandardReference`; a barrier with no standards reference keeps the rubric and gets the
+  `explanation.noStandard.body` answer; an unknown or foreign `erklaerung` key falls back
+  to the empty state. The last two are the ones worth having: dropping the rubric for the
+  five barriers without a criterion would look like an editorial oversight rather than the
+  point (`PRD.md` §6.1), and an unknown key must never become an error state
+  (`ARCHITECTURE.md` §17)
+- Arriving at the explanation — following „Was bedeutet das?" focuses the section, so the
+  browser scrolls it into view; a *toggle* changing the same parameter does not, because
+  focus belongs to the checkbox (`ARCHITECTURE.md` §12.2). Both halves need asserting: a
+  link that only rewrites the URL looks broken to a sighted user, and a selection that
+  steals focus breaks the panel's focus guarantee. Neither is visible in a screenshot
 - `SimulationRegionComponent` — `role="region"`, an `aria-label`, the exit link as the
   first focusable child, `aria-describedby` pointing at a frame-owned element that exists
   and whose text does **not** change with barrier state (`ARCHITECTURE.md` §5.1); the

@@ -1,0 +1,84 @@
+<!-- Rubric order is the order of docs/UX-COPY.md §5.8 and docs/PRD.md §8.1 F:
+     problem, affected, standards, solution. It is an argument, not a list —
+     what is wrong, whom it excludes, what the norms say, how it is done
+     instead — so the order carries meaning and is not free to change.
+
+     The whole section is suppressed for a scenario with no barriers: its
+     empty state points at the barrier panel, and on such a page the panel
+     offers nothing to point at (see `hasBarriers`). -->
+@if (hasBarriers()) {
+  <!-- tabindex="-1" so „Was bedeutet das?" can land here: the link merges a
+       query parameter, which moves neither scroll nor focus by itself, and
+       without a focus target the browser would leave the user at the top of
+       the page (see `focusOnSelection`). Same reason the panel column and
+       <main> carry one. -->
+  <section #section class="explanation" tabindex="-1" [attr.aria-labelledby]="headingId">
+    <h2 [id]="headingId">Erklärung</h2>
+
+    @if (selected(); as explained) {
+      <p class="barrier-name">{{ explained.name }}</p>
+
+      <!-- The state is stated in text and only in text. The panel codes it
+           three ways over — text, symbol, colour (docs/DESIGN.md §3.3) —
+           because it stands next to a control the user is about to operate. A
+           sentence in running prose that carried its meaning in colour would
+           need the same three channels to stay honest, so it carries it in
+           the words. -->
+      <p class="state">{{ stateLine(explained) }}</p>
+      <p class="area">{{ areaLine(explained) }}</p>
+
+      <h3>Was ist das Problem?</h3>
+      <p>{{ explained.explanation.problem }}</p>
+
+      <h3>Wen betrifft es?</h3>
+      <p>{{ explained.explanation.affected }}</p>
+
+      <h3>Was sagen die Normen?</h3>
+      @if (explained.standards.length > 0) {
+        <ul class="standards">
+          @for (standard of explained.standards; track standardKey(standard)) {
+            <li>
+              <span class="standard-name">{{ standardLabel(standard) }}</span>
+              <!-- Criterion and title belong together: the number alone is
+                   unreadable aloud, the title alone is ambiguous across norms.
+                   They become the link text where a `StandardReference`
+                   carries a url, so the link says which criterion it leads to
+                   (SC 2.4.4). -->
+              @if (standard.url) {
+                <a class="criterion" [href]="standard.url"
+                  >{{ standard.criterion }} {{ standard.title }}</a
+                >
+              } @else {
+                <span class="criterion">{{ standard.criterion }} {{ standard.title }}</span>
+              }
+              @if (levelLabel(standard); as level) {
+                <span class="level">{{ level }}</span>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <!-- The rubric is answered, never omitted (docs/UX-COPY.md §5.8,
+             CLAUDE.md rule 19). A conformant page that still excludes people
+             is the point, not an edge case. Reachable only for a barrier:
+             content/data-contract.spec.ts requires every *part* of a combined
+             barrier to cite a standard, because BarrierPart has no
+             `organisational` field that could justify the claim below. -->
+        <p class="no-standard">
+          Zu dieser Barriere gibt es kein passendes Erfolgskriterium. Sie verstößt gegen keine Norm
+          — und schließt trotzdem Menschen aus. Barrierefreiheit ist mehr als das Erfüllen von
+          Vorgaben.
+        </p>
+      }
+
+      <h3>Wie geht es barrierefrei?</h3>
+      <p>{{ explained.explanation.solution }}</p>
+    } @else {
+      <!-- Names the area rather than a direction: „rechts" and „unten" both
+           depend on the breakpoint and are wrong at 400 % zoom, and for a
+           screen reader user neither ever meant anything
+           (docs/UX-COPY.md §5.8). -->
+      <p class="empty">Wähle im Barriere-Panel einen Eintrag aus, um zu erfahren, worum es geht.</p>
+    }
+  </section>
+}

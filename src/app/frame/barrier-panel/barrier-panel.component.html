@@ -169,7 +169,13 @@
      explanation is a change of view state, it is addressable, and it should
      survive being opened in a new tab. `replaceUrl` because an explanation
      selection is not a step in the user's history (docs/ARCHITECTURE.md §10)
-     — the Back button belongs to step navigation. -->
+     — the Back button belongs to step navigation.
+
+     Merging a query parameter moves neither scroll nor focus, so the arrival
+     is not in this template: ExplanationViewComponent focuses its own section
+     when the selection changes without a toggle (`focusOnSelection` there).
+     No `fragment` here on purpose — the URL contract is `frei` and
+     `erklaerung`, and a fragment would ride along in every shared link. -->
 <ng-template #explainLink let-urlKey="urlKey">
   <a
     class="explain"

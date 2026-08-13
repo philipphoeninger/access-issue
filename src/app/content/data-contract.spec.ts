@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ScenarioRegistry } from '../core/scenario-registry.service';
 import { AXE_RULE_FIXTURES } from './axe-rule-fixtures';
 import { RESPONSIBLE_AREAS } from '../models/domain.model';
-import type { Barrier, Scenario } from '../models/domain.model';
+import type { Barrier, BarrierPart, Scenario } from '../models/domain.model';
 
 // Data contract tests, docs/TESTING.md §8. These run over the real scenario
 // registry so they scale automatically as barriers and scenarios are added —
@@ -24,6 +24,26 @@ function forEachBarrier(
       fn(scenario, barrier);
     }
   }
+}
+
+/**
+ * Every part of every combined barrier. Parts are content in their own right
+ * — the panel gives each one a checkbox and the explanation view renders each
+ * one's prose and standards from `part.*`, never from the parent's — so the
+ * guarantees below have to reach them. They did not: every assertion in this
+ * file used to walk `scenario.barriers` only, which made "missing prose is
+ * impossible by contract test" (docs/SPEC_v1.md slice 6) untrue for exactly
+ * the barrier shape that has the most content to get wrong.
+ */
+function forEachPart(
+  scenarios: readonly Scenario[],
+  fn: (scenario: Scenario, barrier: Barrier, part: BarrierPart) => void,
+): void {
+  forEachBarrier(scenarios, (scenario, barrier) => {
+    for (const part of barrier.parts ?? []) {
+      fn(scenario, barrier, part);
+    }
+  });
 }
 
 describe('scenario data contract (docs/TESTING.md §8)', () => {
@@ -78,6 +98,45 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
           `${scenario.path}/${barrier.urlKey}: empty standards requires organisational: true`,
         )
         .toBeTrue();
+    });
+  });
+
+  // Same guarantee as for barriers, on the objects the explanation view
+  // actually renders when a part is selected (`?erklaerung=video-ut`). Like
+  // the combined-barrier test further down, this iterates nothing today — the
+  // CSR video barrier is still a `status: 'planned'` stub — and it is written
+  // now precisely so that it is already in place when that content is
+  // authored, which is the moment it can fail.
+  it('gives every part of a combined barrier non-empty problem, affected and solution prose', () => {
+    forEachPart(scenarios, (scenario, barrier, part) => {
+      const where = `${scenario.path}/${barrier.urlKey}/${part.urlKey}`;
+      expect(part.explanation.problem.trim().length)
+        .withContext(`${where} problem`)
+        .toBeGreaterThan(0);
+      expect(part.explanation.affected.trim().length)
+        .withContext(`${where} affected`)
+        .toBeGreaterThan(0);
+      expect(part.explanation.solution.trim().length)
+        .withContext(`${where} solution`)
+        .toBeGreaterThan(0);
+    });
+  });
+
+  // Parts have no `organisational` field (docs/ARCHITECTURE.md §6), so nothing
+  // about a part could ever justify an empty `standards` array — while the
+  // explanation view renders exactly one thing for an empty array:
+  // „Sie verstößt gegen keine Norm" (docs/UX-COPY.md §5.8). Asserting that
+  // claim is never made for a part is the only way to keep the view from
+  // stating, in a teaching tool, something no one decided.
+  //
+  // If a genuinely organisational part is ever needed, the fix is to add
+  // `organisational` to `BarrierPart` and mirror the barrier-level rule here —
+  // not to delete this test.
+  it('requires every part of a combined barrier to cite at least one standard', () => {
+    forEachPart(scenarios, (scenario, barrier, part) => {
+      expect(part.standards.length)
+        .withContext(`${scenario.path}/${barrier.urlKey}/${part.urlKey}`)
+        .toBeGreaterThan(0);
     });
   });
 
