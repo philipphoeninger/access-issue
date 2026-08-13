@@ -657,6 +657,13 @@ eingeben oder eine echte Handlung auslösen könnte. Er wird im Rahmenstil geset
 unabhängig vom Barrierezustand immer vorhanden und wird nie zur Barriere gemacht. Kommt
 später ein Szenario mit einem weiteren Eingabepunkt hinzu, braucht es dort ebenfalls einen.
 
+„Im Rahmenstil gesetzt" heißt wörtlich: mit `--wi-*`-Tokens, also mit Poppins und den
+WERTE.IT-Farben. Das ist die **einzige** Stelle, an der ein Rahmen-Token im
+Simulationsbereich steht, und sie ist als benannte Ausnahme in `CLAUDE.md` (Regel 5)
+festgehalten — ein Hinweis, dass nichts übertragen wird, in Elbwerks eigener Schrift
+gesetzt, liest sich als Teil der Fiktion, die er unterbrechen soll. Umgekehrt gilt die
+Ausnahme nicht: Ein `--sim-*`-Token im Rahmen bleibt ausnahmslos verboten.
+
 **Felder** — Beschriftungen sind in beiden Zuständen identisch. Der Unterschied liegt in
 der programmatischen Verknüpfung, nicht im Text:
 

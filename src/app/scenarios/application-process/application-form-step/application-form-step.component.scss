@@ -162,22 +162,19 @@ textarea.field-control {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// The one --wi-* usage inside the simulation, and the only one in the project.
+// The Simulationshinweis, and with it the only --wi-* tokens inside the
+// simulation anywhere in this project.
 //
-// CLAUDE.md rule 5 forbids a frame token inside the region. docs/UX-COPY.md
-// §8.4 designates the Simulationshinweis as „der einen Textsorte, die aus dem
-// Rahmen in die Simulation hineinragt", says it is set „im Rahmenstil", and
-// requires it wherever someone could enter real data. The two cannot both hold
-// literally, and this file resolves it in favour of the copy document, because
-// the note's whole job is to be recognisably *not* Elbwerk speaking: a warning
-// that nothing is transmitted, set in Elbwerk's own typeface and colours,
-// reads as part of the fiction it is there to interrupt.
+// This is the named exception to CLAUDE.md rule 5, settled in the slice 8
+// review and written into the rule itself — it is not a local decision this
+// file took. docs/UX-COPY.md §8.4 designates the note as „der einen Textsorte,
+// die aus dem Rahmen in die Simulation hineinragt" and sets it „im
+// Rahmenstil"; the reason is the point of the note: a warning that nothing is
+// transmitted, set in Elbwerk's own typeface and colours, reads as part of the
+// fiction it exists to interrupt.
 //
-// This is flagged for review rather than settled here (CLAUDE.md, "When
-// something here is wrong"). If the rule wins instead, the note needs its own
-// --sim-* treatment that still reads as frame voice, and rule 5 keeps its
-// absolute form; if the copy wins, rule 5 gains this one named exception. It
-// should not stay ambiguous.
+// The exception covers the three Simulationshinweise and nothing else. It does
+// not run the other way: no --sim-* token in the frame, ever.
 // ─────────────────────────────────────────────────────────────────────────────
 .simulation-note {
   max-width: 44rem;

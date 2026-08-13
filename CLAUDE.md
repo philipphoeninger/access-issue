@@ -109,6 +109,15 @@ in a screenshot.
    explanation read state to render *text*; nothing in the frame changes how it is
    focusable, labelled, or styled because a barrier is active.
 5. **Never use a `--wi-*` token inside the simulation, or a `--sim-*` token in the frame.**
+   One named exception, and no others: the **Simulationshinweis** — the note that stands
+   wherever someone could enter real data — is set in frame style with `--wi-*` tokens.
+   `UX-COPY.md` §8.4 designates it as the one text type that reaches from the frame into
+   the simulation, and the reason is the point of it: a warning that nothing is
+   transmitted, set in Elbwerk's own typeface and colours, reads as part of the fiction it
+   exists to interrupt. There are three of them (`elbwerk.form.simulationNote`,
+   `csr.donate.simulationNote`, `csr.social.disclaimer`); a new input point gets a fourth.
+   Nothing else in a scenario component may reach across, and the exception does not run
+   the other way — no `--sim-*` token in the frame, ever.
 
 ### Barriers
 
