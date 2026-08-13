@@ -17,12 +17,19 @@
 // region for the first time. A download link is the one element that can take
 // the browser somewhere else entirely, so the four steps below are worth
 // running there too.
+//
+// Slice 10 completes the set with step 4. Its region has no interactive
+// element at all in any state, which makes it the one page where the exit link
+// is the *only* stop inside the region — the case where a first-focusable-
+// element guarantee is easiest to lose by accident and most obvious to a
+// participant when it is gone.
 import { expect, test, type Page } from '@playwright/test';
 import { gotoRendered } from './support/goto';
 
 const POSTING_PATH = '/szenario/bewerbung/stellenanzeige';
 const FORM_PATH = '/szenario/bewerbung/formular';
 const UPLOAD_PATH = '/szenario/bewerbung/dokumente';
+const CONFIRM_PATH = '/szenario/bewerbung/rueckmeldung';
 
 /** docs/TESTING.md §4: the tested states. Grows with the barriers. */
 const STATES: Array<{ name: string; path: string; query: string }> = [
@@ -40,6 +47,23 @@ const STATES: Array<{ name: string; path: string; query: string }> = [
   { name: 'step 3 — all barriers resolved', path: UPLOAD_PATH, query: '?frei=alle' },
   { name: 'step 3 — only `pdf` resolved', path: UPLOAD_PATH, query: '?frei=pdf' },
   { name: 'step 3 — only `upload` resolved', path: UPLOAD_PATH, query: '?frei=upload' },
+  { name: 'step 4 — all barriers active (default)', path: CONFIRM_PATH, query: '' },
+  { name: 'step 4 — all barriers resolved', path: CONFIRM_PATH, query: '?frei=alle' },
+  {
+    name: 'step 4 — only `bestaetigung` resolved',
+    path: CONFIRM_PATH,
+    query: '?frei=bestaetigung',
+  },
+  {
+    name: 'step 4 — only `ansprechperson` resolved',
+    path: CONFIRM_PATH,
+    query: '?frei=ansprechperson',
+  },
+  {
+    name: 'step 4 — only `inklusionshinweis` resolved',
+    path: CONFIRM_PATH,
+    query: '?frei=inklusionshinweis',
+  },
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

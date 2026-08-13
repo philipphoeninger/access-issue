@@ -10,6 +10,7 @@ const PAGES = [
   '/szenario/bewerbung/stellenanzeige',
   '/szenario/bewerbung/formular',
   '/szenario/bewerbung/dokumente',
+  '/szenario/bewerbung/rueckmeldung',
 ];
 
 test.describe('Reflow at 320px width (docs/DESIGN.md §5, §8)', () => {

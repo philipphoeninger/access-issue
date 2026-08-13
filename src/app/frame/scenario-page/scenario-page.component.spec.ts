@@ -1,8 +1,11 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, type Provider } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import type { ScenarioRouteData } from '../../core/scenario-routes';
+import { ScenarioRegistry } from '../../core/scenario-registry.service';
+import { makeScenario } from '../../core/testing/barrier-fixtures';
+import type { Scenario } from '../../models/domain.model';
 import {
   SCENARIO_STEP_VIEWS,
   stepViewKey,
@@ -10,7 +13,10 @@ import {
 } from '../../scenarios/scenario-step-views';
 import { ScenarioPageComponent } from './scenario-page.component';
 
-function setup(data: ScenarioRouteData): ComponentFixture<ScenarioPageComponent> {
+function setup(
+  data: ScenarioRouteData,
+  extraProviders: Provider[] = [],
+): ComponentFixture<ScenarioPageComponent> {
   TestBed.configureTestingModule({
     imports: [ScenarioPageComponent],
     providers: [
@@ -22,11 +28,32 @@ function setup(data: ScenarioRouteData): ComponentFixture<ScenarioPageComponent>
         // bar inside the region reads the barrier count from (slice 4).
         useValue: { data: of(data), queryParamMap: of(convertToParamMap({})) },
       },
+      ...extraProviders,
     ],
   });
   const fixture = TestBed.createComponent(ScenarioPageComponent);
   fixture.detectChanges();
   return fixture;
+}
+
+/**
+ * A registry over one made-up scenario, for the cases that need content the
+ * application does not ship. ScenarioPageComponent calls `getScenario` and
+ * `getStep` and nothing else; the other three lookups are here to satisfy the
+ * type it injects, and return what the real registry returns for an unknown
+ * key.
+ */
+function registryOf(scenario: Scenario): ScenarioRegistry {
+  return {
+    getAll: () => [scenario],
+    getScenario: (path) => (path === scenario.path ? scenario : undefined),
+    getStep: (scenarioPath, stepPath) =>
+      scenarioPath === scenario.path
+        ? scenario.steps.find((step) => step.path === stepPath)
+        : undefined,
+    getBarrier: () => undefined,
+    getBarrierByUrlKey: () => undefined,
+  };
 }
 
 describe('ScenarioPageComponent (docs/SPEC_v1.md Slice 3)', () => {
@@ -172,15 +199,29 @@ describe('ScenarioPageComponent (docs/SPEC_v1.md Slice 3)', () => {
       }
     });
 
-    // Step 4 has no view yet (slice 10). That is a defined state, not an
+    // A step with no entry in SCENARIO_STEP_VIEWS is a defined state, not an
     // error: the region renders empty and the bar falls back to the bare
     // domain rather than to a path the frame invented.
-    it('renders the region empty for a step whose view does not exist yet', async () => {
-      const fixture = setup({
-        scenarioPath: 'bewerbung',
-        stepPath: 'rueckmeldung',
-        hasPanel: true,
+    //
+    // Until slice 10 this was step 4 of the application process, which had no
+    // component yet. Every step of every available scenario has one now, so the
+    // case is only reachable through a scenario the registry does not ship —
+    // which is exactly what the *next* scenario looks like while its first
+    // component is being written, and the reason the state still exists. The
+    // registry is stubbed rather than the view map mutated: the shape under
+    // test is "a step nobody wrote a view for", and a deleted entry for a step
+    // that does have one says something different.
+    it('renders the region empty for a step whose view does not exist', async () => {
+      const unbuilt = makeScenario([], {
+        id: 'unbuilt-scenario',
+        path: 'ungebaut',
+        title: 'Ungebautes Szenario',
+        steps: [{ id: 'auftakt', path: 'auftakt', title: 'Auftakt', barrierIds: [] }],
       });
+
+      const fixture = setup({ scenarioPath: unbuilt.path, stepPath: 'auftakt', hasPanel: true }, [
+        { provide: ScenarioRegistry, useValue: registryOf(unbuilt) },
+      ]);
 
       await settled(fixture);
 

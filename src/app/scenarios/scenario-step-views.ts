@@ -17,9 +17,11 @@
 // who opens the application process never downloads the CSR campaign.
 //
 // **One entry per step, and no entry is also a defined state.** A step with no
-// entry renders the region empty rather than throwing — that is what slice 10
-// looks like from here until it lands, and it keeps the frame gate meaningful
-// in the meantime.
+// entry renders the region empty rather than throwing. Every step of every
+// available scenario has an entry as of slice 10, so the case is unreachable
+// through the router today — it is what the next scenario's first step will
+// look like from here until its component lands, and it keeps the frame gate
+// meaningful in the meantime.
 import type { Type } from '@angular/core';
 
 export interface ScenarioStepView {
@@ -59,6 +61,13 @@ export const SCENARIO_STEP_VIEWS: Readonly<Record<string, ScenarioStepView>> = {
     load: () =>
       import('./application-process/document-upload-step/document-upload-step.component').then(
         (m) => m.DocumentUploadStepComponent,
+      ),
+  },
+  [stepViewKey('application-process', 'rueckmeldung')]: {
+    simulatedPath: '/karriere/it-projektmanager/bewerbung/bestaetigung',
+    load: () =>
+      import('./application-process/confirmation-step/confirmation-step.component').then(
+        (m) => m.ConfirmationStepComponent,
       ),
   },
 };

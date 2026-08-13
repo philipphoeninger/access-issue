@@ -1,0 +1,89 @@
+<app-elbwerk-page>
+  <!-- Heading levels are fixed by docs/ARCHITECTURE.md §5.6 rule 1: page h1 =
+       scenario title (frame), region h2 = the region's own heading, all
+       scenario content from h3. `elbwerk.confirm.h2` is therefore an h3 and the
+       section headings below it h4s, whatever the key names in
+       docs/UX-COPY.md §8.9 call them. A broken outline is never an admissible
+       barrier — and on this page it would be the only thing a checker found,
+       on a page whose point is that a checker finds nothing. -->
+  <h3 id="sim-confirm-heading">{{ heading }}</h3>
+
+  <!-- Barriere `bestaetigung`, Muster A (docs/UX-COPY.md §8.9).
+
+       Aktiv: Textbaustein-Deutsch, und Aktenzeichen wie Ablauf stehen
+       ausschließlich in der Bildsignatur, der das `alt`-Attribut ganz fehlt.
+       Screenreader lesen dann den Dateinamen vor, und
+       `signatur_personalabteilung_final.png` ist genau das, was in der Realität
+       in eine Vorlage kopiert wird. Das ist die eine Barriere dieses Schritts,
+       die axe sieht (Regel `image-alt`, src/app/content/axe-rule-fixtures.ts).
+
+       Behoben: klare Sprache, das Aktenzeichen als Text, der Ablauf als
+       nummerierte Liste — und die Signatur bleibt als Dekoration erhalten:
+       `alt=""` plus `aria-hidden="true"`, weil ihre Information vollständig
+       danebensteht. Ein zusätzlich beschriftetes Bild ließe dieselben Angaben
+       zweimal vorlesen, deshalb wird `elbwerk.confirm.signatureImageAlt` hier
+       bewusst nicht ausgegeben (docs/UX-COPY.md §8.9). -->
+  @if (plainConfirmation()) {
+    <p class="confirm-body">{{ bodyPlain }}</p>
+    <p class="confirm-reference">{{ reference }}</p>
+
+    <h4>{{ nextStepsHeading }}</h4>
+    <ol class="next-steps">
+      @for (step of nextSteps; track step) {
+        <li>{{ step }}</li>
+      }
+    </ol>
+
+    <img
+      class="confirm-signature"
+      [src]="signatureImage"
+      alt=""
+      aria-hidden="true"
+      [width]="signatureSize.width"
+      [height]="signatureSize.height"
+    />
+  } @else {
+    <p class="confirm-body">{{ bodyComplex }}</p>
+
+    <img
+      class="confirm-signature"
+      [src]="signatureImage"
+      [width]="signatureSize.width"
+      [height]="signatureSize.height"
+    />
+  }
+
+  <!-- Barriere `ansprechperson`, Muster A (docs/UX-COPY.md §8.9).
+
+       Aktiv: ein Funktionspostfach, kein Name, keine Durchwahl, keine
+       Erreichbarkeit. Behoben: eine Person, die man erreichen kann.
+
+       Beide Fassungen setzen die Kontaktangaben als Text, nicht als
+       `mailto:`-Link — Elbwerk ist erfunden, und ein Link würde das
+       Mailprogramm der teilnehmenden Person auf eine Adresse öffnen, die es
+       nicht gibt. Der Unterschied zwischen den Fassungen liegt in der Angabe,
+       nicht im Auszeichnungselement. -->
+  @if (namedContact()) {
+    <section class="contact" aria-labelledby="sim-confirm-contact-heading">
+      <h4 id="sim-confirm-contact-heading">{{ contactHeading }}</h4>
+      <p>{{ contactBody }}</p>
+    </section>
+  } @else {
+    <p class="contact-mailbox">{{ contactMailbox }}</p>
+  }
+
+  <!-- Barriere `inklusionshinweis`, Muster A (docs/UX-COPY.md §8.9). Aktiv
+       fehlt der Hinweis ersatzlos — es steht nichts an seiner Stelle, denn
+       genau das ist die Barriere: Wer eine Anpassung bräuchte, findet keinen
+       Anlass zu fragen und geht davon aus, dass es keine gibt.
+
+       Der letzte Satz des behobenen Zustands ist der wichtigste im ganzen
+       Szenario (docs/UX-COPY.md §8.9): Ohne die Zusage, dass die Anfrage der
+       Bewerbung nicht schadet, ist der Hinweis eine Falle. -->
+  @if (inclusionNote()) {
+    <section class="inclusion" aria-labelledby="sim-confirm-inclusion-heading">
+      <h4 id="sim-confirm-inclusion-heading">{{ inclusionHeading }}</h4>
+      <p>{{ inclusionBody }}</p>
+    </section>
+  }
+</app-elbwerk-page>

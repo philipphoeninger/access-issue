@@ -1,0 +1,77 @@
+// --sim-* tokens only (CLAUDE.md rule 5). Ordinary corporate styling, nothing
+// distinctive — docs/DESIGN.md §4.2.
+//
+// Nothing in here is a barrier, and on this page that matters more than
+// elsewhere: two of the three barriers are organisational, so the page they sit
+// on has to look and behave like a page that is doing everything right. A
+// styling defect here would be the only thing a checker found — on the step
+// whose lesson is that a checker finds nothing.
+:host {
+  display: block;
+}
+
+h3 {
+  margin: 0 0 16px;
+  color: var(--sim-brand);
+  font-size: 1.5rem;
+}
+
+h4 {
+  margin: 0 0 8px;
+  color: var(--sim-brand);
+  font-size: 1.25rem;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+.confirm-body,
+.confirm-reference,
+.contact-mailbox {
+  max-width: 44rem;
+}
+
+// The case number is set apart because it is the one detail on this page
+// someone writes down. Weight, not colour: the meaning may not sit in the
+// colour alone (1.4.1), and colour-only marking is a barrier of step 2.
+.confirm-reference {
+  font-weight: 700;
+}
+
+.next-steps {
+  max-width: 44rem;
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.next-steps li {
+  margin-bottom: 4px;
+}
+
+// Rendered at natural width and no larger, for the same reason as the benefits
+// graphic in step 1: scaling a raster image *up* would blur it for everyone
+// rather than only under magnification, which would make the barrier look like
+// a rendering bug instead of the authoring decision it is. `max-width: 100%`
+// keeps it inside a 320px viewport (WCAG 1.4.10).
+.confirm-signature {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0 24px;
+  border: 1px solid var(--sim-border);
+}
+
+.contact,
+.inclusion {
+  max-width: 44rem;
+  margin-top: 24px;
+  padding: 16px 18px;
+  border: 1px solid var(--sim-border);
+  background: var(--sim-surface);
+}
+
+.contact p:last-child,
+.inclusion p:last-child {
+  margin-bottom: 0;
+}

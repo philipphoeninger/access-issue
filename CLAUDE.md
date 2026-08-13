@@ -197,11 +197,14 @@ in a screenshot.
   root-absolute path, which 404s under a configurable `base href` (`ARCHITECTURE.md` §16).
   The Poppins WOFF2 files sit in `src/styles/fonts/` for exactly that reason. Never write
   a leading `/` into an asset URL.
-- **`public/simulation/grafik_benefits_final.png` is generated**, from
-  `assets-src/simulation/grafik_benefits_final.svg`; the regeneration command is in that
-  file's header. It is a raster image on purpose — an SVG would stay sharp under
-  magnification and take half of the text-graphic barrier away. Editing the copy in
-  `UX-COPY.md` §8.6 means re-rendering it *and* updating the resolved text variant.
+- **Two PNGs under `public/simulation/` are generated** from SVG sources in
+  `assets-src/simulation/`; each source header carries its own regeneration command, and
+  neither source ships. `grafik_benefits_final.png` (`UX-COPY.md` §8.6) is a raster image
+  on purpose — an SVG would stay sharp under magnification and take half of the
+  text-graphic barrier away. `signatur_personalabteilung_final.png` (§8.9) is one because a
+  signature is: built once in a graphics program, then pasted into every template. Editing
+  either copy section means re-rendering the file *and* updating the resolved text variant,
+  which is the only thing keeping both barrier states carrying the same substance.
 - **No backend.** Nothing is submitted, stored, or transmitted.
 - **No browser storage** — no `localStorage`, no `sessionStorage`. State lives in the URL.
 - Prettier: `printWidth: 100`, `singleQuote: true`.

@@ -13,6 +13,7 @@ const PAGES = [
   '/szenario/bewerbung/stellenanzeige',
   '/szenario/bewerbung/formular',
   '/szenario/bewerbung/dokumente',
+  '/szenario/bewerbung/rueckmeldung',
 ];
 const MIN_TARGET_PX = 24;
 

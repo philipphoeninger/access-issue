@@ -16,9 +16,15 @@ import { AREA_LABELS } from '../area-labels';
 import { ExplanationViewComponent } from './explanation-view.component';
 
 const GRAFIK = APPLICATION_PROCESS_SCENARIO.barriers.find((barrier) => barrier.id === 'grafik')!;
-const ANSPRECHPERSON = APPLICATION_PROCESS_SCENARIO.barriers.find(
-  (barrier) => barrier.id === 'ansprechperson',
-)!;
+/**
+ * Both organisational barriers of the application process (docs/PRD.md §6.1),
+ * read off the shipped content rather than fixtured: docs/SPEC_v1.md slice 10
+ * asks for the no-standard answer on *both*, and a fixture would keep passing
+ * if one of them ever lost its empty `standards` array.
+ */
+const ORGANISATIONAL = APPLICATION_PROCESS_SCENARIO.barriers.filter(
+  (barrier) => barrier.organisational,
+);
 
 const COMBINED_SCENARIO: Scenario = oneStepScenario(VIDEO_BARRIERS);
 
@@ -255,15 +261,25 @@ describe('ExplanationViewComponent (docs/SPEC_v1.md Slice 6)', () => {
     // would read as an editorial oversight, and "conformant and still
     // excluding people" is the learning content.
     it('keeps the rubric and answers it for a barrier without a standards reference', async () => {
-      const harness = await setup({ query: `?erklaerung=${ANSPRECHPERSON.urlKey}` });
+      // Both organisational barriers of the scenario, not one of them: they are
+      // the first pair the application renders (docs/SPEC_v1.md slice 10), and
+      // the acceptance criterion is that neither shows an empty rubric.
+      expect(ORGANISATIONAL.length).toBe(2);
 
-      expect(ANSPRECHPERSON.standards).toEqual([]);
-      expect(headings(harness)).toContain('Was sagen die Normen?');
-      expect(view(harness).querySelector('.standards')).toBeNull();
-      expect(text(harness, '.no-standard')).toBe(
-        'Zu dieser Barriere gibt es kein passendes Erfolgskriterium. Sie verstößt gegen keine Norm — ' +
-          'und schließt trotzdem Menschen aus. Barrierefreiheit ist mehr als das Erfüllen von Vorgaben.',
-      );
+      for (const barrier of ORGANISATIONAL) {
+        const harness = await setup({ query: `?erklaerung=${barrier.urlKey}` });
+
+        expect(barrier.standards).withContext(barrier.urlKey).toEqual([]);
+        expect(headings(harness)).withContext(barrier.urlKey).toContain('Was sagen die Normen?');
+        expect(view(harness).querySelector('.standards')).withContext(barrier.urlKey).toBeNull();
+        expect(text(harness, '.no-standard'))
+          .withContext(barrier.urlKey)
+          .toBe(
+            'Zu dieser Barriere gibt es kein passendes Erfolgskriterium. Sie verstößt gegen keine ' +
+              'Norm — und schließt trotzdem Menschen aus. Barrierefreiheit ist mehr als das ' +
+              'Erfüllen von Vorgaben.',
+          );
+      }
     });
   });
 

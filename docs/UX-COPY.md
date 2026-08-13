@@ -556,8 +556,7 @@ den die Leiste hinter `elbwerk.de` anzeigt.
 | 1 — Stellenanzeige | `/karriere/it-projektmanager` |
 | 2 — Bewerbungsformular | `/karriere/it-projektmanager/bewerbung` |
 | 3 — Unterlagen hochladen | `/karriere/it-projektmanager/bewerbung/unterlagen` |
-
-Der Pfad des Schritts 4 kommt mit seinem Slice hinzu.
+| 4 — Rückmeldung | `/karriere/it-projektmanager/bewerbung/bestaetigung` |
 
 **Das Elbwerk-Logo.** Eine Wort-Bild-Marke (Wortmarke „ELBWERK", darunter
 „KG · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
@@ -895,23 +894,49 @@ Bildsignatur:
 | Schlüssel | Text |
 | --- | --- |
 | `elbwerk.confirm.bodyComplex` | Wir bestätigen den Eingang Ihrer Bewerbungsunterlagen und danken Ihnen für Ihr Interesse an einer Tätigkeit in unserem Hause. Nach Abschluss der Sichtung sämtlicher eingegangener Bewerbungen werden wir uns unaufgefordert mit Ihnen in Verbindung setzen. Von zwischenzeitlichen Rückfragen zum Bearbeitungsstand bitten wir abzusehen. |
-| `elbwerk.confirm.signatureImageAlt` | *(fehlt bei aktiver Barriere)* |
+| `elbwerk.confirm.signatureImageAlt` | Ihr Aktenzeichen: BW-2026-0417. Wie es weitergeht: Wir prüfen Ihre Unterlagen. Bei einer Einladung erhalten Sie eine E-Mail mit Terminvorschlägen. Das Gespräch dauert etwa eine Stunde und findet in Wilhelmsburg oder online statt. Elbwerk KG, Personalabteilung, Hamburg-Wilhelmsburg. |
 
 **Behoben** — klare Sprache, Angaben als Text:
 
 | Schlüssel | Text |
 | --- | --- |
 | `elbwerk.confirm.bodyPlain` | Vielen Dank für Ihre Bewerbung. Wir haben Ihre Unterlagen erhalten. Wir sichten alle Bewerbungen bis zum 15. September und melden uns danach bei Ihnen. Sie müssen nichts weiter tun. |
+| `elbwerk.confirm.reference` | Ihr Aktenzeichen: BW-2026-0417 |
 | `elbwerk.confirm.nextSteps.h3` | Wie es weitergeht |
 | `elbwerk.confirm.nextSteps.items` | Wir prüfen Ihre Unterlagen · Bei einer Einladung erhalten Sie eine E-Mail mit Terminvorschlägen · Das Gespräch dauert etwa eine Stunde und findet in Wilhelmsburg oder online statt |
+
+**Was in der Bildsignatur steht** — und damit, was der behobene Zustand als Text tragen
+muss: das Aktenzeichen, die drei Schritte von `elbwerk.confirm.nextSteps.items` und die
+Absenderzeile „Elbwerk KG · Personalabteilung · Hamburg-Wilhelmsburg". Der Alternativtext
+deckt **alles** davon ab, die Absenderzeile eingeschlossen — ein Alternativtext, der nur
+einen Teil des Bildinhalts nennt, wäre selbst ein Negativbeispiel (Abschnitt 8.6).
+
+Das Aktenzeichen ist die Angabe, nach der jemand handelt: Ohne es lässt sich keine
+Rückfrage zuordnen, und wer es nicht mitlesen kann, hat auch keine Möglichkeit, danach zu
+fragen — die Nummer steht nirgendwo sonst.
+
+`elbwerk.confirm.signatureImageAlt` beschreibt, wie ein korrekter Alternativtext für genau
+diese Grafik lauten würde. Er ist damit Lehrmaterial für den Erklärbereich und die
+manuellen Prüfdurchgänge und wird — wie `elbwerk.job.graphicAlt` (Abschnitt 8.6) — im
+behobenen Zustand **nicht** als `alt` ausgegeben: Dort stehen dieselben Angaben bereits als
+Text daneben, und eine zusätzlich beschriftete Grafik ließe einen Screenreader dieselbe
+Aufzählung zweimal vorlesen. Die Signatur wird dort dekorativ (`alt=""` plus
+`aria-hidden="true"`). Im aktiven Zustand fehlt das `alt`-Attribut ganz.
 
 **Barriere „Ansprechperson"** — aktiv: nur ein Verweis auf `bewerbung@elbwerk.de`, kein
 Name, kein Telefon. Behoben:
 
 | Schlüssel | Text |
 | --- | --- |
+| `elbwerk.confirm.contact.mailbox` | Bei Rückfragen wenden Sie sich bitte an bewerbung@elbwerk.de. |
 | `elbwerk.confirm.contact.h3` | Ihre Ansprechperson |
 | `elbwerk.confirm.contact.body` | Miriam Kessler, Personalabteilung. Telefon 040 555 0123, erreichbar montags bis donnerstags von 9 bis 15 Uhr. E-Mail: m.kessler@elbwerk.de |
+
+**Die Kontaktangaben stehen als Text, nicht als Link** — weder `mailto:` noch `tel:`, in
+keinem der beiden Zustände. Elbwerk ist erfunden; ein Link würde das Mailprogramm der
+teilnehmenden Person mit einer Adresse öffnen, die es nicht gibt. Das ist der einzige
+Grund, und er gilt für beide Fassungen gleichermaßen: Die Barriere ist die fehlende Person,
+nicht das fehlende Link-Ziel.
 
 **Barriere „Inklusionshinweis"** — aktiv: fehlt ersatzlos. Behoben:
 
@@ -926,6 +951,17 @@ Wer nicht sicher ist, ob eine Anfrage ihm schadet, fragt nicht.
 Beide Barrieren dieses Schritts verletzen **kein** WCAG-Kriterium. Der Erklärungsbereich
 muss das ausdrücklich benennen (Abschnitt 5.8) — dass eine Seite normkonform sein und
 trotzdem ausschließen kann, ist der Kern dieses Schritts.
+
+**Kein Simulationshinweis auf dieser Seite.** Die Regel aus Abschnitt 8.4 verlangt ihn
+überall dort, wo jemand echte Daten eingeben oder eine echte Handlung auslösen könnte. Die
+Rückmeldung hat weder Feld noch Schaltfläche, und die Kontaktangaben sind aus dem Grund
+oben kein Link. Es bleibt bei vier Hinweisen.
+
+**Nachgetragen mit Slice 10**: der Pfad des Schritts 4 (Abschnitt 8.1), der Wortlaut von
+`elbwerk.confirm.signatureImageAlt`, `elbwerk.confirm.reference` und
+`elbwerk.confirm.contact.mailbox`. Alle drei folgen dem Muster bereits abgenommener Texte
+und stehen unter demselben Vorbehalt der fachlichen Freigabe wie alle Elbwerk-Texte
+(Abschnitt 10).
 
 ---
 

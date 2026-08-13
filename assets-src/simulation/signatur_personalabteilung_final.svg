@@ -1,0 +1,79 @@
+<!--
+  Quelle der Bildsignatur aus docs/UX-COPY.md §8.9 — der Barriere `bestaetigung`
+  in Schritt 4 des Bewerbungsprozesses.
+
+  ACHTUNG: Diese Datei wird NICHT ausgeliefert. Ausgeliefert wird die daraus
+  gerenderte Rastergrafik public/simulation/signatur_personalabteilung_final.png.
+  Eine Signatur ist in der Realität eine Rastergrafik: Sie wird einmal in einem
+  Grafikprogramm gebaut und danach in jede Vorlage kopiert. Genau so entsteht
+  diese Barriere auch — nicht aus Nachlässigkeit im Code, sondern daraus, dass
+  Text in ein Bild wandert und dort bleibt.
+
+  Neu rendern nach jeder Textänderung, aus dem Projektwurzelverzeichnis:
+
+    rsvg-convert -w 600 -h 300 \
+      assets-src/simulation/signatur_personalabteilung_final.svg \
+      -o public/simulation/signatur_personalabteilung_final.png
+
+  Die Texte hier sind Kopien der Schlüssel `elbwerk.confirm.reference`,
+  `elbwerk.confirm.nextSteps.h3` und `elbwerk.confirm.nextSteps.items`. Sie
+  müssen mit der behobenen Textfassung im Template übereinstimmen — beide
+  Zustände tragen denselben Sachinhalt, das ist die Bedingung dafür, dass das
+  Szenario Barrierefreiheit misst und nicht Informationsmenge
+  (docs/UX-COPY.md §1). confirmation-step.component.spec.ts prüft das für die
+  Textfassung; für die Grafik ist es Handarbeit.
+
+  Die drei Schritte stehen hier verkürzt, wie eine Signatur sie setzt; der
+  vollständige Wortlaut steht in `elbwerk.confirm.nextSteps.items` und im
+  Alternativtext `elbwerk.confirm.signatureImageAlt`, der beschreibt, was das
+  Bild trägt.
+
+  Farben (Token-Namen ohne führende Doppelbindestriche, die ein XML-Kommentar
+  nicht enthalten darf): sim-brand #1F3A5F, sim-text #33475B, sim-muted
+  #5A6B7B, sim-surface #F5F6F7, sim-border #D8DDE2 (src/styles/_tokens.scss).
+-->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 600 300"
+  width="600"
+  height="300"
+  font-family="Arial, Helvetica, sans-serif"
+>
+  <rect width="600" height="300" fill="#FFFFFF" />
+  <rect x="0.5" y="0.5" width="599" height="299" fill="#F5F6F7" stroke="#D8DDE2" />
+
+  <!-- Die senkrechte Marke links, wie sie eine Signaturvorlage trägt. -->
+  <rect x="0" y="0" width="6" height="300" fill="#1F3A5F" />
+
+  <text x="36" y="52" font-size="22" font-weight="700" fill="#1F3A5F">Elbwerk KG</text>
+  <text x="36" y="76" font-size="15" fill="#5A6B7B">Personalabteilung · Hamburg-Wilhelmsburg</text>
+
+  <line x1="36" y1="94" x2="564" y2="94" stroke="#D8DDE2" />
+
+  <!-- Das Aktenzeichen: die Angabe, nach der jemand handelt, und die nirgendwo
+       sonst auf der Seite steht, solange die Barriere aktiv ist. -->
+  <rect x="36" y="112" width="330" height="40" rx="4" fill="#1F3A5F" />
+  <text x="52" y="138" font-size="16" font-weight="700" fill="#FFFFFF">
+    Ihr Aktenzeichen: BW-2026-0417
+  </text>
+
+  <text x="36" y="188" font-size="17" font-weight="700" fill="#1F3A5F">Wie es weitergeht</text>
+
+  <g>
+    <circle cx="46" cy="214" r="10" fill="#1F3A5F" />
+    <text x="46" y="219" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+    <text x="66" y="219" font-size="14" fill="#33475B">Wir prüfen Ihre Unterlagen</text>
+
+    <circle cx="46" cy="244" r="10" fill="#1F3A5F" />
+    <text x="46" y="249" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+    <text x="66" y="249" font-size="14" fill="#33475B">
+      Bei einer Einladung: E-Mail mit Terminvorschlägen
+    </text>
+
+    <circle cx="46" cy="274" r="10" fill="#1F3A5F" />
+    <text x="46" y="279" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+    <text x="66" y="279" font-size="14" fill="#33475B">
+      Gespräch etwa eine Stunde, in Wilhelmsburg oder online
+    </text>
+  </g>
+</svg>
