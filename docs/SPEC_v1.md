@@ -602,7 +602,7 @@ require replacing a barrier the PRD names explicitly.
 | Question | Owner |
 | --- | --- |
 | Imprint, privacy policy, and a BITV 2.0 accessibility statement — for a tool on this subject, their absence needs explaining | Philipp / BSVH |
-| ~~`Elbwerk` checked against the trade register and DPMA~~ — done: an `Elbwerk GmbH` exists. The company is now `Elbwerk GmbH & Co. KG`, which does not (`DESIGN.md` §2.1) | Philipp — closed |
+| `Elbwerk KG` checked against the trade register and DPMA. The earlier check found an `Elbwerk GmbH` — that is why the legal form changed — but `Elbwerk KG` is a third distinct name and has not been through it (`DESIGN.md` §2.1) | Philipp |
 | Whether the job posting should mirror a real BSVH-adjacent role or stay neutral | WERTE.IT |
 | Hosting and `base href` value | Philipp, phase 4 |
 

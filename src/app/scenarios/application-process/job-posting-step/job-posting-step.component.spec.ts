@@ -120,7 +120,7 @@ describe('JobPostingStepComponent (docs/SPEC_v1.md Slice 7)', () => {
     // would be a twelfth that nothing in the panel explains.
     it('gives the company logo a text alternative (docs/UX-COPY.md §8.1)', () => {
       const logo: HTMLImageElement = element(setup()).querySelector('.logo')!;
-      expect(logo.getAttribute('alt')).toBe('Elbwerk GmbH & Co. KG');
+      expect(logo.getAttribute('alt')).toBe('Elbwerk KG');
     });
   });
 

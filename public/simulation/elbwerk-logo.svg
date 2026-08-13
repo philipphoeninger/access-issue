@@ -1,5 +1,5 @@
 <!--
-  Elbwerk GmbH & Co. KG — Wort-Bild-Marke der fiktiven Firma (docs/UX-COPY.md §8.1).
+  Elbwerk KG — Wort-Bild-Marke der fiktiven Firma (docs/UX-COPY.md §8.1).
 
   Die Rechtsform steht in der Wortmarke, also im Bild: Wer die Firma umbenennt,
   ändert diese Datei mit — und die Textgrafik unter assets-src/, in der die
@@ -49,17 +49,13 @@
     letter-spacing="1.6"
     fill="#1F3A5F"
   >ELBWERK</text>
-  <!-- Sperrung bewusst enger als in der Wortmarke darüber: Die Zeile ist mit
-       ausgeschriebener Rechtsform lang genug, um bei weiterer Sperrung über
-       die rechte Bildkante zu laufen. Das „&" muss als Entity stehen — in XML
-       ist es sonst der Beginn einer Referenz und die Datei parst nicht mehr. -->
   <text
     x="57"
     y="40"
     font-family="Arial, Helvetica, sans-serif"
     font-size="9"
     font-weight="400"
-    letter-spacing="1.2"
+    letter-spacing="2.4"
     fill="#5A6B7B"
-  >GMBH &amp; CO. KG · HAMBURG</text>
+  >KG · HAMBURG</text>
 </svg>

@@ -62,27 +62,31 @@ Elbwerk is a mid-sized Hamburg engineering and services firm. The name carries a
 connection to the BSVH without being a real company. Fictional domain: `elbwerk.de`, used
 in the simulation bar only — never as a live link.
 
-The legal form is **GmbH & Co. KG**, and it is the one part of the name that was not a free
-choice: an `Elbwerk GmbH` turned out to exist. The name itself carries the local connection
-and is relied on by the module deck and by `elbwerk.de`, so the company keeps it and changes
-only its form.
+The legal form is **KG**, and it is the one part of the name that was not a free choice: an
+`Elbwerk GmbH` turned out to exist. The name itself carries the local connection and is
+relied on by the module deck and by `elbwerk.de`, so the company keeps it and changes only
+its form.
 
-`GmbH & Co. KG` rather than `AG`, and the reason is characterisation rather than law. An
-Aktiengesellschaft in Wilhelmsburg would quietly contradict the premise: chapter 3 is about
-the *Mittelstand*, and an AG reads as a listed corporation with a legal department that
-somebody would have asked. `GmbH & Co. KG` is the commonest form for a firm of this size in
-Germany, which keeps Elbwerk in the category the module is actually talking about — and
-keeps the barriers reading as ordinary neglect rather than as corporate malice.
+Two criteria decided which form, and they point the same way. **Characterisation:** chapter
+3 is about the *Mittelstand*, so an `AG` is wrong — it reads as a listed corporation with a
+legal department somebody would have asked, and the barriers would read as corporate malice
+rather than as ordinary neglect. A `KG` is a partnership, which is what a firm of this size
+in Hamburg usually is. **Brevity:** `GmbH & Co. KG` is equally accurate and was the first
+choice, but the string appears in the region's accessible name, in the simulation bar's
+description and in the logo, and at that length it draws attention to itself. In a tool
+whose whole design problem is that the simulated company must be *unremarkable*, a legal
+form nobody notices is the one doing its job.
 
 Two consequences worth stating, because both are easy to undo by accident. The legal form
-appears in the logo wordmark, so the logo carries `GMBH & CO. KG · HAMBURG`; and it appears
-inside the generated benefits graphic, where it is pixels and has to be re-rendered rather
-than edited (`CLAUDE.md`, "Stack and conventions"). A rename that misses either leaves the
-real company's name visible in a picture, where no search finds it — which is exactly how
-this one survived the first pass.
+appears in the logo wordmark, so the logo carries `KG · HAMBURG`; and it appears inside the
+generated benefits graphic, where it is pixels and has to be re-rendered rather than edited
+(`CLAUDE.md`, "Stack and conventions"). A rename that misses either leaves the old name
+visible in a picture, where no search finds it — which is exactly how the first rename
+nearly shipped.
 
-The check that produced all of this — trade register and DPMA — was the open item here and
-is now closed.
+**Still to check:** the register and DPMA search that started this covered `Elbwerk GmbH`.
+`Elbwerk KG` is a third distinct firm name and has not been through it. The check is cheap;
+running it before the slides are printed is the point of this whole item.
 
 ---
 

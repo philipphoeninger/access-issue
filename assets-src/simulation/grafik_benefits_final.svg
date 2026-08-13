@@ -44,7 +44,7 @@
   <rect x="0" y="0" width="640" height="6" fill="#1F3A5F" />
 
   <text x="40" y="62" font-size="30" font-weight="700" fill="#1F3A5F">Was wir bieten</text>
-  <text x="40" y="88" font-size="15" fill="#5A6B7B">Elbwerk GmbH &amp; Co. KG · Hamburg-Wilhelmsburg</text>
+  <text x="40" y="88" font-size="15" fill="#5A6B7B">Elbwerk KG · Hamburg-Wilhelmsburg</text>
 
   <!-- Fünf Leistungs-Kacheln, wie sie eine Marketingabteilung exportiert. -->
   <g>

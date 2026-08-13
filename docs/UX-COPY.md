@@ -198,7 +198,7 @@ sichtbaren Schrittindikator gar nicht, weil die `h1` unmittelbar darüber ihn sc
 | `simBar.counter.some` | {active} von {total} Barrieren aktiv |
 | `simBar.counter.none` | Keine Barriere aktiv |
 | `simBar.counter.all` | Alle {total} Barrieren aktiv |
-| `simBar.description` | Nachbau der Website der fiktiven Elbwerk GmbH & Co. KG. Kein echtes Unternehmen, keine echte Bewerbung, keine Datenübertragung. |
+| `simBar.description` | Nachbau der Website der fiktiven Elbwerk KG. Kein echtes Unternehmen, keine echte Bewerbung, keine Datenübertragung. |
 
 `simBar.description` ist der Text, auf den `aria-describedby` des Simulationsbereichs
 zeigt (`ARCHITECTURE.md` §5.1). Er ist Teil des Rahmens, nicht der Simulation.
@@ -213,7 +213,7 @@ akustisch richtig.
 
 | Schlüssel | Text |
 | --- | --- |
-| `simRegion.label` | Simulation: Website der Elbwerk GmbH & Co. KG |
+| `simRegion.label` | Simulation: Website der Elbwerk KG |
 | `simRegion.exitLink` | Simulation verlassen — zurück zum Barriere-Panel |
 | `simRegion.endAnchor` | Ende des Simulationsbereichs |
 
@@ -528,9 +528,9 @@ nicht besonders — gewöhnlich. Das ist die Vorgabe.
 
 | Schlüssel | Text |
 | --- | --- |
-| `elbwerk.nav.brand` | Elbwerk GmbH & Co. KG |
+| `elbwerk.nav.brand` | Elbwerk KG |
 | `elbwerk.nav.items` | Unternehmen · Leistungen · Karriere · Kontakt |
-| `elbwerk.logo.alt` | Elbwerk GmbH & Co. KG |
+| `elbwerk.logo.alt` | Elbwerk KG |
 | `elbwerk.jobs.h2` | Offene Stellen |
 | `elbwerk.job.title` | IT-Projektmanager (m/w/d) |
 | `elbwerk.job.meta` | Vollzeit · Hamburg-Wilhelmsburg · ab sofort |
@@ -558,7 +558,7 @@ den die Leiste hinter `elbwerk.de` anzeigt.
 Die Pfade der Schritte 2 bis 4 kommen mit ihren Slices hinzu.
 
 **Das Elbwerk-Logo.** Eine Wort-Bild-Marke (Wortmarke „ELBWERK", darunter
-„GMBH & CO. KG · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
+„KG · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
 (`ARCHITECTURE.md` §16). Es trägt `elbwerk.logo.alt` als Alternativtext — Logotypen sind
 von WCAG 1.4.5 ausdrücklich ausgenommen, und ein Firmenlogo mit korrektem Alternativtext
 ist genau das, was eine gewöhnliche Unternehmensseite richtig macht. Das Logo ist **keine**
@@ -954,7 +954,7 @@ als zusätzliche Option und ist tastaturbedienbar.
 | `csr.carousel.position` | Beitrag {current} von {total} |
 | `csr.carousel.quote1` | „Ohne die Unterstützung hätten wir den Treff im Winter schließen müssen." — Regina Ohlsen, Leiterin des Nachbarschaftstreffs |
 | `csr.carousel.quote2` | „Meine Kinder gehen zweimal die Woche zur Hausaufgabenhilfe. Das ist Gold wert." — Aylin Demir, Anwohnerin |
-| `csr.carousel.quote3` | „Wir kommen aus dem Stadtteil. Da hilft man sich." — Torben Kruse, Elbwerk GmbH & Co. KG |
+| `csr.carousel.quote3` | „Wir kommen aus dem Stadtteil. Da hilft man sich." — Torben Kruse, Elbwerk KG |
 
 **Aktiv:** Wechsel alle vier Sekunden, keine Pause-Schaltfläche.
 **Behoben:** Pause-Schaltfläche als erstes Element der Gruppe, Positionsanzeige, Wechsel
@@ -1045,7 +1045,7 @@ ohne die eine gehörlose Person nicht weiß, ob sie hingehen kann.
 | --- | --- |
 | Fachliche Freigabe aller Elbwerk-Texte | WERTE.IT-Team |
 | Erklärtexte je Barriere (Abschnitt 5.8 liefert nur die Rubriken) | WERTE.IT-Team |
-| ~~Prüfung „Elbwerk" gegen Handelsregister und DPMA~~ — erledigt: Eine `Elbwerk GmbH` existiert. Die Firma heißt jetzt `Elbwerk GmbH & Co. KG`, und die gibt es nicht (`DESIGN.md` §2.1) | Philipp — geschlossen |
+| Prüfung „Elbwerk KG" gegen Handelsregister und DPMA. Die erste Prüfung fand eine `Elbwerk GmbH` — daher die geänderte Rechtsform —, aber `Elbwerk KG` ist ein dritter, eigener Firmenname und wurde noch nicht geprüft (`DESIGN.md` §2.1) | Philipp |
 | Sind die Personennamen in den Testimonials unbedenklich, oder sollen sie neutraler werden? | WERTE.IT-Team |
 | Transkripttext des Kampagnenvideos — hängt am Videomaterial (`PRD.md` §10) | WERTE.IT-Team |
 | **Prüfung der Fassung in Leichter Sprache (Abschnitt 9.8) durch eine Fachstelle.** Der Entwurf folgt den Regeln nur annähernd. Eine schlecht gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine. | WERTE.IT-Team / Fachstelle |
