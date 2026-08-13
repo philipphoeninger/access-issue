@@ -1,0 +1,119 @@
+// Elbwerk, nicht WERTE.IT: ausschließlich --sim-*-Tokens (CLAUDE.md Regel 5).
+// Die eine Ausnahme ist der Simulationshinweis am Ende dieser Datei, und sie
+// ist als solche benannt.
+:host {
+  display: block;
+}
+
+.feed {
+  display: grid;
+  // Drei Beiträge nebeneinander, wo Platz ist, darunter eine Spalte. `auto-fit`
+  // statt fester Spaltenzahl, damit die Einbettung bei 320 px und bei 400 %
+  // Vergrößerung ohne waagerechtes Scrollen umbricht (WCAG 1.4.10,
+  // e2e/reflow.spec.ts).
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post {
+  border: 1px solid var(--sim-border);
+  background: var(--sim-white);
+}
+
+.post-media {
+  // Bezugspunkt für die Bildunterschrift.
+  position: relative;
+}
+
+.post-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Barriere `kontrast` (docs/UX-COPY.md §9.5)
+//
+// `.post-overlay` legt nur die Lage fest. Farbe und Fläche stehen in den beiden
+// Modifikatoren, und beide sind vollständig ausgeschrieben: Keiner ist die
+// Reparatur des anderen (CLAUDE.md Regel 10).
+//
+// **Die Fläche ist deckend, nicht durchscheinend, und nicht verlaufend.** Warum
+// — und warum die behobene Fassung weiß auf --sim-brand steht und nicht
+// --sim-text auf einem abgedunkelten Verlauf, wie docs/UX-COPY.md §9.5 es
+// beschreibt — steht ausführlich in campaign-media.component.ts. Kurz: dunkel
+// auf dunkel verfehlte die 4,5:1, die derselbe Absatz verlangt, und über einem
+// Bild kann axe gar kein Verhältnis berechnen.
+//
+// Unter `forced-colors` überschreibt das System beide Fassungen und die
+// Barriere ist nicht zu sehen. Dagegen steht hier nichts — die Einstellung hat
+// Vorrang (CLAUDE.md Regel 9), und die Komponente meldet den Hinweis an die
+// Simulationsleiste.
+// ─────────────────────────────────────────────────────────────────────────────
+.post-overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 8px 12px;
+  font-family: var(--sim-font-family);
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: var(--sim-leading-body);
+}
+
+// Aktiv: 2,92:1. Ein helles Grau, das im Entwurf gut aussah — die häufigste
+// Herkunft dieser Barriere ist eine rein ästhetische Entscheidung.
+.post-overlay--faint {
+  background: var(--sim-white);
+  color: var(--sim-fail-text);
+}
+
+// Behoben: 11,48:1.
+.post-overlay--readable {
+  background: var(--sim-brand);
+  color: var(--sim-white);
+}
+
+.post--text {
+  padding: 12px 16px;
+}
+
+.post-text {
+  margin: 0;
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  line-height: var(--sim-leading-body);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Der Simulationshinweis, und damit die --wi-*-Tokens: die benannte Ausnahme zu
+// CLAUDE.md Regel 5 (docs/UX-COPY.md §8.4). Dieselbe Gestalt wie in
+// application-form-step und document-upload-step — ein Hinweis, dass nichts
+// übertragen wird, in Elbwerks eigener Schrift gesetzt, läse sich als Teil der
+// Fiktion, die er unterbrechen soll.
+//
+// Die Ausnahme gilt nur in dieser Richtung: kein --sim-*-Token im Rahmen, nie.
+// ─────────────────────────────────────────────────────────────────────────────
+.simulation-note {
+  max-width: 44rem;
+  margin: 0 0 20px;
+  border: 2px dashed var(--wi-navy);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-surface-card);
+  padding: 10px 14px;
+  color: var(--wi-text-primary);
+  font-family: var(--wi-font-family);
+  font-size: var(--wi-size-meta);
+  line-height: var(--wi-leading-body);
+}
+
+// Kein Fokusring in dieser Datei: den zeichnet `[data-simulation-region]
+// :focus-visible` global in src/styles.scss (CLAUDE.md Regel 8). `outline:
+// none` steht hier nirgends — dieser Abschnitt hat ohnehin kein fokussierbares
+// Element.

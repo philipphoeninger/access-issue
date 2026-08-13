@@ -25,6 +25,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { ScenarioRegistry } from '../../core/scenario-registry.service';
+import { SuppressionNoticeService } from '../../core/suppression-notice.service';
 import {
   scenarioStepPath,
   stepIndicator,
@@ -53,6 +54,17 @@ import { SimulationRegionComponent } from '../simulation-region/simulation-regio
 export class ScenarioPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly registry = inject(ScenarioRegistry);
+
+  /**
+   * Notes about barriers a system preference has overridden (docs/UX-COPY.md
+   * §5.9, CLAUDE.md rule 9). Published by the scenario component that
+   * implements the suppressed barrier, rendered by the simulation bar, passed
+   * through here because the bar's input already runs down this path.
+   *
+   * Text, and nothing else: this component's own semantics do not change
+   * because a note exists (CLAUDE.md rule 4).
+   */
+  protected readonly suppressionNotes = inject(SuppressionNoticeService).notes;
 
   private readonly routeData = toSignal(this.route.data, { requireSync: true });
 

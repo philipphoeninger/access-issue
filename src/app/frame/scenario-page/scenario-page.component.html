@@ -56,7 +56,11 @@
          is simulation content (docs/UX-COPY.md §8) and the frame does not
          invent it. A step whose view has not been built yet renders the region
          empty, which stays a defined state. -->
-    <app-simulation-region [scenario]="scenario()" [simulatedPath]="simulatedPath()">
+    <app-simulation-region
+      [scenario]="scenario()"
+      [simulatedPath]="simulatedPath()"
+      [suppressionNotes]="suppressionNotes()"
+    >
       @if (stepComponent(); as component) {
         <ng-container *ngComponentOutlet="component" />
       }

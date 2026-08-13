@@ -231,6 +231,27 @@ screenshot needs to understand why the result does not match the barrier descrip
 `forced-colors` (Windows high contrast) has the same character: it will neutralise
 contrast-based barriers regardless of toggle state. The same note mechanism covers it.
 
+**Where the mechanism lives** (built in `SPEC_v2.md` slice 16, for the campaign's
+`kontrast` barrier — the first one a system preference actually suppresses):
+
+- `core/media-preference.ts` turns a media query into a signal, with a live listener. A
+  preference read once at startup would be wrong from the moment someone switches high
+  contrast on mid-session, and would stay wrong until a reload.
+- `core/suppression-notice.service.ts` is the seam. **Detection belongs to the barrier,
+  rendering belongs to the frame**: only the component implementing a barrier knows what
+  the preference took away and what would otherwise be on screen, and only the simulation
+  bar may say it, because there is exactly one place such a note appears. The service is a
+  keyed set of strings, published by the simulation and read by the frame — nothing more.
+- `ScenarioPageComponent` binds the service's notes into the region's existing
+  `suppressionNotes` input.
+
+This is not the frame reading barrier state (§5.2): nothing about the bar's semantics,
+labelling or focusability changes: it renders one more paragraph. The note is text.
+
+A suppressed barrier is still an *active* barrier — the counter counts it, and the panel
+checkbox stays unchecked. The system preference changes what is rendered, not what is
+switched on.
+
 ### 5.6 Boundary invariants
 
 Some WCAG properties are page-level and span the frame/simulation boundary. They cannot

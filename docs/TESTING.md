@@ -137,12 +137,12 @@ Concrete counts for v1:
 | Application | 4 Response | 3 | 5 |
 | CSR | Campaign page | 1 | 3 |
 | CSR | Texts (combined, 2 parts) | 1 | 4 + 2 partial |
-| CSR | Media | 3 | 5 |
+| CSR | Media | 3 | 8 (see below) |
 | CSR | Event (combined, 3 parts) | 1 | 5 + 6 partial |
 | CSR | Donation appeal | 4 | 6 |
 | Procurement | A Tender | 4 | 6 |
 | Procurement | B Ticket system | 3 | 5 |
-| **Total** | | **29** | **61** |
+| **Total** | | **29** | **64** |
 
 The CSR campaign is a single page, so its rows are page sections rather than routing steps
 (`ARCHITECTURE.md` §12.1.1). Its partial-repair states outnumber the others: a three-part
@@ -151,7 +151,7 @@ combined barrier has six of them, and they are where the teaching happens.
 State carries across steps, so step transitions are tested separately from the per-step
 matrix.
 
-Sixty-one states, each running three axe passes plus structural assertions. That is
+Sixty-four states, each running three axe passes plus structural assertions. That is
 roughly triple the original estimate and pushes the suite past the point where it stays
 comfortably inside an eight-minute pull-request budget on Chromium.
 
@@ -167,6 +167,16 @@ state; an interaction bug between two of them would be a defect in the state ser
 in a scenario, and the state service is unit-tested directly. If a future barrier ever
 reads another barrier's state, that pair gets its own combination test and this rationale
 is void for that pair.
+
+**The media section is the one exception, and it is deliberate.** `SPEC_v2.md` slice 16
+asks for all eight combinations of its three barriers by name, and the row above was
+changed from 5 to 8 when that slice was built rather than the spec being trimmed to match.
+The reason it is worth the three extra page loads: `alt`, `emoji` and `kontrast` are three
+barriers in *one* component and one stylesheet, which is the situation the independence
+argument above does not cover on its face — `alt`'s `image-alt` violation has to appear
+whether or not `kontrast` is repaired, and the caption's contrast is computed over markup
+the `alt` branch rewrites. Do not read this as licence to power-set the donation section's
+four; that would be sixteen states of barriers that genuinely do not touch each other.
 
 ---
 

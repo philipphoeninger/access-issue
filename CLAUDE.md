@@ -206,6 +206,10 @@ in a screenshot.
   signature is: built once in a graphics program, then pasted into every template. Editing
   either copy section means re-rendering the file *and* updating the resolved text variant,
   which is the only thing keeping both barrier states carrying the same substance.
+  The campaign's three post images (`public/simulation/csr-post-*.svg`) are **not**
+  generated — they are hand-authored SVGs that ship as they are, with no source in
+  `assets-src/`. They stay vector because nothing about them depends on being raster:
+  what teaches there is the alternative text (`UX-COPY.md` §9.3), not the pixels.
 - **No backend.** Nothing is submitted, stored, or transmitted.
 - **No browser storage** — no `localStorage`, no `sessionStorage`. State lives in the URL.
 - Prettier: `printWidth: 100`, `singleQuote: true`.

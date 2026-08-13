@@ -1,0 +1,70 @@
+<!-- Simulationshinweis (docs/UX-COPY.md §8.4, §9.3 `csr.social.disclaimer`).
+     Steht vor der Einbettung, in jedem Barrierezustand, und wird nie zur
+     Barriere gemacht — die benannte Ausnahme zu CLAUDE.md Regel 5, im
+     Rahmenstil gesetzt. -->
+<p class="simulation-note">{{ disclaimer }}</p>
+
+<!-- Nachbildung der Einbettung: lokales Markup, lokale Bilder, keine Anfrage
+     nach außen (docs/ARCHITECTURE.md §16).
+
+     `role="list"` neben dem `ul`, weil `list-style: none` die Listensemantik in
+     Safari/VoiceOver sonst mitentfernt. Das ist keine halbe Reparatur einer
+     Barriere, sondern die Auszeichnung, die diese Liste in beiden Zuständen
+     trägt — keine der drei Barrieren dieses Abschnitts handelt von ihr. -->
+<ul class="feed" role="list">
+  @for (post of posts; track post.id) {
+    <li class="post">
+      <div class="post-media">
+        <!-- Barriere `alt`, Muster B: dasselbe Bild, einmal mit
+             Alternativtext, einmal ohne. Ausgelassen, nicht abgefangen
+             (CLAUDE.md Regel 6) — es steht kein leeres `alt` da und kein
+             `aria-hidden`, das die Lücke kaschierte. Ein `img` ohne `alt` ist
+             genau das, was eine Redaktion hinterlässt, die das Feld übersprungen
+             hat. -->
+        @if (altTexts()) {
+          <img
+            class="post-image"
+            [src]="post.image"
+            [alt]="post.alt"
+            [width]="imageSize.width"
+            [height]="imageSize.height"
+          />
+        } @else {
+          <img
+            class="post-image"
+            [src]="post.image"
+            [width]="imageSize.width"
+            [height]="imageSize.height"
+          />
+        }
+
+        <!-- Barriere `kontrast`, Muster B: dieselbe Bildunterschrift, zwei
+             Farbfassungen. Beide Klassen setzen Vorder- *und* Hintergrundfarbe;
+             keine ist die Reparatur der anderen (CLAUDE.md Regel 10), und
+             `.post-overlay` selbst legt nur die Lage fest. -->
+        <p
+          class="post-overlay"
+          [class.post-overlay--readable]="readableOverlay()"
+          [class.post-overlay--faint]="!readableOverlay()"
+        >
+          {{ post.overlay }}
+        </p>
+      </div>
+    </li>
+  }
+
+  <!-- Barriere `emoji`, Muster A: zwei ausgeschriebene Fassungen desselben
+       Beitrags.
+
+       Ein eigener Beitrag ohne Bild, kein Untertext zu einem der drei oben.
+       docs/UX-COPY.md §9.4 gibt genau einen Beitragstext her; die anderen drei
+       mit erfundenen Bildunterschriften zu versehen wäre erfundene Redaktion
+       (CLAUDE.md Regel 14). -->
+  <li class="post post--text">
+    @if (plainWording()) {
+      <p class="post-text">{{ plainPost }}</p>
+    } @else {
+      <p class="post-text">{{ emojiPost }}</p>
+    }
+  </li>
+</ul>

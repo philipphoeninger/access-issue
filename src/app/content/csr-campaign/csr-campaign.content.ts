@@ -14,11 +14,11 @@
 // transcribe docs/PRD.md §6.2.
 //
 // Barrier set and order follow the five sections of docs/PRD.md §6.2. Slices 14
-// and 15 build the first two of them; slices 16 to 18 add the other three
-// (docs/SPEC_v2.md §5).
+// to 16 build the first three of them; slices 17 and 18 add the event and the
+// donation appeal (docs/SPEC_v2.md §5).
 import type { Barrier, BarrierPart } from '../../models/domain.model';
 import { BITV_2_0_4 } from '../standards/bitv';
-import { WCAG_2_1_1, WCAG_2_4_7, WCAG_3_1_5 } from '../standards/wcag';
+import { WCAG_1_1_1, WCAG_1_4_3, WCAG_2_1_1, WCAG_2_4_7, WCAG_3_1_5 } from '../standards/wcag';
 
 // ── Bereich 1: Kampagnenseite ────────────────────────────────────────────────
 
@@ -162,5 +162,91 @@ export const SPRACHE_BARRIER: Barrier = {
   // editorial claim itself is the one thing this project cannot test
   // (docs/UX-COPY.md §10).
   automatedDetection: 'manual',
+  contentStatus: 'placeholder',
+};
+
+// ── Bereich 3: Medien ────────────────────────────────────────────────────────
+//
+// Die drei Barrieren der nachgebildeten Social-Media-Einbettung
+// (docs/UX-COPY.md §9.3 bis §9.5, docs/SPEC_v2.md slice 16). Zwei von ihnen
+// sieht axe — nach dem Bewerbungsprozess, wo fast alles Handarbeit war, das
+// erste Mal die Mehrheit eines Bereichs.
+
+export const ALT_BARRIER: Barrier = {
+  id: 'alt',
+  urlKey: 'alt',
+  title: 'Alternativtexte',
+  shortTitle: 'Bilder mit Alternativtexten',
+  categories: ['visual'],
+  affectedGroups: ['blinde und sehbehinderte Personen'],
+  responsibleArea: 'kommunikation',
+  groupId: 'medien',
+  organisational: false,
+  standards: [WCAG_1_1_1],
+  explanation: {
+    problem:
+      '[Platzhalter] Die drei Bilder der Social-Media-Einbettung tragen kein `alt`-Attribut. Was auf ihnen zu sehen ist — die gestrichene Wand, die Scheckübergabe, der Bastelnachmittag — steht nirgendwo als Text.',
+    affected:
+      '[Platzhalter] Blinde und sehbehinderte Personen hören an dieser Stelle den Dateinamen oder gar nichts. Die Kampagne zeigt ihre Wirkung in Bildern; wer sie nicht sieht, erfährt von dieser Wirkung nichts.',
+    solution:
+      '[Platzhalter] Jedes Bild trägt einen Alternativtext, der beschreibt, was zu sehen ist, statt es zu deuten. „Zwölf Mitarbeitende stehen mit Malerrollen vor der frisch gestrichenen Wand" sagt, was auf dem Bild ist; „Teamgeist in Aktion" sagt es nicht.',
+  },
+  // axe sieht ein `img` ohne `alt` (Regel `image-alt`, content/axe-rule-
+  // fixtures.ts). Eine der wenigen Barrieren dieses Projekts, bei der ein
+  // Werkzeug den Befund selbst erhebt statt ihn nur zu bestätigen.
+  automatedDetection: 'axe',
+  contentStatus: 'placeholder',
+};
+
+export const EMOJI_BARRIER: Barrier = {
+  id: 'emoji',
+  urlKey: 'emoji',
+  title: 'Emojis',
+  shortTitle: 'Emojis ergänzen den Text, statt ihn zu ersetzen',
+  categories: ['visual', 'cognitive'],
+  affectedGroups: ['blinde Personen', 'kognitive Einschränkungen'],
+  responsibleArea: 'kommunikation',
+  groupId: 'medien',
+  organisational: false,
+  standards: [WCAG_1_1_1],
+  explanation: {
+    problem:
+      '[Platzhalter] Im Beitragstext tragen Emojis die Information, statt sie zu begleiten: die Zahl 80 steht als Ziffern-Emojis, der Aufruf als zeigende Hand, die Zusage von Inklusion als Rollstuhlsymbol. Ein Screenreader liest daraus eine Kette von Symbolnamen.',
+    affected:
+      '[Platzhalter] Blinde Personen hören „Ziffer acht, Ziffer null, Prozent" statt „80 Prozent" — und das ist noch der verständliche Teil. Für Menschen mit kognitiven Einschränkungen zerfällt der Satz in Zeichen, die einzeln geraten werden müssen.',
+    solution:
+      '[Platzhalter] Der Beitrag steht als vollständiger Satz. Ein schmückendes Emoji darf bleiben — die Lehre ist nicht „Emojis sind schlecht", sondern „Emojis dürfen keine Information tragen".',
+  },
+  // Manual: axe liest Emojis als Text und hat keinen Begriff davon, dass ein
+  // Zeichen eine Zahl vertritt (docs/TESTING.md §2). Prüfbar ist, dass die
+  // behobene Fassung genau ein Emoji trägt und die Zahl ausschreibt.
+  automatedDetection: 'manual',
+  contentStatus: 'placeholder',
+};
+
+export const KONTRAST_BARRIER: Barrier = {
+  id: 'kontrast',
+  urlKey: 'kontrast',
+  title: 'Kontrast',
+  shortTitle: 'Text auf Bildern gut lesbar',
+  categories: ['visual'],
+  affectedGroups: ['Sehbehinderung', 'Farbfehlsichtige', 'ältere Nutzer'],
+  responsibleArea: 'kommunikation',
+  groupId: 'medien',
+  organisational: false,
+  standards: [WCAG_1_4_3],
+  explanation: {
+    problem:
+      '[Platzhalter] Die Bildunterschriften der Einbettung stehen in einem hellen Grau, das auf seinem Untergrund ein Kontrastverhältnis von 2,92:1 erreicht. Gefordert sind 4,5:1.',
+    affected:
+      '[Platzhalter] Menschen mit Sehbehinderung, Farbfehlsichtige und ältere Nutzer — und außerdem jede Person, die das Gerät bei Sonnenlicht in der Hand hält. Kontrast ist die Barriere, die am häufigsten aus einer rein ästhetischen Entscheidung entsteht.',
+    solution:
+      '[Platzhalter] Der Text steht auf einer eigenen, deckenden Fläche und erreicht dort 11,48:1. Ein Schriftzug direkt auf einem Bild ist nie verlässlich lesbar: Was darunter liegt, wechselt von Bild zu Bild.',
+  },
+  // axe rechnet Vordergrund gegen Hintergrund und meldet `color-contrast`
+  // (content/axe-rule-fixtures.ts). Dass es das kann, hängt daran, dass der
+  // Text auf einer deckenden Fläche steht und nicht auf dem Bild —
+  // scenarios/csr-campaign/campaign-media/ erklärt, warum das so gebaut ist.
+  automatedDetection: 'axe',
   contentStatus: 'placeholder',
 };

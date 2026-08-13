@@ -81,6 +81,11 @@ const STATES: Array<{ name: string; path: string; query: string }> = [
     query: '?frei=leichte-sprache',
   },
   { name: 'campaign — only `jargon` resolved', path: CAMPAIGN_PATH, query: '?frei=jargon' },
+  // Slice 16's media section adds no row, and the omission is a decision rather
+  // than an oversight: `alt`, `emoji` and `kontrast` change no tab stop in any
+  // of their eight combinations — the section has no focusable element at all.
+  // The two rows above already cover the section switched fully off and fully
+  // on. A barrier that ever puts a control into that section brings its own row.
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

@@ -1,30 +1,68 @@
-// The CSR campaign page and its barriers (docs/SPEC_v2.md slices 14 and 15).
+// The CSR campaign page and its barriers (docs/SPEC_v2.md slices 14 to 16).
 //
-// Both barriers so far are `automatedDetection: 'manual'`: axe sees a `<div>`
-// with a click handler as ordinary text, and no tool judges whether a sentence
-// is comprehensible or notices that an easy-language version is missing. Run 2
-// therefore has nothing to assert on this page. What proves the navigation is
-// the keyboard — real `Tab` and `Enter` presses, reading
-// `document.activeElement` (docs/TESTING.md §9); what proves the language
-// barrier is that its four states are four different pages and that its
-// disclosure is a real one.
+// The first two sections are `automatedDetection: 'manual'` throughout: axe
+// sees a `<div>` with a click handler as ordinary text, and no tool judges
+// whether a sentence is comprehensible or notices that an easy-language version
+// is missing. What proves the navigation is the keyboard — real `Tab` and
+// `Enter` presses, reading `document.activeElement` (docs/TESTING.md §9); what
+// proves the language barrier is that its four states are four different pages
+// and that its disclosure is a real one.
 //
-// The safety-critical path (docs/TESTING.md §7) is not repeated here: the two
+// The media section of slice 16 is the first place on this page where run 2 has
+// something to say: `alt` plants an `image-alt` violation and `kontrast` a
+// `color-contrast` one, and both have to disappear when the barrier is
+// resolved.
+//
+// The safety-critical path (docs/TESTING.md §7) is not repeated here: the
 // campaign states are rows in e2e/exit-link.spec.ts, where the trap detector
 // runs against every tested state of every scenario. This suite covers what is
 // particular to the campaign page.
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { frameGate, pageLevelRules } from './support/axe-runs';
+import { barrierAssertion, expectedRuleFor, frameGate, pageLevelRules } from './support/axe-runs';
 import { gotoRendered } from './support/goto';
 
 const PATH = '/szenario/csr-kampagne';
+
+/** The rule ids come from the fixture, never from a literal (docs/TESTING.md §5). */
+const ALT_RULE = expectedRuleFor('csr-kampagne', 'alt');
+const CONTRAST_RULE = expectedRuleFor('csr-kampagne', 'kontrast');
+
+/**
+ * The media section's own matrix: **all eight combinations** of its three
+ * barriers, which docs/SPEC_v2.md slice 16 asks for by name („All eight tested
+ * states of this section pass runs 1 and 3").
+ *
+ * That is more than the n + 2 of docs/TESTING.md §4, which puts this section at
+ * five. The two documents disagree, and this file follows the spec: eight
+ * states of a three-barrier section cost three extra page loads, and the three
+ * barriers share a component and a stylesheet — the one situation §4's
+ * „barriers are implemented independently" argument does not cover on its face.
+ * §4's rule stands everywhere else; do not read this as a licence to power-set
+ * the donation section's four.
+ */
+const MEDIA_KEYS = ['alt', 'emoji', 'kontrast'] as const;
+
+const MEDIA_STATES: Array<{ resolved: readonly string[]; url: string }> = [];
+for (let mask = 0; mask < 8; mask++) {
+  const resolved = MEDIA_KEYS.filter((_key, index) => (mask & (1 << index)) !== 0);
+  MEDIA_STATES.push({
+    resolved,
+    url: resolved.length === 0 ? PATH : `${PATH}?frei=${resolved.join(',')}`,
+  });
+}
 
 /**
  * docs/TESTING.md §4 — the tested states of this page. Grows with the
  * barriers, and a combined barrier contributes its partial-repair states as
  * well: those are where the teaching happens, and they are the states a
  * repair-layer implementation could not produce at all.
+ *
+ * The media section contributes its eight (see `MEDIA_STATES`). Its
+ * „nothing resolved" state is the page default and already the first row, so
+ * seven are added. `?frei=alt,emoji,kontrast` is not the same URL as
+ * `?frei=alle` and stays a row of its own: the media section is repaired while
+ * the navigation and the language barrier still stand.
  */
 const STATES: Array<{ name: string; url: string }> = [
   { name: 'all barriers active (default)', url: PATH },
@@ -33,6 +71,10 @@ const STATES: Array<{ name: string; url: string }> = [
   { name: 'only `sprache` resolved (both parts)', url: `${PATH}?frei=sprache` },
   { name: 'partial — only `jargon` resolved', url: `${PATH}?frei=jargon` },
   { name: 'partial — only `leichte-sprache` resolved', url: `${PATH}?frei=leichte-sprache` },
+  ...MEDIA_STATES.filter(({ resolved }) => resolved.length > 0).map(({ resolved, url }) => ({
+    name: `media — ${resolved.join(' + ')} resolved`,
+    url,
+  })),
 ];
 
 /** The five sections of docs/UX-COPY.md §9, in page order. */
@@ -72,6 +114,44 @@ for (const { name, url } of STATES) {
       await gotoRendered(page, url);
       const results = await pageLevelRules(page).analyze();
       expect(results.violations).toEqual([]);
+    });
+  });
+}
+
+// Run 2, over the media section's own eight states (docs/SPEC_v2.md slice 16).
+// Both directions for both rules, in one loop: this is the assertion that the
+// barriers are genuinely there while they are switched on, and genuinely gone
+// once they are not. A simulation that only *looks* broken passes every other
+// test in this file.
+//
+// The other barriers of the page stay active throughout, which is the point of
+// running the section's matrix rather than the page's: `alt` has to plant its
+// violation whether or not `kontrast` is repaired, and nothing about the
+// navigation may change what axe finds here.
+for (const { resolved, url } of MEDIA_STATES) {
+  const label = resolved.length === 0 ? 'none resolved' : `${resolved.join(' + ')} resolved`;
+  const altResolved = resolved.includes('alt');
+  const contrastResolved = resolved.includes('kontrast');
+
+  test.describe(`axe run 2 — media section, ${label}`, () => {
+    test(`reports ${altResolved ? 'no' : 'an'} ${ALT_RULE} and ${
+      contrastResolved ? 'no' : 'a'
+    } ${CONTRAST_RULE} violation`, async ({ page }) => {
+      await gotoRendered(page, url);
+      const results = await barrierAssertion(page).analyze();
+      const ids = results.violations.map((violation) => violation.id);
+
+      if (altResolved) {
+        expect(ids).not.toContain(ALT_RULE);
+      } else {
+        expect(ids).toContain(ALT_RULE);
+      }
+
+      if (contrastResolved) {
+        expect(ids).not.toContain(CONTRAST_RULE);
+      } else {
+        expect(ids).toContain(CONTRAST_RULE);
+      }
     });
   });
 }
@@ -407,13 +487,13 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
   // exists at all: a barrier that half stands is a barrier that stands.
   test('counts a partially resolved barrier as active', async ({ page }) => {
     await gotoRendered(page, PATH);
-    await expect(page.locator('.counter')).toHaveText('Alle 2 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('Alle 5 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=jargon`);
-    await expect(page.locator('.counter')).toHaveText('Alle 2 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('Alle 5 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=sprache`);
-    await expect(page.locator('.counter')).toHaveText('1 von 2 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('4 von 5 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=alle`);
     await expect(page.locator('.counter')).toHaveText('Keine Barriere aktiv');
@@ -429,7 +509,7 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
 
     await expect(boxFor(page, JARGON)).toBeChecked();
     await expect(boxFor(page, EASY)).toBeChecked();
-    await expect(page.locator('.counter')).toHaveText('1 von 2 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('4 von 5 Barrieren aktiv');
     // Focus stays where the user put it (docs/ARCHITECTURE.md §12.2).
     expect((await focused(page)).id).toBe(await boxFor(page, PARENT).getAttribute('id'));
   });
@@ -552,7 +632,7 @@ test.describe('Deep links into the campaign', () => {
   test('reproduce the barrier state the URL names', async ({ page }) => {
     await gotoRendered(page, `${PATH}?frei=navigation`);
     await expect(page.locator('nav.section-nav')).toHaveCount(1);
-    await expect(page.locator('.counter')).toHaveText('1 von 2 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('4 von 5 Barrieren aktiv');
     await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(1);
 
     await gotoRendered(page, PATH);
@@ -571,5 +651,255 @@ test.describe('Deep links into the campaign', () => {
       'Purpose-driven Impact-Programm',
     );
     await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(1);
+  });
+});
+
+// The media section of docs/SPEC_v2.md slice 16. Its structural assertions live
+// in the component spec
+// (src/app/scenarios/csr-campaign/campaign-media/…spec.ts) where they run in
+// milliseconds; what is here is what only a real browser can answer — what axe
+// computes, what the network does, and what a system preference overrides.
+test.describe('The media section (docs/UX-COPY.md §9.3 to §9.5)', () => {
+  const FEED = '[data-simulation-region] .feed';
+
+  test('is a local reproduction, not an embed', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    await expect(page.locator(`${FEED} .post`)).toHaveCount(4);
+    await expect(page.locator(`${FEED} iframe`)).toHaveCount(0);
+    // docs/UX-COPY.md §9.3 `csr.social.disclaimer` — a Simulationshinweis, so
+    // it stands in every state and is never made into a barrier
+    // (docs/UX-COPY.md §8.4, CLAUDE.md rule 5).
+    await expect(page.locator('[data-simulation-region] .simulation-note')).toHaveText(
+      'Nachbildung einer Social-Media-Einbettung. Es werden keine Daten an Dritte übertragen.',
+    );
+  });
+
+  // docs/SPEC_v2.md slice 16: „No network request leaves the page in any
+  // state." A third-party embed is the one thing a social-media reproduction
+  // is most likely to smuggle in, and it would leak the reader of a teaching
+  // page to a platform that never asked them (docs/ARCHITECTURE.md §16).
+  //
+  // Asserted on the requests the browser actually makes, not on the markup:
+  // a script, a font, a tracking pixel and a preconnect all reach the network
+  // without an `iframe` ever appearing in the DOM.
+  test('makes no request to a third party in any state', async ({ page, baseURL }) => {
+    const origin = new URL(baseURL!).origin;
+    const foreign: string[] = [];
+    page.on('request', (request) => {
+      if (!request.url().startsWith(origin) && !request.url().startsWith('data:')) {
+        foreign.push(request.url());
+      }
+    });
+
+    for (const { url } of MEDIA_STATES) {
+      await gotoRendered(page, url);
+      // The images are part of the section, so waiting for them is part of the
+      // claim: a request that only happens once an image loads would otherwise
+      // be made after the assertion.
+      await expect(page.locator(`${FEED} img`)).toHaveCount(3);
+    }
+
+    expect(foreign).toEqual([]);
+  });
+
+  // The images actually load. This looks like a test of nothing until you have
+  // shipped a broken one: an `img` whose source 404s or whose SVG will not
+  // parse still has no `alt` attribute, so run 2 keeps finding its `image-alt`
+  // violation, the alt assertions keep passing, and the suite stays green over
+  // three placeholder icons. That is exactly what happened while this slice was
+  // being built — a comment in one of the SVGs contained a double hyphen, which
+  // XML forbids, and nothing said so.
+  test('serves all three post images', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    // `expect.poll`, not a bare `evaluateAll`: `gotoRendered` waits for the
+    // routed component, and the images are created *after* the document load
+    // event by a lazily loaded chunk — their fetch and decode are still in
+    // flight at that moment. A one-shot read would report `naturalWidth: 0` on
+    // a cold server or a loaded CI worker and fail on three perfectly good
+    // files, which is the kind of red that teaches people to re-run the suite
+    // instead of reading it.
+    await expect
+      .poll(() =>
+        page
+          .locator(`${FEED} img`)
+          .evaluateAll((images) => images.map((image) => (image as HTMLImageElement).naturalWidth)),
+      )
+      .toEqual([600, 600, 600]);
+  });
+
+  test('shows the three post images without alt while `alt` is active', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    const alts = await page
+      .locator(`${FEED} img`)
+      .evaluateAll((images) => images.map((image) => image.getAttribute('alt')));
+    expect(alts).toEqual([null, null, null]);
+  });
+
+  test('carries the reviewed alternative texts once `alt` is resolved', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=alt`);
+
+    await expect(page.locator(`${FEED} img`).first()).toHaveAttribute(
+      'alt',
+      'Zwölf Mitarbeitende von Elbwerk stehen mit Malerrollen vor der frisch gestrichenen Wand des Nachbarschaftstreffs.',
+    );
+    const alts = await page
+      .locator(`${FEED} img`)
+      .evaluateAll((images) => images.map((image) => image.getAttribute('alt')));
+    expect(alts.filter((alt) => alt === null)).toEqual([]);
+  });
+
+  // The claim the copy makes about the contrast ratios (docs/UX-COPY.md §9.5),
+  // read off the rendered page rather than off the stylesheet: 2.92:1 active,
+  // 11.48:1 resolved. axe's verdict is run 2 above; this is the number itself,
+  // and it is what would catch a token whose value drifted.
+  test('renders the overlay caption at the contrast ratio the copy names', async ({ page }) => {
+    /**
+     * The three channels of a computed colour — and a hard failure on anything
+     * this arithmetic cannot honestly handle.
+     *
+     * **Translucency is thrown, not dropped.** A ratio is only defined against
+     * a known backdrop, and the shape this has to refuse is the one
+     * docs/UX-COPY.md §9.5 asks for in words: a gradient scrim instead of a
+     * solid band. Set `background-image` and drop `background-color`, and
+     * `backgroundColor` computes to `rgba(0, 0, 0, 0)` — an alpha-blind parser
+     * reads that as pure black, reports 21:1 for the white caption and passes,
+     * while the caption is really white text on whatever the picture shows
+     * (the light wall of post 1, about 1.1:1). Nothing else would catch it
+     * either: axe returns *incomplete* over a gradient rather than a violation,
+     * so run 2's `not.toContain` above passes vacuously too. This is the only
+     * assertion standing between that change and a barrier that is repaired in
+     * name only.
+     */
+    const channels = (value: string): [number, number, number] => {
+      const parts = /^rgba?\(([^)]+)\)$/.exec(value);
+      if (parts === null) {
+        throw new Error(`Kein rgb()/rgba()-Wert, Kontrast nicht berechenbar: "${value}"`);
+      }
+      const numbers = parts[1].split(/[,/\s]+/).filter((part) => part.length > 0);
+      if (numbers.length < 3) {
+        throw new Error(`Unvollständiger Farbwert: "${value}"`);
+      }
+      if (numbers.length > 3 && Number(numbers[3]) !== 1) {
+        throw new Error(
+          `Durchscheinende Fläche (Alpha ${numbers[3]}) in "${value}": Über einer ` +
+            'teiltransparenten Fläche ist kein Kontrastverhältnis bestimmbar. Die ' +
+            'Bildunterschrift braucht eine deckende Fläche (docs/UX-COPY.md §9.5).',
+        );
+      }
+      return [Number(numbers[0]), Number(numbers[1]), Number(numbers[2])];
+    };
+
+    const ratio = (colours: { color: string; background: string }): number => {
+      const luminance = (value: string): number => {
+        const [red, green, blue] = channels(value).map((part) => {
+          const channel = part / 255;
+          return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+      };
+      const first = luminance(colours.color) + 0.05;
+      const second = luminance(colours.background) + 0.05;
+      return Math.max(first, second) / Math.min(first, second);
+    };
+
+    const read = async (url: string): Promise<{ color: string; background: string }> => {
+      await gotoRendered(page, url);
+      return page
+        .locator(`${FEED} .post-overlay`)
+        .first()
+        .evaluate((caption) => {
+          const style = getComputedStyle(caption);
+          return { color: style.color, background: style.backgroundColor };
+        });
+    };
+
+    expect(ratio(await read(PATH))).toBeLessThan(3);
+    expect(ratio(await read(`${PATH}?frei=kontrast`))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('writes the information out instead of into emojis once `emoji` is resolved', async ({
+    page,
+  }) => {
+    await gotoRendered(page, PATH);
+    await expect(page.locator(`${FEED} .post-text`)).toContainText('🎉🎉🎉');
+
+    await gotoRendered(page, `${PATH}?frei=emoji`);
+    const resolved = page.locator(`${FEED} .post-text`);
+    await expect(resolved).toContainText('80 Prozent');
+    await expect(resolved).not.toContainText('♿');
+  });
+
+  // CLAUDE.md rule 9: the system preference wins, and the frame says what it
+  // took away. Without the note a lecturer with high contrast switched on sees
+  // a barrier that is not there and reports it as broken.
+  // `page.emulateMedia` rather than the `forcedColors` context option: the
+  // context option leaves `matchMedia('(forced-colors: active)')` reporting
+  // `false` in this Chromium, so a test written on it would assert against a
+  // preference the page never saw — and would have passed for the wrong reason
+  // if the note were shown unconditionally.
+  test.describe('under forced colors', () => {
+    const NOTE =
+      'Dein System erzwingt eigene Farben. Diese Einstellung hat Vorrang: Die Kontrast-Barriere wird nicht dargestellt. Ohne diese Einstellung wäre der Text auf den Bildern kaum lesbar.';
+
+    test('names the suppressed contrast barrier in the simulation bar', async ({ page }) => {
+      await page.emulateMedia({ forcedColors: 'active' });
+      await gotoRendered(page, PATH);
+
+      await expect(page.locator('.suppression p')).toHaveText(NOTE);
+      // Exactly one note, and it is the only thing in the bar that changed:
+      // the counter still counts the barrier, because it is still switched on
+      // (docs/UX-COPY.md §5.6). A suppressed barrier is not a resolved one.
+      await expect(page.locator('.suppression p')).toHaveCount(1);
+      await expect(page.locator('.counter')).toHaveText('Alle 5 Barrieren aktiv');
+    });
+
+    // Nothing is being overridden once the barrier is repaired, so there is
+    // nothing to report. A note that stood in every state would be furniture.
+    test('says nothing once the barrier is resolved', async ({ page }) => {
+      await page.emulateMedia({ forcedColors: 'active' });
+      await gotoRendered(page, `${PATH}?frei=kontrast`);
+
+      await expect(page.locator('.suppression')).toHaveCount(0);
+    });
+
+    // The preference can change while the page is open — a lecturer switching
+    // high contrast on mid-session is the case this exists for. A note read
+    // once at startup would be wrong from that moment on and would stay wrong
+    // until a reload.
+    test('follows the preference while the page is open', async ({ page }) => {
+      await gotoRendered(page, PATH);
+      await expect(page.locator('.suppression')).toHaveCount(0);
+
+      await page.emulateMedia({ forcedColors: 'active' });
+      await expect(page.locator('.suppression p')).toHaveText(NOTE);
+
+      await page.emulateMedia({ forcedColors: 'none' });
+      await expect(page.locator('.suppression')).toHaveCount(0);
+    });
+  });
+});
+
+// Same claim as for the two groups before it: the anchor has to land in front
+// of the part of the section its group is about.
+test.describe('The panel anchor of the media group', () => {
+  test('lands on the section heading, above the feed', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=alt`);
+
+    await page.locator('#barrier-group-medien-anchor').focus();
+    await page.keyboard.press('Enter');
+    expect((await focused(page)).id).toBe('sim-medien');
+
+    // The section has no control of its own, so the assertion is about
+    // position rather than about the next tab stop: everything the group
+    // switches is below the landing point.
+    const feedBelow = await page.evaluate(() => {
+      const heading = document.getElementById('sim-medien')!;
+      const feed = document.querySelector('[data-simulation-region] .feed')!;
+      return (heading.compareDocumentPosition(feed) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    });
+    expect(feedBelow).toBe(true);
   });
 });

@@ -1140,6 +1140,23 @@ Erklärtext muss beides benennen.
 Die Alternativtexte sind bewusst beschreibend und nicht interpretierend — sie taugen als
 Muster für das, was das Modul lehrt.
 
+**Die drei Bilder sind schematische SVG-Zeichnungen** (ergänzt in Slice 16), aus demselben
+Grund wie die Veranstaltungsgrafik in `SPEC_v2.md` §4.2: Ein Foto müsste erst hergestellt
+werden und bände den Bau an eine externe Lieferung. Was hier lehrt, ist der Unterschied
+zwischen fehlendem und vorhandenem Alternativtext, nicht die fotografische Qualität. Die
+Alternativtexte oben beschreiben, was auf den Zeichnungen zu sehen ist — sie bleiben
+richtig, wenn später Fotos an ihre Stelle treten, weil das Motiv dasselbe ist.
+
+**Der Beitrag aus Abschnitt 9.4 steht als eigener Beitrag im Feed**, nicht als
+Bildunterschrift zu einem der drei Bilder (Slice 16, redaktionell zu bestätigen). Die Copy
+gibt genau einen Beitragstext her; die übrigen drei mit erfundenen Texten zu versehen wäre
+erfundene Redaktion. Der Abschnitt zeigt also vier Beiträge: drei Bilder und einen Text.
+
+`csr.social.disclaimer` ist einer der vier **Simulationshinweise** (Abschnitt 8.4). Er steht
+vor der Einbettung, in jedem Barrierezustand, im Rahmenstil — und er steht hier nicht, weil
+jemand Daten eingeben könnte, sondern weil eine Social-Media-Einbettung genau die Stelle
+ist, an der eine echte Seite Daten an Dritte überträgt.
+
 ### 9.4 Bereich „Medien" — Barriere „Emojis"
 
 **Aktiv** — Emojis tragen die Information, statt sie zu begleiten:
@@ -1173,6 +1190,27 @@ vollständigen Satz ist unproblematisch.
 
 **Aktiv:** Overlay-Text in `--sim-fail-text` (2,92:1) direkt auf dem Bild.
 **Behoben:** Overlay in `--sim-text` auf einem abgedunkelten Verlauf, mindestens 4,5:1.
+
+**Die Umsetzung weicht in zwei Punkten ab** (Slice 16, redaktionell zu bestätigen). Beide
+Fassungen stehen auf einer **deckenden Fläche** am unteren Bildrand, nicht direkt auf dem
+Bild und nicht auf einem Verlauf; die behobene Fassung ist `--sim-white` auf `--sim-brand`
+(11,48:1), nicht `--sim-text`.
+
+Der zweite Punkt ist ein Rechenfehler der Vorlage: `--sim-text` ist ein dunkles Blaugrau,
+auf einem *abgedunkelten* Verlauf stünde also dunkel auf dunkel und verfehlte genau die
+4,5:1, die derselbe Absatz verlangt.
+
+Der erste ist eine Anforderung aus der Prüfbarkeit: axe kann ein Kontrastverhältnis nur
+berechnen, wenn es den Hintergrund kennt. Über einem Bild oder einem Verlauf meldet es
+„incomplete" statt eines Verstoßes — und „incomplete" prüft niemand. Die Barriere ist als
+`automatedDetection: 'axe'` deklariert (`SPEC_v2.md` Slice 16); auf dem Bild wäre sie das
+nur dem Namen nach.
+
+Der didaktische Gehalt bleibt: zu schwacher Text über einem Bild, und die Reparatur ist
+die, die eine echte Redaktion vornimmt. Sollte die Redaktion auf der Fassung „direkt auf
+dem Bild" bestehen, ist die Folge, dass die Barriere `automatedDetection: 'manual'` wird
+und der Testlauf 2 sie nicht mehr belegt — das ist die Entscheidung, die dann zu treffen
+wäre, nicht eine Frage der Darstellung.
 
 ### 9.6 Bereich „Event und Podiumsdiskussion" — kombinierte Barriere, 3 Teile
 
@@ -1324,6 +1362,8 @@ der automatische Wechsel unterbleibt.
 | Aufklappfläche und Zeilenumbrüche der Leichten Sprache (Abschnitt 9.2) — in Slice 15 festgelegt, weil die Fassung sonst nicht darstellbar ist | WERTE.IT-Team |
 | Namen und Kontaktdaten der fiktiven Ansprechpersonen (Miriam Kessler, Torben Kruse) — sollen sie so bleiben oder neutraler werden? | WERTE.IT-Team |
 | `csr.text.h3` („Unser Ziel") und die Zuordnung der fünf Menüpunkte zu den Abschnitten (Abschnitt 9, 9.1) — in Slice 14 ergänzt, weil die Bereichsnavigation ohne Ziele nicht baubar ist | WERTE.IT-Team |
+| **Das Overlay steht auf einer deckenden Fläche, nicht auf dem Bild (Abschnitt 9.5)** — in Slice 16 entschieden, weil `--sim-text` auf einem abgedunkelten Verlauf die geforderten 4,5:1 verfehlt und weil axe über einem Bild kein Verhältnis berechnen kann. Wer die Vorlage wiederherstellt, gibt die automatische Prüfbarkeit der Barriere auf | WERTE.IT-Team |
+| Der Emoji-Beitrag (Abschnitt 9.4) steht als eigener Beitrag im Feed, nicht als Unterschrift zu einem der drei Bilder — in Slice 16 festgelegt, weil die Copy genau einen Beitragstext hergibt | WERTE.IT-Team |
 | Soll die Stellenanzeige eine reale BSVH-nahe Tätigkeit abbilden oder bewusst neutral bleiben? | WERTE.IT-Team |
 
 **Ein Hinweis zur Prüfung.** Die beiden Sprachfassungen in Abschnitt 8.3 sind der einzige

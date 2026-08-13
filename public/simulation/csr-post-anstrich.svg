@@ -1,0 +1,95 @@
+<!-- Beitragsbild 1 der nachgebildeten Social-Media-Einbettung
+     (docs/UX-COPY.md §9.3 `csr.social.post1.alt`, docs/SPEC_v2.md Slice 16).
+
+     Schematisch statt fotorealistisch, aus demselben Grund wie die
+     Veranstaltungsgrafik in docs/SPEC_v2.md §4.2: Ein Foto müsste erst
+     hergestellt werden und bände den Bau an eine externe Lieferung. Was hier
+     lehrt, ist der Unterschied zwischen fehlendem und vorhandenem
+     Alternativtext, nicht die fotografische Qualität. Ein Foto kann die Datei
+     später ersetzen, ohne dass die Komponente sich ändert.
+
+     **Die Farben stehen als Zahlenwerte, nicht als Tokens.** Eine über <img>
+     eingebundene SVG-Datei sieht die CSS-Variablen des Dokuments nicht; die
+     Werte unten sind die der Simulations-Tokens sim-brand, sim-text,
+     sim-muted, sim-surface und sim-border aus src/styles/_tokens.scss. Wer
+     dort eine Farbe ändert, ändert sie hier mit — automatisch geschieht das
+     nicht.
+
+     (Ohne die beiden führenden Bindestriche geschrieben: Zwei Bindestriche
+     hintereinander sind in einem XML-Kommentar nicht erlaubt, und die Datei
+     lädt dann gar nicht. Genau so ist es beim Bauen dieses Schnitts
+     passiert.)
+
+     Die untere Bildkante bleibt frei: Dort liegt im Beitrag das Text-Overlay
+     (Barriere `kontrast`), und was darunter läge, wäre in keinem der beiden
+     Zustände zu sehen. -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 600 600"
+  width="600"
+  height="600"
+>
+  <defs>
+    <!-- Eine Person mit Malerrolle. Zwölfmal verwendet — genau die Zahl, die
+         der Alternativtext nennt. -->
+    <g id="painter">
+      <rect x="-17" y="-34" width="14" height="34" rx="6" fill="#33475b" />
+      <rect x="3" y="-34" width="14" height="34" rx="6" fill="#33475b" />
+      <rect x="-23" y="-102" width="46" height="72" rx="16" fill="#1f3a5f" />
+      <circle cx="0" cy="-120" r="17" fill="#33475b" />
+      <path
+        d="M18 -92 L44 -130"
+        stroke="#1f3a5f"
+        stroke-width="7"
+        stroke-linecap="round"
+        fill="none"
+      />
+      <path d="M49 -142 L49 -128" stroke="#5a6b7b" stroke-width="5" stroke-linecap="round" />
+      <rect x="34" y="-156" width="30" height="14" rx="5" fill="#5a6b7b" />
+    </g>
+    <g id="painter-alt">
+      <rect x="-17" y="-34" width="14" height="34" rx="6" fill="#5a6b7b" />
+      <rect x="3" y="-34" width="14" height="34" rx="6" fill="#5a6b7b" />
+      <rect x="-23" y="-102" width="46" height="72" rx="16" fill="#5a6b7b" />
+      <circle cx="0" cy="-120" r="17" fill="#33475b" />
+      <path
+        d="M18 -92 L44 -130"
+        stroke="#5a6b7b"
+        stroke-width="7"
+        stroke-linecap="round"
+        fill="none"
+      />
+      <path d="M49 -142 L49 -128" stroke="#1f3a5f" stroke-width="5" stroke-linecap="round" />
+      <rect x="34" y="-156" width="30" height="14" rx="5" fill="#1f3a5f" />
+    </g>
+  </defs>
+
+  <!-- Wand des Nachbarschaftstreffs, davor der frisch gestrichene Abschnitt -->
+  <rect x="0" y="0" width="600" height="600" fill="#f5f6f7" />
+  <rect x="34" y="40" width="532" height="330" fill="#c9d3dc" />
+  <rect x="34" y="40" width="532" height="330" fill="none" stroke="#a8b6c4" stroke-width="3" />
+  <path
+    d="M120 40 L120 370 M260 40 L260 370 M400 40 L400 370"
+    stroke="#d8dde2"
+    stroke-width="6"
+    opacity="0.7"
+  />
+  <rect x="0" y="470" width="600" height="130" fill="#d8dde2" />
+  <path d="M0 470 L600 470" stroke="#a8b6c4" stroke-width="3" />
+
+  <!-- Hintere Reihe, sechs Personen -->
+  <use href="#painter" transform="translate(92 442) scale(0.82)" />
+  <use href="#painter-alt" transform="translate(184 442) scale(0.82)" />
+  <use href="#painter" transform="translate(276 442) scale(0.82)" />
+  <use href="#painter-alt" transform="translate(368 442) scale(0.82)" />
+  <use href="#painter" transform="translate(460 442) scale(0.82)" />
+  <use href="#painter-alt" transform="translate(544 442) scale(0.82)" />
+
+  <!-- Vordere Reihe, sechs Personen -->
+  <use href="#painter-alt" transform="translate(56 512)" />
+  <use href="#painter" transform="translate(160 512)" />
+  <use href="#painter-alt" transform="translate(264 512)" />
+  <use href="#painter" transform="translate(368 512)" />
+  <use href="#painter-alt" transform="translate(472 512)" />
+  <use href="#painter" transform="translate(566 512)" />
+</svg>

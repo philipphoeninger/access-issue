@@ -231,6 +231,10 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     { scenarioPath: 'csr-kampagne', urlKey: 'sprache' },
     { scenarioPath: 'csr-kampagne', urlKey: 'jargon' },
     { scenarioPath: 'csr-kampagne', urlKey: 'leichte-sprache' },
+    // The media section of slice 16.
+    { scenarioPath: 'csr-kampagne', urlKey: 'alt' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'emoji' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'kontrast' },
   ];
 
   it('keeps every previously published {scenarioPath, urlKey} pair (add here on release)', () => {

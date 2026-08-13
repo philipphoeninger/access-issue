@@ -29,7 +29,14 @@ export const AXE_RULE_FIXTURES: Record<string, Record<string, string>> = {
     // text (docs/SPEC_v1.md slice 10 — 'axe' when the image lacks alt).
     bestaetigung: 'image-alt',
   },
-  // The campaign's two barriers so far are both `automatedDetection: 'manual'`
-  // (docs/SPEC_v2.md slices 14, 15); `alt` and `kontrast` arrive with slice 16.
-  'csr-kampagne': {},
+  'csr-kampagne': {
+    // Media section: the three post images without `alt` (docs/SPEC_v2.md
+    // slice 16).
+    alt: 'image-alt',
+    // Media section: the overlay caption at 2.92:1. axe can only compute a
+    // contrast ratio when it knows the background colour, which is why the
+    // caption sits on an opaque band rather than directly on the image —
+    // scenarios/csr-campaign/campaign-media/ carries the full reasoning.
+    kontrast: 'color-contrast',
+  },
 };
