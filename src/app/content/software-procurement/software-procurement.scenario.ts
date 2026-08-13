@@ -12,5 +12,6 @@ export const SOFTWARE_PROCUREMENT_SCENARIO: Scenario = {
     'Ein Ticketsystem wird eingekauft — nach Funktionsumfang, Bedienbarkeit und Preis. Erst im Arbeitsalltag zeigt sich, wer es nicht nutzen kann.',
   status: 'planned',
   steps: [],
+  groups: [],
   barriers: [],
 };

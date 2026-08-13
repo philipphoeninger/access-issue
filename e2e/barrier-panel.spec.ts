@@ -7,6 +7,8 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { frameGate, pageLevelRules } from './support/axe-runs';
 import { gotoRendered } from './support/goto';
+import { SCENARIOS } from '../src/app/core/scenario-registry.service';
+import { firstStepPath } from '../src/app/core/scenario-routes';
 
 const STEP = '/szenario/bewerbung/formular';
 
@@ -165,5 +167,97 @@ test.describe('Barrier panel — effect on the rest of the page', () => {
     // replaceUrl (docs/ARCHITECTURE.md §10): the Back button belongs to step
     // navigation, not to reading an explanation.
     expect(await page.evaluate(() => history.length)).toBe(before);
+  });
+});
+
+// docs/SPEC_v2.md slice 13: „Anchor link moves focus to the section heading
+// inside the simulation region and does not trap it."
+//
+// Nothing but a browser can answer this. The `anchorId` a group declares is a
+// string; the id it is supposed to hit lives in a simulation component the
+// frame deliberately knows nothing about (docs/ARCHITECTURE.md §5.2), so no
+// contract test can pair them up. A typo — `sim-medien` declared against
+// `id="sim-media"` rendered — produces a link that scrolls nowhere and moves
+// no focus, with every unit test, every contract test and every axe run
+// green. That is the failure this suite exists to make impossible.
+//
+// The cases are generated from the declared groups, so the five sections of
+// the CSR campaign are covered the moment slice 14 declares them, without
+// anyone remembering to come back here. Today that generates nothing: no
+// shipped scenario declares an `anchorId`, which is asserted rather than
+// assumed below — a suite that quietly stops testing anything is the thing
+// this file cannot afford.
+const ANCHORED_GROUPS = SCENARIOS.filter((scenario) => scenario.status === 'available').flatMap(
+  (scenario) =>
+    scenario.groups
+      .filter((group) => group.anchorId !== undefined)
+      // `firstStepPath` returns routerLink segments starting with
+      // '/szenario', so joining them yields the route as typed in the URL
+      // bar — and it is the same function the home page links with, so this
+      // suite cannot drift to a route that does not exist.
+      .map((group) => ({ url: firstStepPath(scenario).join('/'), scenario, group })),
+);
+
+test.describe('Barrier panel — section anchors (docs/ARCHITECTURE.md §12.1.1)', () => {
+  for (const { url, scenario, group } of ANCHORED_GROUPS) {
+    test(`${scenario.path} → "${group.title}" reaches its section and leaves focus there`, async ({
+      page,
+    }) => {
+      await gotoRendered(page, url);
+
+      const link = page.locator(`#barrier-group-${group.id}-anchor`);
+      await expect(link).toHaveCount(1);
+      await expect(link).toHaveAttribute('href', new RegExp(`#${group.anchorId}$`));
+
+      // The target has to exist, and it has to be inside the region: an
+      // anchor that lands in the frame would be a link out of the simulation
+      // dressed up as a link into it.
+      const target = page.locator(`#${group.anchorId}`);
+      await expect(target).toHaveCount(1);
+      expect(
+        await page.evaluate(
+          (id) =>
+            document
+              .querySelector('[data-simulation-region]')!
+              .contains(document.getElementById(id)),
+          group.anchorId!,
+        ),
+      ).toBe(true);
+
+      // A real keyboard activation, not `.click()` (docs/TESTING.md §9), and
+      // the assertion is on `document.activeElement`: scrolling to a section
+      // without taking focus with it is the failure mode of a naive anchor.
+      //
+      // **This requires the target to carry `tabindex="-1"`.** A heading is
+      // not focusable, so a browser jumping to it moves the sequential focus
+      // starting point and leaves `document.activeElement` on `body` — the
+      // page scrolls and the screen reader stays where it was. Every other
+      // in-page target in this application is `tabindex="-1"` for this exact
+      // reason (`#content`, `#panel`, the region's end anchor), and a section
+      // heading declared as an `anchorId` is no different. Verified in both
+      // directions while this suite was written: without the attribute the
+      // assertion below fails, with it the whole case passes.
+      await link.focus();
+      await page.keyboard.press('Enter');
+      expect(await page.evaluate(() => document.activeElement?.id)).toBe(group.anchorId);
+
+      // ...and it is a jump, not a trap: Tab moves on from the target
+      // (docs/TESTING.md §7).
+      const before = await page.evaluate(() => document.activeElement?.id);
+      await page.keyboard.press('Tab');
+      expect(await page.evaluate(() => document.activeElement?.id)).not.toBe(before);
+    });
+  }
+
+  // The negative control for the generator above. Without it, a renamed
+  // `groups` field or a filter that stops matching would empty ANCHORED_GROUPS
+  // and every case above would silently cease to exist.
+  test('no available scenario declares an anchor yet — remove this once one does', async () => {
+    const declared = SCENARIOS.filter((scenario) => scenario.status === 'available').flatMap(
+      (scenario) => scenario.groups,
+    );
+
+    expect(declared.length).toBeGreaterThan(0);
+    expect(ANCHORED_GROUPS.length).toBe(0);
   });
 });

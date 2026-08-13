@@ -85,6 +85,19 @@ export interface Barrier {
   affectedGroups: string[];
   responsibleArea: ResponsibleArea;
   /**
+   * Panel grouping key — the `id` of one of the scenario's `groups`
+   * (docs/ARCHITECTURE.md §6, §12.1.1). For multi-step scenarios the groups
+   * mirror the steps one-to-one; for single-page scenarios they mirror the
+   * page's sections. One mechanism, not two: the panel's structure is declared
+   * here, not derived from the routing structure, because the two only
+   * coincided in the application process (docs/SPEC_v2.md §4.1).
+   *
+   * A `groupId` that matches no declared group would make the barrier vanish
+   * from the panel — a barrier nobody can switch off. content/data-contract.spec.ts
+   * asserts that cannot happen.
+   */
+  groupId: string;
+  /**
    * True when the barrier is an organisational omission rather than a technical
    * defect — no missing labels, no failing contrast, nothing a checker could see.
    * Examples: no named contact person, no note that adjustments are possible,
@@ -109,7 +122,29 @@ export interface ScenarioStep {
   id: string;
   path: string; // route segment
   title: string;
-  barrierIds: string[]; // barriers surfaced in this step
+}
+
+/**
+ * One `fieldset` in the barrier panel (docs/ARCHITECTURE.md §12.1.1). Groups
+ * are declared per scenario and referenced by `Barrier.groupId`.
+ */
+export interface BarrierGroup {
+  id: string;
+  /** Panel heading and, for single-page scenarios, the section anchor label. */
+  title: string;
+  /**
+   * Anchor target inside the simulation region, single-page scenarios only.
+   * Carries the `sim-` prefix like every other id in the region
+   * (docs/ARCHITECTURE.md §5.6 rule 2). A multi-step scenario leaves this
+   * undefined: its groups are steps, and a step is reached by navigating, not
+   * by jumping within the page.
+   *
+   * **The element it names must carry `tabindex="-1"`.** A heading is not
+   * focusable, so a jump to one scrolls the page and leaves focus behind —
+   * useless to the screen-reader user the link exists for. e2e/barrier-panel
+   * asserts it for every declared anchor.
+   */
+  anchorId?: string;
 }
 
 export interface Scenario {
@@ -119,5 +154,11 @@ export interface Scenario {
   summary: string;
   status: 'available' | 'planned';
   steps: ScenarioStep[]; // single-element array for one-page scenarios
+  /**
+   * Panel groups, in panel order. Empty only for a `planned` stub — an
+   * available scenario with barriers must declare the groups they name
+   * (content/data-contract.spec.ts).
+   */
+  groups: BarrierGroup[];
   barriers: Barrier[];
 }

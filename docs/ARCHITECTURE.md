@@ -346,7 +346,15 @@ interface ScenarioStep {
   id: string;
   path: string;                // route segment
   title: string;
-  barrierIds: string[];        // barriers surfaced in this step
+}
+
+/** One fieldset in the barrier panel. See §12.1.1. */
+interface BarrierGroup {
+  id: string;
+  /** Panel heading and, for single-page scenarios, the section anchor label. */
+  title: string;
+  /** Anchor target inside the simulation region, single-page scenarios only. */
+  anchorId?: string;
 }
 
 interface Scenario {
@@ -356,6 +364,7 @@ interface Scenario {
   summary: string;
   status: 'available' | 'planned';
   steps: ScenarioStep[];       // single-element array for one-page scenarios
+  groups: BarrierGroup[];      // panel groups, in panel order
   barriers: Barrier[];
 }
 ```
@@ -364,6 +373,13 @@ Notes on the shape:
 
 - A single-page scenario (CSR) is modelled as a scenario with one step. This removes the
   branch between "flow scenarios" and "page scenarios" everywhere downstream.
+- **`ScenarioStep` no longer lists its barriers.** It carried `barrierIds: string[]` while
+  the panel grouped by step; once `Barrier.groupId` became the grouping key (§12.1.1), no
+  runtime code read the field, and a step listing one set of barriers while their `groupId`
+  said another is a contradiction nothing would have caught. Removed for the same reason
+  as `implementation` below, and the barrier→group mapping now exists in exactly one place.
+  Panel order within a group is the order of `scenario.barriers`, which is authored in
+  reading order.
 - `status: 'planned'` lets the procurement scenario exist in the registry, appear on the
   home page as not-yet-available, and be filled in later without touching routing code.
 - Combined barriers carry `parts`. A barrier with `parts` is *resolved* only when every

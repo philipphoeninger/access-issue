@@ -229,34 +229,60 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     }
   });
 
-  it('references only barrierIds that exist in the scenario barrier list', () => {
+  // The barrier panel renders one fieldset per declared group and fills it by
+  // matching `groupId` (docs/ARCHITECTURE.md §12.1.1). A barrier naming a
+  // group that does not exist would simply not be offered — a barrier nobody
+  // can switch off, invisible in every screenshot. This is the assertion that
+  // lets the panel filter without a catch-all group of its own.
+  it('resolves every groupId to a group the scenario declares', () => {
+    forEachBarrier(scenarios, (scenario, barrier) => {
+      const groupIds = scenario.groups.map((group) => group.id);
+      expect(groupIds)
+        .withContext(`${scenario.path}/${barrier.urlKey}: groupId "${barrier.groupId}"`)
+        .toContain(barrier.groupId);
+    });
+  });
+
+  // The other direction. An empty group renders as a fieldset with a legend
+  // and nothing in it — a heading promising controls that are not there, and
+  // in a single-page scenario an anchor to a section whose barriers went
+  // somewhere else.
+  it('gives every declared group at least one barrier', () => {
     for (const scenario of scenarios) {
-      const barrierIds = new Set(scenario.barriers.map((barrier) => barrier.id));
-      for (const step of scenario.steps) {
-        for (const barrierId of step.barrierIds) {
-          expect(barrierIds.has(barrierId))
-            .withContext(`${scenario.path}/${step.path} → ${barrierId}`)
-            .toBeTrue();
-        }
+      for (const group of scenario.groups) {
+        const count = scenario.barriers.filter((barrier) => barrier.groupId === group.id).length;
+        expect(count).withContext(`${scenario.path} → group "${group.id}"`).toBeGreaterThan(0);
       }
     }
   });
 
-  // The barrier panel groups by step and looks its entries up through
-  // `step.barrierIds` (docs/ARCHITECTURE.md §12.1.1), so a barrier that
-  // belongs to no step would simply not be offered — a barrier nobody can
-  // switch off, invisible in every screenshot. Listing one twice would offer
-  // two controls for one piece of state.
-  it('surfaces every barrier in exactly one step', () => {
+  // Group ids reach the DOM as `barrier-group-{id}-title` and
+  // `barrier-group-{id}-anchor` (frame/barrier-panel), which the anchor link's
+  // `aria-labelledby` then references. Holding them to the urlKey shape keeps
+  // those ids valid and unambiguous; nothing else would.
+  it('keeps group ids unique within a scenario and matching /^[a-z0-9-]+$/', () => {
     for (const scenario of scenarios) {
-      const stepCounts = new Map(scenario.barriers.map((barrier) => [barrier.id, 0]));
-      for (const step of scenario.steps) {
-        for (const barrierId of step.barrierIds) {
-          stepCounts.set(barrierId, (stepCounts.get(barrierId) ?? 0) + 1);
-        }
+      const ids = scenario.groups.map((group) => group.id);
+      expect(new Set(ids).size).withContext(`${scenario.path} group ids`).toBe(ids.length);
+      for (const id of ids) {
+        expect(id).withContext(`${scenario.path} group "${id}"`).toMatch(URL_KEY_PATTERN);
       }
-      for (const [barrierId, count] of stepCounts) {
-        expect(count).withContext(`${scenario.path} → ${barrierId}`).toBe(1);
+    }
+  });
+
+  // An `anchorId` is a link target inside the simulation region, so it obeys
+  // the region's id rule (docs/ARCHITECTURE.md §5.6 rule 2, CLAUDE.md rule 2).
+  // Without the prefix it could collide with a frame id and quietly steal a
+  // `for` or `aria-labelledby` reference across the boundary.
+  it('prefixes every group anchorId with sim-', () => {
+    for (const scenario of scenarios) {
+      for (const group of scenario.groups) {
+        if (group.anchorId === undefined) {
+          continue;
+        }
+        expect(group.anchorId)
+          .withContext(`${scenario.path} → group "${group.id}"`)
+          .toMatch(/^sim-[a-z0-9-]+$/);
       }
     }
   });

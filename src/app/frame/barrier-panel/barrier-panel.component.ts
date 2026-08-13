@@ -10,12 +10,12 @@
 //  - **Labels name the accessible state, not the action** (docs/UX-COPY.md
 //    §4): „Formularfelder mit Beschriftungen", ticked = that state holds.
 //    Buttons are the opposite — „Alle Barrieren beheben" names an action.
-//  - **Grouped by step, labelled by area** (docs/ARCHITECTURE.md §12.1.1).
-//    Grouping by area instead would scatter the barriers of the screen the
-//    user is looking at across four groups. The area message is carried by
-//    the summary line under the panel instead. There is deliberately no area
-//    filter: hiding other departments' barriers is the exact reflex the
-//    module argues against.
+//  - **Grouped by declared group, labelled by area** (docs/ARCHITECTURE.md
+//    §12.1.1). Grouping by area instead would scatter the barriers of the
+//    screen the user is looking at across four groups. The area message is
+//    carried by the summary line under the panel instead. There is
+//    deliberately no area filter: hiding other departments' barriers is the
+//    exact reflex the module argues against.
 //  - **No `<form>`, no submit control, no counter of its own.** Changes apply
 //    instantly, and the only counter in the application is the simulation
 //    bar's (docs/UX-COPY.md §5.6). Two counters on one screen turn „1 von 5
@@ -41,7 +41,8 @@ import { MatCheckboxModule, type MatCheckbox } from '@angular/material/checkbox'
 import { Announcer } from '../../core/announcer.service';
 import { BarrierStateService } from '../../core/barrier-state.service';
 import { combinedBarrierParts } from '../../core/url-state';
-import type { Barrier, BarrierPart, Scenario, ScenarioStep } from '../../models/domain.model';
+import type { Barrier, BarrierGroup, BarrierPart, Scenario } from '../../models/domain.model';
+import { FragmentLink } from '../../shared/fragment-link.directive';
 import { VisuallyHidden } from '../../shared/visually-hidden.directive';
 import { AREA_LABELS } from '../area-labels';
 
@@ -51,6 +52,8 @@ export type BarrierDisplayState = 'active' | 'partial' | 'resolved';
 interface PanelGroup {
   id: string;
   legend: string;
+  /** Section anchor inside the simulation region, single-page scenarios only. */
+  anchorId?: string;
   barriers: readonly Barrier[];
 }
 
@@ -63,7 +66,14 @@ const STATE_LABELS: Record<BarrierDisplayState, string> = {
 
 @Component({
   selector: 'app-barrier-panel',
-  imports: [NgTemplateOutlet, RouterLink, MatButtonModule, MatCheckboxModule, VisuallyHidden],
+  imports: [
+    NgTemplateOutlet,
+    RouterLink,
+    MatButtonModule,
+    MatCheckboxModule,
+    FragmentLink,
+    VisuallyHidden,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './barrier-panel.component.html',
   styleUrl: './barrier-panel.component.scss',
@@ -80,28 +90,27 @@ export class BarrierPanelComponent {
   protected readonly headingId = 'barrier-panel-heading';
 
   /**
-   * One group per flow step (docs/ARCHITECTURE.md §12.1.1). A scenario whose
-   * steps collapse to one — the CSR campaign — renders a single group whose
-   * legend is `panel.groupLabel` rather than the step title, which on a
-   * one-step scenario would only repeat the page `h1`.
+   * One group per declared `BarrierGroup`, in declaration order
+   * (docs/ARCHITECTURE.md §12.1.1). The groups are content, not a derivation
+   * of the routing structure: for the application process they mirror its
+   * four steps, for the CSR campaign its five page sections, and the panel
+   * does not need to know which of the two it is looking at
+   * (docs/SPEC_v2.md §4.1).
    *
-   * Barriers are looked up by the step's `barrierIds` rather than filtered
-   * out of `scenario.barriers`, so the panel's order is the flow's order. A
-   * barrier that belongs to no step would therefore not appear at all; that
-   * is a content defect, and content/data-contract.spec.ts asserts it cannot
-   * happen rather than this component silently papering over it.
+   * Barriers keep `scenario.barriers` order within their group, which is
+   * authored in reading order. A barrier whose `groupId` matches no declared
+   * group would silently disappear from the panel — a barrier nobody can
+   * switch off. content/data-contract.spec.ts asserts that cannot happen
+   * rather than this component papering over it with a catch-all group.
    */
   protected readonly groups = computed<PanelGroup[]>(() => {
     const scenario = this.scenario();
-    const byId = new Map(scenario.barriers.map((barrier) => [barrier.id, barrier]));
-    const singleStep = scenario.steps.length === 1;
 
-    return scenario.steps.map((step: ScenarioStep) => ({
-      id: step.id,
-      legend: singleStep ? 'Barrieren in diesem Schritt' : step.title,
-      barriers: step.barrierIds
-        .map((barrierId) => byId.get(barrierId))
-        .filter((barrier): barrier is Barrier => barrier !== undefined),
+    return scenario.groups.map((group: BarrierGroup) => ({
+      id: group.id,
+      legend: group.title,
+      anchorId: group.anchorId,
+      barriers: scenario.barriers.filter((barrier) => barrier.groupId === group.id),
     }));
   });
 
@@ -207,6 +216,37 @@ export class BarrierPanelComponent {
   // simulation region (docs/ARCHITECTURE.md §5.6 rule 2); this is frame code.
   protected labelId(urlKey: string): string {
     return `barrier-${urlKey}-label`;
+  }
+
+  // Group ids are content, so the data contract holds them to the same
+  // /^[a-z0-9-]+$/ shape as urlKeys — these two ids would otherwise be
+  // whatever an author typed into a `title`-adjacent field.
+  //
+  // `groupTitleId` lands on the `legend` itself. It exists only so the anchor
+  // link can borrow the group's name; a group without an anchor carries no id
+  // at all.
+  protected groupTitleId(groupId: string): string {
+    return `barrier-group-${groupId}-title`;
+  }
+
+  protected groupAnchorLinkId(groupId: string): string {
+    return `barrier-group-${groupId}-anchor`;
+  }
+
+  /**
+   * Accessible name for a group's anchor link — the same composition as
+   * `explainLabelledBy`, and for the same reason: five links reading „Zu
+   * diesem Bereich springen" and nothing else would be indistinguishable in a
+   * screen reader's link list (SC 2.4.4), while an `aria-label` would invent
+   * copy and drop the visible text out of the accessible name (SC 2.5.3).
+   * The self-reference keeps the visible text first.
+   *
+   * Borrowing the group's name this way is also why the link can stand
+   * outside the `legend` without losing the relationship to it — and it must
+   * stand outside, or its text becomes part of the fieldset's own name.
+   */
+  protected groupAnchorLabelledBy(groupId: string): string {
+    return `${this.groupAnchorLinkId(groupId)} ${this.groupTitleId(groupId)}`;
   }
 
   protected explainId(urlKey: string): string {

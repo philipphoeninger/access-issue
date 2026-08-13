@@ -13,5 +13,6 @@ export const CSR_CAMPAIGN_SCENARIO: Scenario = {
     'Die Kampagne „Inklusiv. Nachhaltig. Sichtbar." mit Video, Spendenaufruf, Social Media und Event. Die Barrieren stecken überwiegend in Medien, Sprache und Bewegung.',
   status: 'planned',
   steps: [],
+  groups: [],
   barriers: [],
 };

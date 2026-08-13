@@ -316,7 +316,10 @@ real scenario registry, so they scale automatically with content.
 | No `urlKey` equals `alle` | Reserved word, `ARCHITECTURE.md` §8 |
 | `urlKey` matches `/^[a-z0-9-]+$/` | Commas, spaces and umlauts would break the comma-separated grammar or force encoding that lecturers cannot hand-edit |
 | Snapshot of all `{scenarioPath, urlKey}` pairs | Fails on removal or rename, passes on addition — protects already-printed slides |
-| Every `barrierId` in a step exists in the scenario's barrier list | Typos would render a step with a missing toggle |
+| Every `groupId` resolves to a group the scenario declares | The panel fills its fieldsets by matching `groupId`; a typo renders a barrier nobody can switch off |
+| Every declared group holds at least one barrier | An empty group is a legend promising controls that are not there — and, in a single-page scenario, an anchor to a section whose barriers went elsewhere |
+| Group ids unique within a scenario and matching `/^[a-z0-9-]+$/` | They reach the DOM as `barrier-group-{id}-title`/`-anchor`, which the anchor link's `aria-labelledby` references |
+| Every group `anchorId` carries the `sim-` prefix | It targets an element inside the simulation region, so it obeys the region's id rule (`ARCHITECTURE.md` §5.6 rule 2) |
 | Every combined barrier has ≥ 2 parts, each with a unique `urlKey` | A one-part combined barrier is a modelling error |
 | Every barrier with `automatedDetection: 'axe'` has a fixture entry | Prevents the fixture drifting behind content |
 | Scenario `path` values unique | Routing collision |
@@ -367,8 +370,17 @@ navigation (`ARCHITECTURE.md` §10). That single assertion protects the Back but
 - Area summary — the line under the panel names the distinct `responsibleArea` values of
   the current scenario, correctly pluralised, and updates when the scenario changes. Assert
   the *set*, not a hard-coded sentence: the whole point is that it reflects the data
-- Step grouping — one `fieldset` per flow step, each with a `legend`; a single-step scenario
-  renders one group rather than none
+- Grouping — one `fieldset` per declared `BarrierGroup`, each with a `legend`; a scenario
+  declaring one group renders one rather than none. The application process's four legends
+  and its eleven checkbox labels are asserted as literals, not derived from the scenario:
+  slice 13 replaced the mechanism underneath them, and an expectation computed the way the
+  component computes its output would have agreed with whatever the new one produced
+- Section anchors — a group with an `anchorId` renders a same-document link whose
+  accessible name is its own visible text followed by the group title; a group without one
+  renders no link and no id on its legend. The link stands *beside* the legend, never
+  inside it: a fieldset is named from its legend's subtree, so a link in there renames the
+  group to „Medien Zu diesem Bereich springen" and screen readers repeat that as they move
+  through its checkboxes. No axe rule reports this, which is why it has an assertion
 - `ExplanationViewComponent` — all four rubrics render for every barrier in the registry,
   in the order of `UX-COPY.md` §5.8; standards render criterion, level and title from the
   `StandardReference`; a barrier with no standards reference keeps the rubric and gets the

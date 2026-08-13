@@ -9,6 +9,7 @@ function scenario(overrides: Partial<Scenario>): Scenario {
     summary: 'Zusammenfassung',
     status: 'available',
     steps: [],
+    groups: [],
     barriers: [],
     ...overrides,
   };
@@ -18,7 +19,7 @@ describe('buildScenarioRoutes (docs/ARCHITECTURE.md §9)', () => {
   it('omits the step segment for a single-step scenario', () => {
     const csr = scenario({
       path: 'csr-kampagne',
-      steps: [{ id: 'landing', path: 'landing', title: 'Landing', barrierIds: [] }],
+      steps: [{ id: 'landing', path: 'landing', title: 'Landing' }],
     });
 
     const routes = buildScenarioRoutes([csr]);
@@ -36,8 +37,8 @@ describe('buildScenarioRoutes (docs/ARCHITECTURE.md §9)', () => {
     const bewerbung = scenario({
       path: 'bewerbung',
       steps: [
-        { id: 'stellenanzeige', path: 'stellenanzeige', title: 'Stellenanzeige', barrierIds: [] },
-        { id: 'formular', path: 'formular', title: 'Bewerbungsformular', barrierIds: [] },
+        { id: 'stellenanzeige', path: 'stellenanzeige', title: 'Stellenanzeige' },
+        { id: 'formular', path: 'formular', title: 'Bewerbungsformular' },
       ],
     });
 
@@ -72,7 +73,7 @@ describe('buildScenarioRoutes (docs/ARCHITECTURE.md §9)', () => {
   it('every generated route lazy-loads a component', () => {
     const bewerbung = scenario({
       path: 'bewerbung',
-      steps: [{ id: 'a', path: 'a', title: 'A', barrierIds: [] }],
+      steps: [{ id: 'a', path: 'a', title: 'A' }],
     });
 
     const routes = buildScenarioRoutes([bewerbung]);
@@ -89,16 +90,16 @@ describe('step naming (docs/UX-COPY.md §5.3)', () => {
     path: 'bewerbung',
     title: 'Bewerbungsprozess',
     steps: [
-      { id: 'stellenanzeige', path: 'stellenanzeige', title: 'Stellenanzeige', barrierIds: [] },
-      { id: 'formular', path: 'formular', title: 'Bewerbungsformular', barrierIds: [] },
-      { id: 'dokumente', path: 'dokumente', title: 'Unterlagen hochladen', barrierIds: [] },
+      { id: 'stellenanzeige', path: 'stellenanzeige', title: 'Stellenanzeige' },
+      { id: 'formular', path: 'formular', title: 'Bewerbungsformular' },
+      { id: 'dokumente', path: 'dokumente', title: 'Unterlagen hochladen' },
     ],
   });
 
   const csr = scenario({
     path: 'csr-kampagne',
     title: 'CSR-Kampagne',
-    steps: [{ id: 'landing', path: 'landing', title: 'Landing', barrierIds: [] }],
+    steps: [{ id: 'landing', path: 'landing', title: 'Landing' }],
   });
 
   describe('stepIndicator', () => {

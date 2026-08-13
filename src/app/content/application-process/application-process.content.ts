@@ -41,6 +41,7 @@ export const GRAFIK_BARRIER: Barrier = {
   categories: ['visual'],
   affectedGroups: ['blinde und sehbehinderte Personen', 'Nutzer mit Vergrößerung'],
   responsibleArea: 'kommunikation',
+  groupId: 'stellenanzeige',
   organisational: false,
   standards: [WCAG_1_1_1, WCAG_1_4_5],
   explanation: {
@@ -68,6 +69,7 @@ export const SPRACHE_BARRIER: Barrier = {
     'geringe Literalität',
   ],
   responsibleArea: 'kommunikation',
+  groupId: 'stellenanzeige',
   organisational: false,
   standards: [WCAG_3_1_5],
   explanation: {
@@ -92,6 +94,7 @@ export const LABELS_BARRIER: Barrier = {
   categories: ['visual', 'motor'],
   affectedGroups: ['blinde und sehbehinderte Personen', 'Spracheingabe-Nutzer'],
   responsibleArea: 'it',
+  groupId: 'formular',
   organisational: false,
   standards: [WCAG_1_3_1, WCAG_3_3_2, WCAG_4_1_2],
   explanation: {
@@ -118,6 +121,7 @@ export const TASTATUR_BARRIER: Barrier = {
     'temporäre Einschränkungen',
   ],
   responsibleArea: 'it',
+  groupId: 'formular',
   organisational: false,
   standards: [WCAG_2_1_1, WCAG_2_1_2],
   explanation: {
@@ -140,6 +144,7 @@ export const PFLICHTFELD_BARRIER: Barrier = {
   categories: ['visual', 'cognitive'],
   affectedGroups: ['Farbfehlsichtige', 'Screenreader-Nutzer', 'kognitive Einschränkungen'],
   responsibleArea: 'personal',
+  groupId: 'formular',
   organisational: false,
   standards: [WCAG_1_4_1, WCAG_3_3_2],
   explanation: {
@@ -162,6 +167,7 @@ export const FEHLER_BARRIER: Barrier = {
   categories: ['cognitive', 'visual'],
   affectedGroups: ['alle Gruppen', 'besonders kognitive Einschränkungen', 'Screenreader-Nutzer'],
   responsibleArea: 'it',
+  groupId: 'formular',
   organisational: false,
   standards: [WCAG_3_3_1, WCAG_3_3_3],
   explanation: {
@@ -186,6 +192,7 @@ export const PDF_BARRIER: Barrier = {
   categories: ['visual', 'situational'],
   affectedGroups: ['blinde und sehbehinderte Personen', 'mobile Nutzung'],
   responsibleArea: 'personal',
+  groupId: 'dokumente',
   organisational: false,
   standards: [WCAG_1_3_1, WCAG_1_3_2, WCAG_4_1_2],
   explanation: {
@@ -208,6 +215,7 @@ export const UPLOAD_BARRIER: Barrier = {
   categories: ['cognitive', 'visual'],
   affectedGroups: ['alle Gruppen', 'besonders Screenreader-Nutzer', 'kognitive Einschränkungen'],
   responsibleArea: 'personal',
+  groupId: 'dokumente',
   organisational: false,
   standards: [WCAG_3_3_2],
   explanation: {
@@ -232,6 +240,7 @@ export const BESTAETIGUNG_BARRIER: Barrier = {
   categories: ['visual', 'cognitive'],
   affectedGroups: ['blinde Personen', 'kognitive Einschränkungen', 'geringe Literalität'],
   responsibleArea: 'kommunikation',
+  groupId: 'rueckmeldung',
   organisational: false,
   standards: [WCAG_1_1_1, WCAG_3_1_5],
   explanation: {
@@ -254,6 +263,7 @@ export const ANSPRECHPERSON_BARRIER: Barrier = {
   categories: ['cognitive', 'situational'],
   affectedGroups: ['alle Gruppen'],
   responsibleArea: 'personal',
+  groupId: 'rueckmeldung',
   // Organisatorisches Versäumnis, kein technischer Fehler: eine fehlende
   // namentliche Ansprechperson verletzt kein WCAG-Erfolgskriterium. Der leere
   // `standards`-Array ist deshalb korrekt und Absicht (docs/PRD.md §6.1).
@@ -279,6 +289,7 @@ export const INKLUSIONSHINWEIS_BARRIER: Barrier = {
   categories: ['cognitive', 'situational'],
   affectedGroups: ['alle Gruppen'],
   responsibleArea: 'personal',
+  groupId: 'rueckmeldung',
   // Wie bei der Ansprechperson: ein fehlender Hinweis auf mögliche Anpassungen
   // ist ein organisatorisches Versäumnis ohne Normbezug. Leerer `standards`-
   // Array bewusst (docs/PRD.md §6.1, docs/ARCHITECTURE.md §6).

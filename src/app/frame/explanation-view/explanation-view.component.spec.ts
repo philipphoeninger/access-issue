@@ -45,14 +45,7 @@ const EMPTY_SCENARIO: Scenario = oneStepScenario([]);
 
 function oneStepScenario(barriers: readonly Barrier[]): Scenario {
   return makeScenario(barriers, {
-    steps: [
-      {
-        id: 'kampagne',
-        path: 'kampagne',
-        title: 'Kampagne',
-        barrierIds: barriers.map((barrier) => barrier.id),
-      },
-    ],
+    steps: [{ id: 'kampagne', path: 'kampagne', title: 'Kampagne' }],
   });
 }
 

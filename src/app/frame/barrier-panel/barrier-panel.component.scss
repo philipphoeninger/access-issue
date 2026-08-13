@@ -41,6 +41,20 @@ h2 {
   font-weight: var(--wi-weight-semibold);
 }
 
+// The section anchor of a single-page scenario. It follows the legend as a
+// sibling — inside it, its text would become part of the fieldset's
+// accessible name — and reads as a line under the heading rather than as part
+// of it: normal body weight, meta size, link colour, its own line.
+.group-anchor {
+  display: block;
+  // 24px minimum interactive target (SC 2.5.8), as for `.explain`.
+  min-height: var(--wi-target-min);
+  padding: var(--wi-space-1) 0;
+  color: var(--wi-text-link);
+  font-size: var(--wi-size-meta);
+  font-weight: var(--wi-weight-regular);
+}
+
 .barriers,
 .parts {
   list-style: none;

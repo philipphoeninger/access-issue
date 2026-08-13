@@ -5,11 +5,49 @@
   </p>
 
   @for (group of groups(); track group.id) {
-    <!-- One fieldset per flow step, legend naming it (docs/ARCHITECTURE.md
-         §12.1.1). Screen readers announce group membership, so a user hears
-         which step a barrier belongs to without having to reconstruct it. -->
+    <!-- One fieldset per declared group, legend naming it
+         (docs/ARCHITECTURE.md §12.1.1). Screen readers announce group
+         membership, so a user hears which step or page section a barrier
+         belongs to without having to reconstruct it. -->
     <fieldset class="group">
-      <legend>{{ group.legend }}</legend>
+      <!-- The anchor link exists only for single-page scenarios, where the
+           group is a section of one long page and the user needs a way to
+           reach the part their toggle changed. A multi-step scenario declares
+           no `anchorId`, renders no link, and — deliberately — no id on the
+           legend either: an id nothing references is markup nobody asked for.
+
+           **The link stands beside the legend, never inside it.** A fieldset
+           is named from its legend's subtree, link text included, so a link
+           in there renames the group to „Medien Zu diesem Bereich springen" —
+           and screen readers repeat that group name as they move through the
+           checkboxes inside it. Verified against Chromium's accessibility
+           tree; no axe rule reports it. It reads as a heading with a link
+           under it either way, which is what docs/ARCHITECTURE.md §12.1.1
+           asks for.
+
+           The branch wraps the whole `legend` rather than its content, so the
+           `@else` arm is character-for-character the markup the application
+           process shipped with — inside the element, Angular's whitespace
+           handling would have left a space on either side of the title. -->
+      @if (group.anchorId; as anchorId) {
+        <legend [id]="groupTitleId(group.id)">{{ group.legend }}</legend>
+
+        <!-- appFragmentLink, not routerLink + fragment: the router would
+             change the URL and neither scroll nor move focus, and a bare
+             href="#…" resolves against <base href> and reloads the
+             application (shared/fragment-link.directive.ts). This way the
+             browser performs a real same-document jump and focuses the
+             section heading itself — no focus code, no trap. -->
+        <a
+          class="group-anchor"
+          [id]="groupAnchorLinkId(group.id)"
+          [attr.aria-labelledby]="groupAnchorLabelledBy(group.id)"
+          [appFragmentLink]="anchorId"
+          >Zu diesem Bereich springen</a
+        >
+      } @else {
+        <legend>{{ group.legend }}</legend>
+      }
 
       <ul class="barriers">
         @for (barrier of group.barriers; track barrier.id) {

@@ -49,16 +49,23 @@ const EMPTY_PARTS_SCENARIO: Scenario = oneStepScenario([
 /** A scenario that is `available` and has a step, but no barriers authored yet. */
 const EMPTY_SCENARIO: Scenario = oneStepScenario([]);
 
+/**
+ * A single-page scenario whose group carries a section anchor — the shape the
+ * CSR campaign has and the application process deliberately does not
+ * (docs/SPEC_v2.md §4.1). A fixture rather than the real campaign content,
+ * which is still a `status: 'planned'` stub until slice 14.
+ */
+const ANCHORED_SCENARIO: Scenario = makeScenario(
+  [{ ...simpleBarrier('kontrast'), groupId: 'medien' }],
+  {
+    steps: [{ id: 'kampagne', path: 'kampagne', title: 'Kampagne' }],
+    groups: [{ id: 'medien', title: 'Medien', anchorId: 'sim-medien' }],
+  },
+);
+
 function oneStepScenario(barriers: readonly Barrier[]): Scenario {
   return makeScenario(barriers, {
-    steps: [
-      {
-        id: 'kampagne',
-        path: 'kampagne',
-        title: 'Kampagne',
-        barrierIds: barriers.map((barrier) => barrier.id),
-      },
-    ],
+    steps: [{ id: 'kampagne', path: 'kampagne', title: 'Kampagne' }],
   });
 }
 
@@ -156,16 +163,28 @@ describe('BarrierPanelComponent (docs/SPEC_v1.md Slice 5)', () => {
     // docs/UX-COPY.md §4: checkboxes carry a *state* label ("Formularfelder
     // mit Beschriftungen"), never an action label ("Beschriftungen ergänzen").
     // Ticked means the state holds.
+    //
+    // The expected order is written out rather than derived from the scenario,
+    // and that is the point of it: slice 13 replaced the grouping mechanism
+    // under this component (docs/SPEC_v2.md §4.1), and an expectation computed
+    // the same way the component computes its output would have agreed with
+    // whatever the new mechanism produced. This list is what shipped.
     it("labels each checkbox with the barrier's panel label, in flow order", async () => {
       const harness = await setup();
-      const expected = APPLICATION_PROCESS_SCENARIO.steps.flatMap((step) =>
-        step.barrierIds.map(
-          (id) =>
-            APPLICATION_PROCESS_SCENARIO.barriers.find((barrier) => barrier.id === id)!.shortTitle,
-        ),
-      );
 
-      expect(checkboxes(harness).map(accessibleName)).toEqual(expected);
+      expect(checkboxes(harness).map(accessibleName)).toEqual([
+        'Gehalt und Leistungen als Text, nicht als Bild',
+        'Stellenbeschreibung in klarer Sprache',
+        'Formularfelder mit Beschriftungen',
+        'Formular per Tastatur bedienbar',
+        'Pflichtfelder erkennbar benannt',
+        'Verständliche Fehlermeldungen',
+        'Stellenanzeige als Text auf der Seite',
+        'Zulässige Dateiformate und Größen angegeben',
+        'Bestätigung in verständlicher Sprache',
+        'Ansprechperson mit Namen und Kontakt genannt',
+        'Hinweis, dass Anpassungen möglich sind',
+      ]);
     });
 
     it('ticks the checkboxes of barriers resolved in the URL, and only those', async () => {
@@ -192,14 +211,20 @@ describe('BarrierPanelComponent (docs/SPEC_v1.md Slice 5)', () => {
     });
   });
 
-  describe('grouping by step (docs/ARCHITECTURE.md §12.1.1)', () => {
-    it('renders one fieldset per flow step, each with a legend naming it', async () => {
+  describe('grouping (docs/ARCHITECTURE.md §12.1.1)', () => {
+    // Also written out rather than derived, for the reason above: these four
+    // legends are what the application process shipped with, and slice 13
+    // moved the ground under them from `scenario.steps` to `scenario.groups`.
+    it('renders one fieldset per declared group, each with a legend naming it', async () => {
       const harness = await setup();
       const groups = Array.from(panel(harness).querySelectorAll('fieldset.group'));
 
-      expect(groups.map((group) => group.querySelector('legend')!.textContent!.trim())).toEqual(
-        APPLICATION_PROCESS_SCENARIO.steps.map((step) => step.title),
-      );
+      expect(groups.map((group) => group.querySelector('legend')!.textContent!.trim())).toEqual([
+        'Stellenanzeige',
+        'Bewerbungsformular',
+        'Unterlagen hochladen',
+        'Rückmeldung',
+      ]);
     });
 
     it('keeps every barrier of the scenario in exactly one group', async () => {
@@ -211,9 +236,10 @@ describe('BarrierPanelComponent (docs/SPEC_v1.md Slice 5)', () => {
       expect(grouped.length).toBe(APPLICATION_PROCESS_SCENARIO.barriers.length);
     });
 
-    // docs/ARCHITECTURE.md §12.1.1: "For single-step scenarios the step
-    // grouping collapses to one group" — one group, not none.
-    it('renders a single group for a one-step scenario', async () => {
+    // A scenario declaring one group renders one group, not none — the shape
+    // the CSR campaign had before its five sections were declared, and the
+    // shape any future single-section scenario would have.
+    it('renders a single group for a scenario that declares one', async () => {
       const harness = await setup({ scenario: COMBINED_SCENARIO });
       const groups = Array.from(panel(harness).querySelectorAll('fieldset.group'));
 
@@ -221,6 +247,71 @@ describe('BarrierPanelComponent (docs/SPEC_v1.md Slice 5)', () => {
       expect(groups[0].querySelector('legend')!.textContent!.trim()).toBe(
         'Barrieren in diesem Schritt',
       );
+    });
+
+    // docs/SPEC_v2.md slice 13: the panel reads `scenario.groups` and nothing
+    // else, so the routing structure can no longer influence the panel's.
+    // Unroutable content — `available` scenarios need a step — but the
+    // decoupling is the point of the slice, and this is what proves it rather
+    // than the absence of `scenario.steps` from the component source.
+    it('groups a scenario that has no steps at all', async () => {
+      const stepless = makeScenario([simpleBarrier('kontrast')], { steps: [] });
+      const harness = await setup({ scenario: stepless });
+      const groups = Array.from(panel(harness).querySelectorAll('fieldset.group'));
+
+      expect(groups.length).toBe(1);
+      expect(groups[0].querySelectorAll('li.barrier').length).toBe(1);
+    });
+
+    // A multi-step scenario declares no `anchorId`, so the panel renders no
+    // anchor link and — deliberately — no id on the legend either. Both halves
+    // matter: the link is the addition slice 13 makes, and the application
+    // process must not have picked it up.
+    it('renders no anchor link for a scenario whose groups declare no anchorId', async () => {
+      const harness = await setup();
+      const legends = Array.from(panel(harness).querySelectorAll('fieldset.group > legend'));
+
+      expect(panel(harness).querySelectorAll('.group-anchor').length).toBe(0);
+      for (const legend of legends) {
+        expect(legend.hasAttribute('id')).withContext(legend.textContent!).toBeFalse();
+        expect(legend.querySelector('[id]')).withContext(legend.textContent!).toBeNull();
+      }
+    });
+
+    // The single-page case. The link is a real same-document anchor, it points
+    // at the section id the group declares, and its accessible name starts
+    // with its own visible text and continues with the group title, so five
+    // such links are told apart in a link list (SC 2.4.4, SC 2.5.3).
+    it('links a group with an anchorId to its section, named by its own text plus the group title', async () => {
+      const harness = await setup({ scenario: ANCHORED_SCENARIO });
+      const link = panel(harness).querySelector<HTMLAnchorElement>('.group-anchor')!;
+      const labelledBy = link.getAttribute('aria-labelledby')!.split(' ');
+
+      expect(link.textContent!.trim()).toBe('Zu diesem Bereich springen');
+      expect(link.getAttribute('href')).toBe(`/${ROUTE_PATH}#sim-medien`);
+      expect(labelledBy[0]).toBe(link.id);
+      expect(
+        harness.fixture.nativeElement.querySelector(`#${labelledBy[1]}`).textContent.trim(),
+      ).toBe('Medien');
+    });
+
+    // A fieldset is named from its legend's subtree, link text included, so a
+    // link inside the legend renames the group to „Medien Zu diesem Bereich
+    // springen" — which a screen reader then repeats as it moves through the
+    // checkboxes in that group. Chromium's accessibility tree confirms it and
+    // no axe rule reports it, which is exactly why this needs an assertion of
+    // its own rather than trust in the template.
+    it('keeps the anchor link out of the legend, so the group keeps its own name', async () => {
+      const harness = await setup({ scenario: ANCHORED_SCENARIO });
+      const group = panel(harness).querySelector<HTMLElement>('fieldset.group')!;
+      const legend = group.querySelector('legend')!;
+
+      expect(legend.querySelector('.group-anchor')).toBeNull();
+      expect(legend.textContent!.trim()).toBe('Medien');
+      // Still the fieldset's own child, and still first — a legend that is not
+      // the first element child stops naming its fieldset at all.
+      expect(group.querySelector<HTMLElement>('.group-anchor')!.parentElement).toBe(group);
+      expect(group.firstElementChild!.tagName).toBe('LEGEND');
     });
   });
 
@@ -361,15 +452,12 @@ describe('BarrierPanelComponent (docs/SPEC_v1.md Slice 5)', () => {
         area.textContent!.replace('Zuständiger Bereich: ', '').trim(),
       );
 
+      // Derived from the barrier list, which is authored in panel order —
+      // this test is about the label being present and correct per barrier,
+      // while the order itself is frozen by the two expectations above.
       expect(areas).toEqual(
-        APPLICATION_PROCESS_SCENARIO.steps.flatMap((step) =>
-          step.barrierIds.map(
-            (id) =>
-              AREA_LABELS[
-                APPLICATION_PROCESS_SCENARIO.barriers.find((barrier) => barrier.id === id)!
-                  .responsibleArea
-              ],
-          ),
+        APPLICATION_PROCESS_SCENARIO.barriers.map(
+          (barrier) => AREA_LABELS[barrier.responsibleArea],
         ),
       );
     });

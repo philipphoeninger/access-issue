@@ -6,6 +6,14 @@
 // still a `status: 'planned'` stub, docs/SPEC_v1.md §3).
 import type { Barrier, Scenario } from '../../models/domain.model';
 
+/**
+ * The group every fixture barrier belongs to unless a test says otherwise.
+ * `makeScenario` declares a matching `BarrierGroup`, so a fixture scenario is
+ * always contract-valid: every `groupId` resolves, and the panel finds its
+ * barriers where the group says they are.
+ */
+export const FIXTURE_GROUP_ID = 'kampagne';
+
 export function simpleBarrier(urlKey: string): Barrier {
   return {
     id: urlKey,
@@ -15,6 +23,7 @@ export function simpleBarrier(urlKey: string): Barrier {
     categories: ['visual'],
     affectedGroups: [],
     responsibleArea: 'it',
+    groupId: FIXTURE_GROUP_ID,
     organisational: false,
     standards: [{ standard: 'WCAG_2_2', criterion: '1.1.1', title: urlKey }],
     explanation: { problem: 'Problem', affected: 'Betroffene', solution: 'Lösung' },
@@ -49,6 +58,10 @@ export function makeScenario(
     summary: '',
     status: 'available',
     steps: [],
+    // docs/UX-COPY.md §5.6 `panel.groupLabel`. A one-group scenario names its
+    // group rather than repeating the page `h1`, which is what a step title
+    // would amount to when there is only one step.
+    groups: [{ id: FIXTURE_GROUP_ID, title: 'Barrieren in diesem Schritt' }],
     barriers: [...barriers],
     ...overrides,
   };

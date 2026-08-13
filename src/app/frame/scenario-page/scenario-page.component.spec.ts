@@ -216,7 +216,7 @@ describe('ScenarioPageComponent (docs/SPEC_v1.md Slice 3)', () => {
         id: 'unbuilt-scenario',
         path: 'ungebaut',
         title: 'Ungebautes Szenario',
-        steps: [{ id: 'auftakt', path: 'auftakt', title: 'Auftakt', barrierIds: [] }],
+        steps: [{ id: 'auftakt', path: 'auftakt', title: 'Auftakt' }],
       });
 
       const fixture = setup({ scenarioPath: unbuilt.path, stepPath: 'auftakt', hasPanel: true }, [

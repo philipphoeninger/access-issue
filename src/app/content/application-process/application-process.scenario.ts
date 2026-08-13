@@ -1,4 +1,4 @@
-// Structure, steps and barrier ids for the application-process scenario.
+// Structure, steps and panel groups for the application-process scenario.
 // Prose lives in application-process.content.ts (docs/ARCHITECTURE.md §13) so
 // structural edits never touch reviewed editorial text.
 //
@@ -33,30 +33,27 @@ export const APPLICATION_PROCESS_SCENARIO: Scenario = {
     'Eine Stellenanzeige, ein Bewerbungsformular, der Upload der Unterlagen und die Rückmeldung. Die Barrieren summieren sich über vier Schritte auf, bis die Bewerbung scheitert.',
   status: 'available',
   steps: [
-    {
-      id: 'stellenanzeige',
-      path: 'stellenanzeige',
-      title: 'Stellenanzeige',
-      barrierIds: ['grafik', 'sprache'],
-    },
-    {
-      id: 'formular',
-      path: 'formular',
-      title: 'Bewerbungsformular',
-      barrierIds: ['labels', 'tastatur', 'pflichtfeld', 'fehler'],
-    },
-    {
-      id: 'dokumente',
-      path: 'dokumente',
-      title: 'Unterlagen hochladen',
-      barrierIds: ['pdf', 'upload'],
-    },
-    {
-      id: 'rueckmeldung',
-      path: 'rueckmeldung',
-      title: 'Rückmeldung',
-      barrierIds: ['bestaetigung', 'ansprechperson', 'inklusionshinweis'],
-    },
+    { id: 'stellenanzeige', path: 'stellenanzeige', title: 'Stellenanzeige' },
+    { id: 'formular', path: 'formular', title: 'Bewerbungsformular' },
+    { id: 'dokumente', path: 'dokumente', title: 'Unterlagen hochladen' },
+    { id: 'rueckmeldung', path: 'rueckmeldung', title: 'Rückmeldung' },
+  ],
+  // Four panel groups mirroring the four steps one-to-one
+  // (docs/ARCHITECTURE.md §12.1.1). They are declared rather than derived
+  // from `steps`, because the panel's structure and the routing structure
+  // coincide here and nowhere else — the CSR campaign is one step with five
+  // groups (docs/SPEC_v2.md §4.1). Ids match the step ids so a deep link and
+  // the group a barrier sits in stay recognisably the same thing; titles are
+  // the step titles from docs/UX-COPY.md §5.3.
+  //
+  // No `anchorId`: a step is reached by navigating to it, not by jumping
+  // within the page, and an in-page anchor to a section that is not rendered
+  // would be a link to nowhere.
+  groups: [
+    { id: 'stellenanzeige', title: 'Stellenanzeige' },
+    { id: 'formular', title: 'Bewerbungsformular' },
+    { id: 'dokumente', title: 'Unterlagen hochladen' },
+    { id: 'rueckmeldung', title: 'Rückmeldung' },
   ],
   barriers: [
     GRAFIK_BARRIER,
