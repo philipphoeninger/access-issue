@@ -11,6 +11,7 @@ import type { Scenario } from '../../models/domain.model';
 import {
   ALT_BARRIER,
   EMOJI_BARRIER,
+  EVENT_BARRIER,
   KONTRAST_BARRIER,
   NAVIGATION_BARRIER,
   SPRACHE_BARRIER,
@@ -43,15 +44,22 @@ export const CSR_CAMPAIGN_SCENARIO: Scenario = {
   // **Only sections whose barriers exist are declared.** The page renders all
   // five from slice 14 on, but a declared group with no barrier is a legend
   // promising controls that are not there, and content/data-contract.spec.ts
-  // rejects it. The remaining two are added by the slice that brings their
-  // barriers (docs/SPEC_v2.md slices 17 and 18), in this order:
+  // rejects it. The last one is added by the slice that brings its barriers
+  // (docs/SPEC_v2.md slice 18):
   //
-  //   { id: 'event',  title: 'Event und Podiumsdiskussion',  anchorId: 'sim-event'  }
-  //   { id: 'spende', title: 'Spendenaufruf',                anchorId: 'sim-spende' }
+  //   { id: 'spende', title: 'Spendenaufruf', anchorId: 'sim-spende' }
   groups: [
     { id: 'kampagnenseite', title: 'Kampagnenseite', anchorId: 'sim-kampagne' },
     { id: 'texte', title: 'Texte und Inhalte', anchorId: 'sim-texte' },
     { id: 'medien', title: 'Medien', anchorId: 'sim-medien' },
+    { id: 'event', title: 'Event und Podiumsdiskussion', anchorId: 'sim-event' },
   ],
-  barriers: [NAVIGATION_BARRIER, SPRACHE_BARRIER, ALT_BARRIER, EMOJI_BARRIER, KONTRAST_BARRIER],
+  barriers: [
+    NAVIGATION_BARRIER,
+    SPRACHE_BARRIER,
+    ALT_BARRIER,
+    EMOJI_BARRIER,
+    KONTRAST_BARRIER,
+    EVENT_BARRIER,
+  ],
 };

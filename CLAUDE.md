@@ -180,10 +180,17 @@ in a screenshot.
     departments' barriers is the exact reflex the module argues against.
 19. **Barriers without a standards reference are legitimate.** Six of the 29 violate no
     WCAG criterion — no named contact person, no note that adjustments are possible, no
-    accessibility criteria in a tender, no assigned responsibility, no event access
-    details. They carry `organisational: true` and an empty `standards` array, and the
-    explanation view says so explicitly rather than hiding the rubric. A conformant page
-    that still excludes people is the point, not an edge case.
+    accessibility criteria in a tender, no assigned responsibility, no sign-language
+    interpreting, no event access details. They carry `organisational: true` and an empty
+    `standards` array, and the explanation view says so explicitly rather than hiding the
+    rubric. A conformant page that still excludes people is the point, not an edge case.
+
+    **A `BarrierPart` carries the flag itself and never inherits it.** The last two in
+    that list are parts of the campaign's event barrier, whose third part *is* a technical
+    defect; a part that borrowed its parent's classification would make one of the two
+    claims false. An empty `standards` array requires the flag at whichever level it sits,
+    and `content/data-contract.spec.ts` enforces both. `responsibleArea` is the opposite
+    case and stays barrier-level.
 
 ---
 
@@ -218,6 +225,11 @@ in a screenshot.
   signature is: built once in a graphics program, then pasted into every template. Editing
   either copy section means re-rendering the file *and* updating the resolved text variant,
   which is the only thing keeping both barrier states carrying the same substance.
+  **Two PDFs are generated the same way** — `stellenausschreibung.py` and `einladung.py`,
+  both on the shared writer in `untagged_pdf.py` — and they are the files the two PDF-only
+  barriers link to. Both are deliberately untagged; that is the barrier, and a tagged
+  document would be the opposite of the statement, so do not "improve" that writer. A
+  download link that 404s demonstrates nothing, so the file always ships with the barrier.
   The campaign's three post images (`public/simulation/csr-post-*.svg`) are **not**
   generated — they are hand-authored SVGs that ship as they are, with no source in
   `assets-src/`. They stay vector because nothing about them depends on being raster:

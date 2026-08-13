@@ -60,10 +60,15 @@
       } @else {
         <!-- The rubric is answered, never omitted (docs/UX-COPY.md §5.8,
              CLAUDE.md rule 19). A conformant page that still excludes people
-             is the point, not an edge case. Reachable only for a barrier:
-             content/data-contract.spec.ts requires every *part* of a combined
-             barrier to cite a standard, because BarrierPart has no
-             `organisational` field that could justify the claim below. -->
+             is the point, not an edge case.
+
+             Reachable for a *part* as well since docs/SPEC_v2.md slice 17:
+             `dolmetschung` and `zugang` of the campaign's event barrier break
+             no criterion, and `BarrierPart` carries its own `organisational`
+             flag so they can say so. What has not changed is who decides —
+             content/data-contract.spec.ts still lets an empty `standards`
+             array through only where that flag is set, at either level, so the
+             claim below is never made on nobody's behalf. -->
         <p class="no-standard">
           Zu dieser Barriere gibt es kein passendes Erfolgskriterium. Sie verstößt gegen keine Norm
           — und schließt trotzdem Menschen aus. Barrierefreiheit ist mehr als das Erfüllen von

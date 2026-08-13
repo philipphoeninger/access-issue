@@ -4,9 +4,9 @@
 // Eine Seite, fünf Abschnitte, und die Abschnitte sind zugleich die
 // Panel-Gruppen (docs/ARCHITECTURE.md §12.1.1). Diese Datei baut das Gerüst:
 // die Elbwerk-Seitenhülle, die Bereichsnavigation mit ihrer Barriere und die
-// fünf Abschnitte mit ihren Überschriften und Sprungzielen. Zwei davon sind
-// vorerst leer — ihre Inhalte und Barrieren bringen die Schnitte 17 und 18
-// (docs/SPEC_v2.md §5), und jeder von ihnen füllt genau einen Abschnitt.
+// fünf Abschnitte mit ihren Überschriften und Sprungzielen. Einer davon ist
+// vorerst leer — seine Inhalte und Barrieren bringt Schnitt 18
+// (docs/SPEC_v2.md §5), und er füllt genau einen Abschnitt.
 //
 // **Die Sprungziele stehen jetzt schon vollständig da**, obwohl das Panel
 // heute nur auf den ersten zeigt. Sie sind das, worauf die Navigation
@@ -23,10 +23,11 @@
 // Die Komponente besitzt keinen Zustand und navigiert nicht
 // (docs/ARCHITECTURE.md §14). Die Barrieren liegen in den Komponenten der
 // Abschnitte — CampaignNavComponent, CampaignTextsComponent,
-// CampaignMediaComponent —, weil sie eigenes Verhalten haben; die Abschnitte
-// hier sind reine Auszeichnung.
+// CampaignMediaComponent, CampaignEventComponent —, weil sie eigenes Verhalten
+// haben; die Abschnitte hier sind reine Auszeichnung.
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ElbwerkPageComponent } from '../../elbwerk-page/elbwerk-page.component';
+import { CampaignEventComponent } from '../campaign-event/campaign-event.component';
 import { CampaignMediaComponent } from '../campaign-media/campaign-media.component';
 import { CampaignNavComponent } from '../campaign-nav/campaign-nav.component';
 import { CampaignTextsComponent } from '../campaign-texts/campaign-texts.component';
@@ -38,6 +39,7 @@ import { CampaignTextsComponent } from '../campaign-texts/campaign-texts.compone
     CampaignNavComponent,
     CampaignTextsComponent,
     CampaignMediaComponent,
+    CampaignEventComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './campaign-page-step.component.html',

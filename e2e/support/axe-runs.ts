@@ -21,9 +21,17 @@ export function frameGate(page: Page): AxeBuilder {
  *
  * Unfiltered by tag on purpose — this run asks whether one specific rule
  * fired, not whether the region conforms. It does not, by design.
+ *
+ * `within` narrows the scope to one part of the region, for the inverse claim:
+ * that a section plants *no* finding of its own. Answering that by filtering
+ * the region's results afterwards does not work — axe reports a violation
+ * against the node it applies to, which may be a descendant of the element the
+ * section is recognised by, so a substring match on the result's markup misses
+ * it. Letting axe do the scoping is exact, and it keeps every axe option in
+ * this file (docs/TESTING.md §5).
  */
-export function barrierAssertion(page: Page): AxeBuilder {
-  return new AxeBuilder({ page }).include('[data-simulation-region]');
+export function barrierAssertion(page: Page, within = '[data-simulation-region]'): AxeBuilder {
+  return new AxeBuilder({ page }).include(within);
 }
 
 /**

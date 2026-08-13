@@ -75,6 +75,35 @@ const STATES: Array<{ name: string; url: string }> = [
     name: `media — ${resolved.join(' + ')} resolved`,
     url,
   })),
+  // The event section of slice 17 — three parts, and therefore **all six**
+  // partial-repair states, which is what docs/TESTING.md §4 budgets for it
+  // („5 + 6 partial"). They are not a power set of the section: the fully
+  // resolved and fully active states are the two rows at the top of this list,
+  // and the six below are exactly the one- and two-part repairs. §4 spends them
+  // here on purpose — „a three-part combined barrier has six of them, and they
+  // are where the teaching happens".
+  { name: 'only `event` resolved (all three parts)', url: `${PATH}?frei=event` },
+  { name: 'partial — only `einladung` resolved', url: `${PATH}?frei=einladung` },
+  { name: 'partial — only `dolmetschung` resolved', url: `${PATH}?frei=dolmetschung` },
+  { name: 'partial — only `zugang` resolved', url: `${PATH}?frei=zugang` },
+  {
+    name: 'partial — `einladung` + `dolmetschung` resolved',
+    url: `${PATH}?frei=einladung,dolmetschung`,
+  },
+  // The state docs/UX-COPY.md §9.6 names as the argument for coupling the three:
+  // a readable invitation to a building nobody can enter.
+  {
+    name: 'partial — `einladung` + `zugang` resolved',
+    url: `${PATH}?frei=einladung,zugang`,
+  },
+  {
+    name: 'partial — `dolmetschung` + `zugang` resolved',
+    url: `${PATH}?frei=dolmetschung,zugang`,
+  },
+  // The one crossing between two sections, and the only state in which the
+  // venue drawing carries a name at all: `alt` is what gives it `role="img"`
+  // and a `<title>` (scenarios/csr-campaign/campaign-event).
+  { name: '`zugang` resolved with alternative texts', url: `${PATH}?frei=zugang,alt` },
 ];
 
 /** The five sections of docs/UX-COPY.md §9, in page order. */
@@ -87,6 +116,33 @@ const SECTIONS = [
 ];
 
 const EXIT_LINK = '.exit-link';
+
+/**
+ * The checkbox belonging to a panel entry, found through the label span the
+ * panel keys off `urlKey` (frame/barrier-panel: `barrier-{urlKey}-label`).
+ * Material renders the `<input>` as a sibling of its `<label>`, so the hop
+ * goes through `mat-checkbox` rather than through the label itself.
+ */
+function boxFor(page: Page, urlKey: string) {
+  return page.locator(`.panel mat-checkbox:has(#barrier-${urlKey}-label) input[type="checkbox"]`);
+}
+
+function isIndeterminate(page: Page, urlKey: string): Promise<boolean> {
+  return boxFor(page, urlKey).evaluate((box) => (box as HTMLInputElement).indeterminate);
+}
+
+/**
+ * One combined barrier's fieldset in the panel, keyed by its parent `urlKey`.
+ *
+ * Scoped through the parent's label id rather than by position or by text:
+ * since docs/SPEC_v2.md slice 17 the campaign has **two** combined barriers,
+ * and a bare `.panel fieldset.combined` now matches both. Every assertion that
+ * used to read „the combined fieldset" would silently have become „whichever
+ * one Playwright found first".
+ */
+function combinedFieldset(page: Page, parentUrlKey: string) {
+  return page.locator(`.panel fieldset.combined:has(#barrier-${parentUrlKey}-label)`);
+}
 
 /** The id, tag and text of whatever currently has focus. */
 function focused(page: Page): Promise<{ tag: string; text: string; id: string }> {
@@ -426,24 +482,10 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
   const JARGON = 'jargon';
   const EASY = 'leichte-sprache';
 
-  /**
-   * The checkbox belonging to a panel entry, found through the label span the
-   * panel keys off `urlKey` (frame/barrier-panel: `barrier-{urlKey}-label`).
-   * Material renders the `<input>` as a sibling of its `<label>`, so the hop
-   * goes through `mat-checkbox` rather than through the label itself.
-   */
-  function boxFor(page: Page, urlKey: string) {
-    return page.locator(`.panel mat-checkbox:has(#barrier-${urlKey}-label) input[type="checkbox"]`);
-  }
-
-  function isIndeterminate(page: Page, urlKey: string): Promise<boolean> {
-    return boxFor(page, urlKey).evaluate((box) => (box as HTMLInputElement).indeterminate);
-  }
-
   test('renders as a fieldset with a legend, a parent and two parts', async ({ page }) => {
     await gotoRendered(page, PATH);
 
-    const combined = page.locator('.panel fieldset.combined');
+    const combined = combinedFieldset(page, PARENT);
     await expect(combined).toHaveCount(1);
     await expect(combined.locator('legend')).toHaveText('Texte verständlich');
     await expect(combined.locator('input[type="checkbox"]')).toHaveCount(3);
@@ -465,7 +507,7 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
 
       // The state badge says the same thing in words, never in a symbol or a
       // colour alone (docs/DESIGN.md §3.3).
-      await expect(page.locator('.panel fieldset.combined > .meta .state')).toHaveText(
+      await expect(combinedFieldset(page, PARENT).locator('> .meta .state')).toHaveText(
         'Teilweise behoben',
       );
     }
@@ -478,7 +520,7 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
 
     await expect(boxFor(page, PARENT)).toBeChecked();
     expect(await isIndeterminate(page, PARENT)).toBe(false);
-    await expect(page.locator('.panel fieldset.combined > .meta .state')).toHaveText(
+    await expect(combinedFieldset(page, PARENT).locator('> .meta .state')).toHaveText(
       'Barrierefrei',
     );
   });
@@ -487,13 +529,13 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
   // exists at all: a barrier that half stands is a barrier that stands.
   test('counts a partially resolved barrier as active', async ({ page }) => {
     await gotoRendered(page, PATH);
-    await expect(page.locator('.counter')).toHaveText('Alle 5 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('Alle 6 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=jargon`);
-    await expect(page.locator('.counter')).toHaveText('Alle 5 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('Alle 6 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=sprache`);
-    await expect(page.locator('.counter')).toHaveText('4 von 5 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('5 von 6 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=alle`);
     await expect(page.locator('.counter')).toHaveText('Keine Barriere aktiv');
@@ -509,7 +551,7 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
 
     await expect(boxFor(page, JARGON)).toBeChecked();
     await expect(boxFor(page, EASY)).toBeChecked();
-    await expect(page.locator('.counter')).toHaveText('4 von 5 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('5 von 6 Barrieren aktiv');
     // Focus stays where the user put it (docs/ARCHITECTURE.md §12.2).
     expect((await focused(page)).id).toBe(await boxFor(page, PARENT).getAttribute('id'));
   });
@@ -632,7 +674,7 @@ test.describe('Deep links into the campaign', () => {
   test('reproduce the barrier state the URL names', async ({ page }) => {
     await gotoRendered(page, `${PATH}?frei=navigation`);
     await expect(page.locator('nav.section-nav')).toHaveCount(1);
-    await expect(page.locator('.counter')).toHaveText('4 von 5 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('5 von 6 Barrieren aktiv');
     await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(1);
 
     await gotoRendered(page, PATH);
@@ -853,7 +895,7 @@ test.describe('The media section (docs/UX-COPY.md §9.3 to §9.5)', () => {
       // the counter still counts the barrier, because it is still switched on
       // (docs/UX-COPY.md §5.6). A suppressed barrier is not a resolved one.
       await expect(page.locator('.suppression p')).toHaveCount(1);
-      await expect(page.locator('.counter')).toHaveText('Alle 5 Barrieren aktiv');
+      await expect(page.locator('.counter')).toHaveText('Alle 6 Barrieren aktiv');
     });
 
     // Nothing is being overridden once the barrier is repaired, so there is
@@ -901,5 +943,352 @@ test.describe('The panel anchor of the media group', () => {
       return (heading.compareDocumentPosition(feed) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
     });
     expect(feedBelow).toBe(true);
+  });
+});
+
+// The three-part combined barrier of docs/SPEC_v2.md slice 17 — the strongest
+// teaching artefact in the tool, and the only one with a physical half.
+//
+// The panel shape itself (indeterminate parent, `fieldset`/`legend`, one
+// checkbox per part) is covered against fixtures in
+// src/app/frame/barrier-panel/barrier-panel.component.spec.ts. What is asserted
+// here is that shipped content produces it for a barrier with *three* parts —
+// the shape the two-part wording of `panel.combinedHint` does not fit, and the
+// first one to exercise `panel.combinedHint.many` (docs/UX-COPY.md §5.6).
+test.describe('Barrier `event` — the three-part combined barrier (docs/UX-COPY.md §9.6)', () => {
+  const PARENT = 'event';
+  const PARTS = ['einladung', 'dolmetschung', 'zugang'] as const;
+
+  test('renders as a fieldset with a legend, a parent and three parts', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    const combined = combinedFieldset(page, PARENT);
+    await expect(combined).toHaveCount(1);
+    await expect(combined.locator('legend')).toHaveText('Veranstaltung für alle zugänglich');
+    await expect(combined.locator('input[type="checkbox"]')).toHaveCount(4);
+
+    // `panel.combinedHint.many`, not the reviewed two-part wording: three
+    // checkboxes under a sentence claiming there are two would be the panel
+    // contradicting itself (docs/UX-COPY.md §5.6).
+    await expect(combined.locator('.hint')).toHaveText(
+      'Diese Barriere hat 3 Teile. Erst wenn alle behoben sind, ist der Inhalt barrierefrei.',
+    );
+
+    // The campaign's second combined barrier, and the panel now has to keep
+    // them apart — both in the DOM and for anyone reading this file.
+    await expect(page.locator('.panel fieldset.combined')).toHaveCount(2);
+  });
+
+  // docs/SPEC_v2.md slice 17: „Parent shows `indeterminate` for any one or two
+  // resolved parts." All six of those states, not a sample.
+  test('shows the parent as indeterminate for any one or two resolved parts', async ({ page }) => {
+    const partial = [
+      ['einladung'],
+      ['dolmetschung'],
+      ['zugang'],
+      ['einladung', 'dolmetschung'],
+      ['einladung', 'zugang'],
+      ['dolmetschung', 'zugang'],
+    ];
+
+    for (const keys of partial) {
+      await gotoRendered(page, `${PATH}?frei=${keys.join(',')}`);
+
+      expect(await isIndeterminate(page, PARENT)).toBe(true);
+      await expect(boxFor(page, PARENT)).not.toBeChecked();
+      for (const key of keys) {
+        await expect(boxFor(page, key)).toBeChecked();
+      }
+      await expect(combinedFieldset(page, PARENT).locator('> .meta .state')).toHaveText(
+        'Teilweise behoben',
+      );
+    }
+  });
+
+  test('resolves the parent only once all three parts are', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=${PARTS.join(',')}`);
+
+    await expect(boxFor(page, PARENT)).toBeChecked();
+    expect(await isIndeterminate(page, PARENT)).toBe(false);
+    await expect(combinedFieldset(page, PARENT).locator('> .meta .state')).toHaveText(
+      'Barrierefrei',
+    );
+  });
+
+  // The first barrier in the project assigned to the `csr` area, which is why
+  // the area summary can name it at all (docs/UX-COPY.md §5.6 `area.csr`).
+  test('names CSR as its area, and the summary counts three areas', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    await expect(combinedFieldset(page, PARENT).locator('> .meta .area')).toHaveText(
+      'Zuständiger Bereich: CSR',
+    );
+    await expect(page.locator('.area-summary')).toHaveText(
+      'Diese 6 Barrieren stammen aus 3 Bereichen: IT, Kommunikation, CSR.',
+    );
+  });
+
+  // docs/SPEC_v2.md slice 17: „Explanation view renders `explanation.noStandard`
+  // for `dolmetschung` and `zugang`." The claim is the point of the whole
+  // barrier — a page that breaks no criterion and still excludes people
+  // (CLAUDE.md rule 19) — so it is asserted on the shipped page, not only in the
+  // component test.
+  test('answers the standards rubric for both organisational parts', async ({ page }) => {
+    for (const key of ['dolmetschung', 'zugang']) {
+      await gotoRendered(page, `${PATH}?erklaerung=${key}`);
+
+      await expect(page.locator('.explanation .standards')).toHaveCount(0);
+      await expect(page.locator('.explanation .no-standard')).toContainText(
+        'Sie verstößt gegen keine Norm',
+      );
+    }
+
+    // And the third part, in the same barrier, does cite criteria. Both halves
+    // in one test on purpose: what has to hold is the *difference* between
+    // them, which is why `organisational` had to move onto `BarrierPart`.
+    await gotoRendered(page, `${PATH}?erklaerung=einladung`);
+    await expect(page.locator('.explanation .no-standard')).toHaveCount(0);
+    await expect(page.locator('.explanation .standards li')).toHaveCount(2);
+  });
+
+  // docs/SPEC_v2.md §4.3 and slice 17: „The explanation names the digital/
+  // physical distinction … explicitly." Asserted as a requirement on the
+  // *content*, not on a wording: the prose is scaffolding and WERTE.IT will
+  // replace it (docs/UX-COPY.md §10), but a replacement that drops the
+  // distinction turns the tool into one that claims a sentence on a web page
+  // fixes a staircase.
+  test('names the digital and the physical barrier as two different things', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?erklaerung=zugang`);
+
+    const explanation = (await page.locator('.explanation').textContent())!.toLowerCase();
+    expect(explanation).toContain('digitale barriere');
+    expect(explanation).toContain('physische');
+    expect(explanation).toContain('rampe');
+  });
+});
+
+test.describe('The event section in the simulation (docs/UX-COPY.md §9.6)', () => {
+  const SECTION = '[data-simulation-region] .venue';
+  const INVITATION = '[data-simulation-region] .invitation';
+  const DOWNLOAD = `${INVITATION} a`;
+
+  // The date, the venue and the registration address belong to no part of the
+  // barrier. A page that hid those would be broken in a way nobody explained
+  // (CLAUDE.md rule 18).
+  test('states the basics in every state of the barrier', async ({ page }) => {
+    for (const query of ['', '?frei=event', '?frei=zugang', '?frei=alle']) {
+      await gotoRendered(page, `${PATH}${query}`);
+      await expect(page.locator('[data-simulation-region] .event-basics')).toContainText(
+        'Donnerstag, 24. September 2026, 18 Uhr',
+      );
+      await expect(page.locator('[data-simulation-region] .event-registration')).toContainText(
+        'event@elbwerk.de',
+      );
+    }
+  });
+
+  // The download link is retained when the part is resolved — „auch als Text",
+  // not „PDF entfernt" (docs/UX-COPY.md §9.6) — and it has to lead somewhere.
+  //
+  // The fetch is the lesson of the media section's image test, applied one
+  // section further on: a link to a file that is not deployed still has the
+  // right text, the right href and the right position, and every assertion
+  // about the barrier keeps passing while the only thing the active state
+  // offers is a 404.
+  test('serves the invitation PDF in both states of `einladung`', async ({ page }) => {
+    for (const query of ['', '?frei=einladung']) {
+      await gotoRendered(page, `${PATH}${query}`);
+
+      // The attribute is relative and carries no leading slash — the rule that
+      // keeps the download working under a configured `base href`
+      // (docs/ARCHITECTURE.md §16).
+      const href = await page.locator(DOWNLOAD).getAttribute('href');
+      expect(href).toBe('simulation/Einladung_Podiumsdiskussion_Sept2026_final.pdf');
+
+      // Fetched at the address the **browser** resolved, read off the element's
+      // `href` property, not at one this test composes from `baseURL`. That
+      // difference is the whole point of the rule above: composing it here
+      // always yields `<origin>/simulation/…` and would keep passing while the
+      // real link resolved somewhere else — against a subpath `base href`, or
+      // against `/szenario/` if the base element were ever dropped. The failure
+      // the relative URL exists to prevent is exactly the one the shortcut
+      // cannot see.
+      const resolved = await page
+        .locator(DOWNLOAD)
+        .evaluate((link) => (link as HTMLAnchorElement).href);
+      expect(new URL(resolved).pathname).toBe(
+        '/simulation/Einladung_Podiumsdiskussion_Sept2026_final.pdf',
+      );
+
+      const response = await page.request.get(resolved);
+      expect(response.status()).toBe(200);
+      expect((await response.body()).subarray(0, 5).toString()).toBe('%PDF-');
+    }
+  });
+
+  test('offers the details only as a download while `einladung` is active', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    await expect(page.locator(INVITATION)).toContainText(
+      'Alle Einzelheiten entnehmen Sie bitte der Einladung.',
+    );
+    await expect(page.locator(`${INVITATION} .programme`)).toHaveCount(0);
+    await expect(page.locator('[data-simulation-region]')).not.toContainText('18:15 Uhr');
+  });
+
+  test('puts the programme on the page once `einladung` is resolved', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=einladung`);
+
+    await expect(page.locator(`${INVITATION} h4`)).toHaveText('Programm');
+    await expect(page.locator(`${INVITATION} .programme li`)).toHaveText([
+      '18:00 Uhr Begrüßung durch die Geschäftsführung',
+      '18:15 Uhr Podiumsdiskussion mit Gästen aus dem Stadtteil',
+      '19:30 Uhr Ausklang bei Getränken',
+    ]);
+  });
+
+  test('says nothing about interpreting until `dolmetschung` is resolved', async ({ page }) => {
+    await gotoRendered(page, PATH);
+    await expect(page.locator('[data-simulation-region]')).not.toContainText('Gebärdensprache');
+
+    await gotoRendered(page, `${PATH}?frei=dolmetschung`);
+    await expect(page.locator('[data-simulation-region] .sign-language')).toContainText(
+      'durchgehend in Deutsche Gebärdensprache gedolmetscht',
+    );
+  });
+
+  test('shows the ramp and the access list only once `zugang` is resolved', async ({ page }) => {
+    await gotoRendered(page, PATH);
+    await expect(page.locator(`${SECTION} svg .ramp`)).toHaveCount(0);
+    await expect(page.locator(`${SECTION} .access`)).toHaveCount(0);
+
+    await gotoRendered(page, `${PATH}?frei=zugang`);
+    await expect(page.locator(`${SECTION} svg .ramp`)).toHaveCount(1);
+    await expect(page.locator(`${SECTION} .access li`)).toHaveCount(4);
+    // The named person with a telephone number, which is what the list cannot
+    // do: it says what was thought of, she says the rest is possible too.
+    await expect(page.locator(`${SECTION} .access-contact`)).toContainText(
+      'Torben Kruse, Telefon 040 555 0188',
+    );
+  });
+
+  // The drawing is really drawn. Same reasoning as „serves all three post
+  // images" in the media section: an `svg` that failed to render still has the
+  // right classes and the right absence of a `<title>`, so every other
+  // assertion here would pass over an empty box.
+  test('renders the drawing with a real size in both variants', async ({ page }) => {
+    for (const query of ['', '?frei=zugang']) {
+      await gotoRendered(page, `${PATH}${query}`);
+
+      const box = await page.locator(`${SECTION} svg`).boundingBox();
+      expect(box!.width).toBeGreaterThan(100);
+      expect(box!.height).toBeGreaterThan(60);
+    }
+  });
+
+  // docs/SPEC_v2.md slice 17: „SVG illustrations use `--sim-*` tokens only and
+  // render correctly under `forced-colors`."
+  //
+  // Asserted structurally rather than against a palette: every stroke resolves
+  // to the element's own `color`, and no shape carries a fill. That is exactly
+  // the property that makes the drawing survive a forced palette — the system
+  // replaces `color`, and the whole drawing follows. A hard-coded stroke would
+  // pass a screenshot in both themes and disappear on a black background.
+  test('draws in currentColor only, in normal and in forced colors', async ({ page }) => {
+    for (const forcedColors of ['none', 'active'] as const) {
+      await page.emulateMedia({ forcedColors });
+      await gotoRendered(page, `${PATH}?frei=zugang`);
+
+      const paint = await page.locator(`${SECTION} svg`).evaluate((drawing) => {
+        const own = getComputedStyle(drawing).color;
+        const shapes = Array.from(drawing.querySelectorAll('rect, circle, path'));
+        return {
+          own,
+          strokes: [...new Set(shapes.map((shape) => getComputedStyle(shape).stroke))],
+          fills: [...new Set(shapes.map((shape) => getComputedStyle(shape).fill))],
+        };
+      });
+
+      expect(paint.strokes).toEqual([paint.own]);
+      expect(paint.fills).toEqual(['none']);
+    }
+    await page.emulateMedia({ forcedColors: 'none' });
+  });
+
+  // The alternative text of the drawing hangs off the barrier `alt`, not off
+  // `zugang` — the reasoning is in
+  // src/app/scenarios/csr-campaign/campaign-event/campaign-event.component.ts.
+  // What is asserted here is the consequence: which of the two texts is on the
+  // drawing depends on `zugang`, and whether there is one at all depends on
+  // `alt`.
+  test('names the drawing only while `alt` is resolved, and names the right one', async ({
+    page,
+  }) => {
+    const name = () =>
+      page.locator(`${SECTION} svg`).evaluate((drawing) => ({
+        role: drawing.getAttribute('role'),
+        title: drawing.querySelector('title')?.textContent?.trim() ?? null,
+      }));
+
+    // Active: no role, no title. Omitted, not replaced by `aria-hidden`
+    // (CLAUDE.md rule 6).
+    for (const query of ['', '?frei=zugang']) {
+      await gotoRendered(page, `${PATH}${query}`);
+      expect(await name()).toEqual({ role: null, title: null });
+      await expect(page.locator(`${SECTION} svg`)).not.toHaveAttribute('aria-hidden', /.*/);
+    }
+
+    await gotoRendered(page, `${PATH}?frei=alt`);
+    expect(await name()).toEqual({
+      role: 'img',
+      title:
+        'Der Eingang des Nachbarschaftstreffs. Drei Stufen führen zur Eingangstür, ein Handlauf ist nicht vorhanden.',
+    });
+
+    await gotoRendered(page, `${PATH}?frei=alt,zugang`);
+    expect(await name()).toEqual({
+      role: 'img',
+      title:
+        'Der Eingang des Nachbarschaftstreffs. Neben drei Stufen führt eine Rampe mit Handlauf zur Eingangstür.',
+    });
+  });
+
+  // Run 2's rules must not start firing from this section. `image-alt` does not
+  // apply to an inline `svg`, and `svg-img-alt` only applies to one that
+  // declares a role — which the drawing does exactly when it also carries a
+  // title. The section therefore plants no automated finding in either state,
+  // which is what `automatedDetection: 'manual'` claims about it.
+  //
+  // axe does the scoping, through the `within` argument. Running over the whole
+  // region and filtering the results by the markup of the offending node does
+  // not work: axe names the node the rule applies to, which for anything inside
+  // the drawing is a descendant of the `svg` — its markup does not carry the
+  // class the section is recognised by, so the finding would be dropped and the
+  // test would pass on a section that really does plant one.
+  test('plants no axe violation of its own in any state', async ({ page }) => {
+    for (const query of ['', '?frei=zugang', '?frei=alt', '?frei=alt,zugang']) {
+      await gotoRendered(page, `${PATH}${query}`);
+
+      const results = await barrierAssertion(page, `${SECTION} svg`).analyze();
+      expect(results.violations.map((violation) => violation.id)).toEqual([]);
+    }
+  });
+});
+
+// Same claim as for the three groups before it: the anchor has to land in front
+// of the part of the section its group is about — here the download link, which
+// is the section's only control and the thing `einladung` is about.
+test.describe('The panel anchor of the event group', () => {
+  test('lands in front of the download link the group is about', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=alle`);
+
+    await page.locator('#barrier-group-event-anchor').focus();
+    await page.keyboard.press('Enter');
+    expect((await focused(page)).id).toBe('sim-event');
+
+    await page.keyboard.press('Tab');
+    const stop = await focused(page);
+    expect(stop.tag).toBe('A');
+    expect(stop.text).toContain('Einladung_Podiumsdiskussion_Sept2026_final.pdf');
   });
 });

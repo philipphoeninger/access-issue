@@ -14,8 +14,10 @@ der Downloadlink der aktiven Barriere zeigt, und es hat genau die Eigenschaften,
 die docs/PRD.md §6.1 der Barriere zuschreibt: keine Tag-Struktur, keine
 Lesereihenfolge, keine Überschriftenauszeichnung, keine Dokumentsprache — nur
 absolut positionierte Textzeilen. Ein Screenreader findet darin keine Struktur,
-weil keine da ist. Das ist kein Versäumnis dieses Skripts, sondern sein Zweck;
-ein sauber getaggtes PDF wäre hier das Gegenteil der Aussage.
+weil keine da ist. Das ist kein Versäumnis, sondern der Zweck; ein sauber
+getaggtes PDF wäre hier das Gegenteil der Aussage. Erzeugt wird es von
+untagged_pdf.py, das sich dieses Werkzeug mit einladung.py teilt — hier stehen
+nur der Text und seine Begründung.
 
 Der Textkörper ist eine Kopie der Fassung aus docs/UX-COPY.md §8.3 (aktive
 Sprachbarriere) samt den Angaben aus §8.1 und §8.6. Ändert sich dort etwas,
@@ -33,6 +35,11 @@ genannten 412 KB; die Größenangabe gehört zur Fiktion des Dateinamens
 
 from pathlib import Path
 
+# Geschwister-Import: Python stellt das Verzeichnis des aufgerufenen Skripts
+# an den Anfang von sys.path. Der Schreiber steht dort und nicht hier, damit
+# eine Korrektur an ihm beide Dokumente erreicht (untagged_pdf.py).
+from untagged_pdf import write_untagged_pdf
+
 OUTPUT = (
     Path(__file__).resolve().parents[2]
     / "public"
@@ -40,14 +47,6 @@ OUTPUT = (
     / "Stellenausschreibung_2026_IT-Projektmanagement_final_v3.pdf"
 )
 
-PAGE_WIDTH, PAGE_HEIGHT = 595, 842  # A4 in PostScript points
-MARGIN_LEFT, MARGIN_TOP = 64, 74
-LINE_HEIGHT = 15
-MAX_LINES_PER_PAGE = 44
-
-# (Schriftgröße, Text). Eine leere Zeile ist ein Absatzabstand. Keine
-# Auszeichnung, keine Ebenen — im Dokument ist eine Überschrift nichts als eine
-# etwas größere Zeile, und genau das ist die Barriere.
 BLOCKS: list[tuple[int, str]] = [
     (16, "Elbwerk KG - Stellenausschreibung"),
     (11, "IT-Projektmanager (m/w/d)"),
@@ -94,77 +93,8 @@ BLOCKS: list[tuple[int, str]] = [
 # Zeichen oder gar nicht ankommen. Auf der Seite daneben stehen sie richtig.
 
 
-def escape(text: str) -> bytes:
-    """PDF-Stringliteral: Klammern und Backslash sind Steuerzeichen."""
-    escaped = text.replace("\\", r"\\").replace("(", r"\(").replace(")", r"\)")
-    return escaped.encode("ascii")
-
-
-def content_stream(lines: list[tuple[int, str]]) -> bytes:
-    """Eine Seite: absolut positionierte Textzeilen, sonst nichts."""
-    out = bytearray(b"BT\n")
-    y = PAGE_HEIGHT - MARGIN_TOP
-    for size, text in lines:
-        if text:
-            out += b"/F1 %d Tf\n1 0 0 1 %d %d Tm\n(%s) Tj\n" % (
-                size,
-                MARGIN_LEFT,
-                y,
-                escape(text),
-            )
-        y -= LINE_HEIGHT
-    out += b"ET\n"
-    return bytes(out)
-
-
-def build_pdf(pages: list[bytes]) -> bytes:
-    """Ein PDF 1.4 ohne StructTreeRoot, ohne /Lang, ohne MarkInfo."""
-    page_count = len(pages)
-    # 1 Catalog, 2 Pages, dann je Seite ein Page- und ein Contents-Objekt,
-    # zuletzt die Schrift.
-    font_number = 3 + 2 * page_count
-    page_numbers = [3 + 2 * index for index in range(page_count)]
-
-    objects: list[bytes] = [
-        b"<< /Type /Catalog /Pages 2 0 R >>",
-        b"<< /Type /Pages /Kids [%s] /Count %d >>"
-        % (b" ".join(b"%d 0 R" % number for number in page_numbers), page_count),
-    ]
-    for index, stream in enumerate(pages):
-        number = page_numbers[index]
-        objects.append(
-            b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %d %d] "
-            b"/Resources << /Font << /F1 %d 0 R >> >> /Contents %d 0 R >>"
-            % (PAGE_WIDTH, PAGE_HEIGHT, font_number, number + 1)
-        )
-        objects.append(b"<< /Length %d >>\nstream\n%s\nendstream" % (len(stream), stream))
-    objects.append(b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
-
-    out = bytearray(b"%PDF-1.4\n")
-    offsets: list[int] = []
-    for number, body in enumerate(objects, start=1):
-        offsets.append(len(out))
-        out += b"%d 0 obj\n%s\nendobj\n" % (number, body)
-
-    xref_offset = len(out)
-    out += b"xref\n0 %d\n" % (len(objects) + 1)
-    out += b"0000000000 65535 f \n"
-    for offset in offsets:
-        out += b"%010d 00000 n \n" % offset
-    out += b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (
-        len(objects) + 1,
-        xref_offset,
-    )
-    return bytes(out)
-
-
 def main() -> None:
-    pages = [
-        content_stream(BLOCKS[start : start + MAX_LINES_PER_PAGE])
-        for start in range(0, len(BLOCKS), MAX_LINES_PER_PAGE)
-    ]
-    OUTPUT.write_bytes(build_pdf(pages))
-    print(f"{OUTPUT.relative_to(Path.cwd())}: {OUTPUT.stat().st_size} Bytes")
+    write_untagged_pdf(OUTPUT, BLOCKS)
 
 
 if __name__ == "__main__":

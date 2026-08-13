@@ -1,0 +1,93 @@
+// Elbwerk, nicht WERTE.IT: ausschließlich --sim-*-Tokens (CLAUDE.md Regel 5).
+// Dieser Abschnitt hat keinen Simulationshinweis — es gibt hier keine Stelle,
+// an der jemand Daten eingeben könnte (docs/UX-COPY.md §8.4).
+:host {
+  display: block;
+}
+
+.event-basics,
+.event-registration,
+.sign-language,
+.access-contact {
+  margin: 0 0 8px;
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  line-height: var(--sim-leading-body);
+}
+
+.event-basics {
+  font-weight: bold;
+}
+
+.invitation,
+.venue {
+  margin-top: 16px;
+
+  p {
+    margin: 0 0 8px;
+    color: var(--sim-text);
+    font-family: var(--sim-font-family);
+    font-size: var(--sim-size-body);
+    line-height: var(--sim-leading-body);
+  }
+
+  h4 {
+    margin: 16px 0 8px;
+    color: var(--sim-brand);
+    font-family: var(--sim-font-family);
+    font-size: 1.0625rem;
+  }
+}
+
+.programme,
+.access {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  line-height: var(--sim-leading-body);
+
+  li {
+    margin-bottom: 4px;
+  }
+}
+
+// Der Downloadlink der Einladung. Dieselbe Überlegung wie beim PDF-Link in
+// Schritt 3 des Bewerbungsprozesses: Der Dateiname ist ein einziges langes
+// Wort, und der Link ist der ganze Absatz statt eines Worts in einem Satz — die
+// Inline-Ausnahme von 2.5.8 trägt ihn also nicht. Zielgröße ist keine der
+// Barrieren dieses Abschnitts, und ein zu kleines Ziel wäre eine Barriere, die
+// niemand erklärt hat (docs/DESIGN.md §5, CLAUDE.md Regel 18).
+.invitation-download a {
+  display: inline-block;
+  padding: 4px 0;
+  color: var(--sim-brand);
+  overflow-wrap: anywhere;
+}
+
+.invitation-download a:focus-visible {
+  outline: var(--sim-focus-width) solid var(--sim-focus-ring);
+  outline-offset: var(--sim-focus-offset);
+}
+
+// Die Zeichnung des Eingangs. Die Farbe steht hier und nur hier: Im Markup ist
+// jede Linie `currentColor`, damit `forced-colors` sie durch die Systemfarbe
+// ersetzen kann (CLAUDE.md Regel 9) — eine Zeichnung mit fest gesetzten
+// Füllfarben bliebe in ihren eigenen Farben stehen und wäre auf dunklem Grund
+// nicht mehr zu erkennen.
+//
+// `height: auto` mit gesetztem `width`/`height` am `svg`: Das Seitenverhältnis
+// steht damit vor dem Layout fest, und die Zeichnung skaliert bis 320 px
+// Fensterbreite und bis 400 % Vergrößerung ohne waagerechtes Scrollen
+// (WCAG 1.4.10, e2e/reflow.spec.ts).
+.venue-illustration {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  color: var(--sim-brand);
+}
+
+// Kein `outline: none` in dieser Datei, nirgends (CLAUDE.md Regel 8).

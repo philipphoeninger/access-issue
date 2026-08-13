@@ -44,6 +44,10 @@ __screenshots__/
 /blob-report
 /playwright/.cache
 
+# Asset generators (assets-src/) — the scripts import a shared writer as a
+# sibling module, which makes Python leave bytecode next to the sources.
+__pycache__/
+
 # System files
 .DS_Store
 Thumbs.db

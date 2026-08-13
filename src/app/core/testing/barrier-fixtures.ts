@@ -40,6 +40,7 @@ export function combinedBarrier(urlKey: string, partUrlKeys: readonly string[]):
       id: partUrlKey,
       urlKey: partUrlKey,
       title: partUrlKey,
+      organisational: false,
       standards: [{ standard: 'WCAG_2_2', criterion: '1.1.1', title: partUrlKey }],
       explanation: { problem: 'Problem', affected: 'Betroffene', solution: 'Lösung' },
       contentStatus: 'placeholder',

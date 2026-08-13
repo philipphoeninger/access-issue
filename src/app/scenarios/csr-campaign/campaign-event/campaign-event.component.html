@@ -1,0 +1,127 @@
+<!-- Kombinierte Barriere `event`, drei Teile, alle drei Muster A
+     (docs/UX-COPY.md §9.6). Die Teile schalten unabhängig; alle acht
+     Kombinationen sind ausgeschriebene Zustände, keiner ist eine Reparatur
+     eines anderen (CLAUDE.md Regel 10). -->
+
+<!-- Eckdaten und Anmeldung stehen in jedem Zustand da. Keine der drei
+     Teilbarrieren handelt von ihnen: Wann und wo etwas stattfindet, verschweigt
+     auch die schlechteste Kampagnenseite nicht — sie verschweigt, wie man
+     hineinkommt. -->
+<p class="event-basics">{{ basics }}</p>
+<p class="event-registration">{{ registration }}</p>
+
+<!-- Teil `einladung`. Aktiv: die Angaben gibt es ausschließlich im Dokument.
+     Behoben: dieselben Angaben stehen als Text auf der Seite.
+
+     **Der Downloadlink steht außerhalb der Verzweigung**, wie bei der Barriere
+     `pdf` in Schritt 3 des Bewerbungsprozesses: Der barrierefreie Zustand ist
+     „auch als Text", nicht „PDF entfernt". Das Dokument verschwindet nicht, es
+     ist nur nicht mehr der einzige Weg. -->
+<div class="invitation">
+  @if (invitationAsText()) {
+    <p>{{ htmlNote }}</p>
+  } @else {
+    <p>{{ pdfIntro }}</p>
+  }
+
+  <p class="invitation-download">
+    <a [href]="invitationPdf">{{ pdfLinkText }}</a>
+  </p>
+
+  @if (invitationAsText()) {
+    <h4>{{ programmeHeading }}</h4>
+    <ul class="programme">
+      @for (item of programmeItems; track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+  }
+</div>
+
+<!-- Teil `dolmetschung`. Aktiv steht hier nichts — kein Hinweis auf etwas, das
+     es nicht gibt, und kein „keine Dolmetschung vorgesehen", das niemand
+     hinschreibt (CLAUDE.md Regel 6). Das ist die Barriere: Wer darauf angewiesen
+     ist, findet keine Angabe und keine Person, die er fragen könnte. -->
+@if (signLanguage()) {
+  <p class="sign-language">{{ signLanguageNote }}</p>
+}
+
+<!-- Teil `zugang`, und mit ihm die einzige physische Barriere des Werkzeugs
+     (docs/SPEC_v2.md §4.3): Aktiv hat der Eingang drei Stufen und die Seite sagt
+     dazu nichts. Behoben führt eine Rampe zur Tür, und die Seite benennt den
+     Zugang.
+
+     Die Zeichnung steht in beiden Zuständen da und zeigt beide Male denselben
+     Eingang — was sich ändert, ist, was dort gebaut ist. Eine Zeichnung, die nur
+     im behobenen Zustand erschiene, machte aus der Barriere ein fehlendes Bild.
+
+     `role="img"` und `<title>` stehen nur, wenn die Barriere `alt` behoben ist;
+     sonst fehlen sie ganz — die eingebettete Entsprechung eines fehlenden
+     `alt`-Attributs. Warum der Alternativtext an `alt` hängt und nicht an
+     `zugang`, steht ausführlich in campaign-event.component.ts. -->
+<div class="venue">
+  <svg
+    class="venue-illustration"
+    viewBox="0 0 320 200"
+    width="320"
+    height="200"
+    [attr.role]="altTexts() ? 'img' : null"
+    [attr.aria-labelledby]="altTexts() ? venueTitleId : null"
+  >
+    @if (altTexts()) {
+      <title [id]="venueTitleId">{{ venueAlt() }}</title>
+    }
+
+    <!-- Reine Strichzeichnung in `currentColor`: Die Farbe setzt das
+         Stylesheet aus einem --sim-*-Token, und unter `forced-colors` ersetzt
+         das System sie durch seine eigene Textfarbe — die Zeichnung bleibt
+         sichtbar, statt als helle Fläche auf hellem Grund zu verschwinden
+         (CLAUDE.md Regel 9, dieselbe Überlegung wie bei den Symbolen des
+         Panels). Deshalb steht hier keine einzige Füllfarbe. -->
+    <g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+      <!-- Fassade mit Tür und Klinke; die Unterkante ist zugleich die
+           Türschwelle. -->
+      <rect x="64" y="24" width="192" height="116" />
+      <rect x="128" y="56" width="64" height="84" />
+      <circle cx="182" cy="100" r="3" />
+
+      <!-- Drei Stufen, in beiden Fassungen dieselben. -->
+      <rect x="116" y="140" width="88" height="13" />
+      <rect x="106" y="153" width="108" height="13" />
+      <rect x="96" y="166" width="128" height="13" />
+
+      @if (stepFreeAccess()) {
+        <!-- Die Rampe *neben* den Stufen, mit Handlauf auf zwei Pfosten
+             (docs/UX-COPY.md §9.6): Sie ersetzt die Stufen nicht, sie steht
+             daneben — so wird auch gebaut.
+
+             Die Klasse trägt keine Deklaration; sie ist der Griff, an dem die
+             Komponentenprüfung die beiden Fassungen auseinanderhält. Am
+             Alternativtext allein ließe sich das nicht prüfen — den gibt es
+             nur, solange die Barriere `alt` behoben ist. -->
+        <g class="ramp">
+          <path d="M204 138 L300 177 L300 179 L204 148 Z" />
+          <path d="M208 118 L296 153" />
+          <path d="M214 120 L214 142" />
+          <path d="M288 150 L288 172" />
+        </g>
+      }
+
+      <!-- Bodenlinie. -->
+      <path d="M16 179 L304 179" />
+    </g>
+  </svg>
+
+  @if (stepFreeAccess()) {
+    <h4>{{ accessHeading }}</h4>
+    <ul class="access">
+      @for (item of accessItems; track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+    <!-- Die benannte Ansprechperson mit Telefonnummer. Sie ist kein Beiwerk:
+         Eine Liste sagt, was vorgesehen ist; eine Person sagt, dass auch das
+         möglich ist, was niemand vorgesehen hat. -->
+    <p class="access-contact">{{ accessContact }}</p>
+  }
+</div>

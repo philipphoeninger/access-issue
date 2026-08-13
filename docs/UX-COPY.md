@@ -1262,6 +1262,30 @@ benennt den Zugang.
 (`SPEC_v2.md` §4.2). Ein fotorealistisches Bild müsste erst erstellt werden und würde die
 Umsetzung an einen externen Liefergegenstand binden — dasselbe Problem wie beim Video.
 
+**Der Alternativtext der Zeichnung hängt an der Barriere „Alternativtexte" (Abschnitt 9.3),
+nicht am Teil „Zugang"** (in Slice 17 entschieden, redaktionell zu bestätigen). Ist jene
+Barriere aktiv, trägt die gerade sichtbare Zeichnung keinen Alternativtext; ist sie behoben,
+trägt sie ihn — die Stufen-Fassung `venueImageAlt.stairs`, die Rampen-Fassung
+`venueImageAlt.ramp`. Zwei Gründe, und der zweite ist der wichtigere:
+
+1. `SPEC_v2.md` §4.2 sagt es so: „Both variants carry real alternative text … when the
+   alt-text barrier is resolved." *Beide* Fassungen tragen ihren Text im selben Zustand —
+   das geht nur, wenn die Barriere quer zum Teil „Zugang" steht, denn je Zustand ist nur
+   eine Zeichnung zu sehen. Sonst bliebe `venueImageAlt.stairs` ohne Verwendung.
+2. Der Teil „Zugang" ist **organisatorisch**: Er verstößt gegen kein Erfolgskriterium und
+   schließt trotzdem Menschen aus, und genau das sagt der Erklärungsbereich (Abschnitt 5.8).
+   Läge der fehlende Alternativtext bei ihm, wäre er ein Verstoß gegen WCAG 1.1.1 — die
+   Aussage daneben wäre falsch, und zwar in einem Modul über Barrierefreiheit.
+
+Der Erklärtext zu „Alternativtexte" nennt die Zeichnung deshalb mit
+(`csr-campaign.content.ts`).
+
+**Das PDF gibt es wirklich.** Der Downloadlink führt auf eine echte, absichtlich ungetaggte
+Datei (`assets-src/simulation/einladung.py` erzeugt sie, wie beim PDF des
+Bewerbungsprozesses). Ein Link ins Leere führte keine Barriere vor, sondern einen Fehler
+404. Die Größenangabe „1,2 MB" im Linktext gehört zur Fiktion des Dateinamens und wird nicht
+an die Platzhalterdatei angepasst.
+
 **Warum drei Teile gekoppelt sind:** Wer die Einladung als Text bereitstellt, aber die
 Stufen lässt, hat eine gut lesbare Einladung zu einer Veranstaltung, die man nicht betreten
 kann. Wer eine Rampe baut, aber nicht dolmetschen lässt, lädt gehörlose Menschen in einen
@@ -1364,6 +1388,8 @@ der automatische Wechsel unterbleibt.
 | `csr.text.h3` („Unser Ziel") und die Zuordnung der fünf Menüpunkte zu den Abschnitten (Abschnitt 9, 9.1) — in Slice 14 ergänzt, weil die Bereichsnavigation ohne Ziele nicht baubar ist | WERTE.IT-Team |
 | **Das Overlay steht auf einer deckenden Fläche, nicht auf dem Bild (Abschnitt 9.5)** — in Slice 16 entschieden, weil `--sim-text` auf einem abgedunkelten Verlauf die geforderten 4,5:1 verfehlt und weil axe über einem Bild kein Verhältnis berechnen kann. Wer die Vorlage wiederherstellt, gibt die automatische Prüfbarkeit der Barriere auf | WERTE.IT-Team |
 | Der Emoji-Beitrag (Abschnitt 9.4) steht als eigener Beitrag im Feed, nicht als Unterschrift zu einem der drei Bilder — in Slice 16 festgelegt, weil die Copy genau einen Beitragstext hergibt | WERTE.IT-Team |
+| **Der Alternativtext der Eingangszeichnung hängt an der Barriere „Alternativtexte", nicht am Teil „Zugang" (Abschnitt 9.6)** — in Slice 17 entschieden. Andernfalls verstieße der Teil „Zugang" gegen WCAG 1.1.1, während der Erklärungsbereich daneben sagt, er verstoße gegen keine Norm. Die Barriere „Alternativtexte" gilt damit für die Bilder der ganzen Seite, wie ihre Panel-Beschriftung es ohnehin sagt | WERTE.IT-Team |
+| **Ist die Rahmung der physischen Barriere (Abschnitt 9.6, `SPEC_v2.md` §4.3) so gewollt?** Der Erklärtext zu „Zugang" benennt ausdrücklich, dass ein Haken zwei verschiedene Dinge zugleich behebt: das Verschweigen des Zugangs und die fehlende Rampe. Das ist die einzige Stelle, an der das Werkzeug über Webbarrierefreiheit hinaus etwas behauptet | WERTE.IT-Team |
 | Soll die Stellenanzeige eine reale BSVH-nahe Tätigkeit abbilden oder bewusst neutral bleiben? | WERTE.IT-Team |
 
 **Ein Hinweis zur Prüfung.** Die beiden Sprachfassungen in Abschnitt 8.3 sind der einzige

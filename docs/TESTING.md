@@ -329,8 +329,11 @@ real scenario registry, so they scale automatically with content.
 | Test | Rationale |
 | --- | --- |
 | Every barrier has non-empty `problem`, `affected`, `solution` | `PRD.md` §8.1 F requires all four parts; missing prose ships as a blank panel |
-| Every barrier has at least one `StandardReference` **unless** `organisational` is true | `PRD.md` §6.1 — five barriers legitimately have none; an unconditional rule would have made them unbuildable |
+| Every barrier has at least one `StandardReference` **unless** `organisational` is true | `PRD.md` §6.1 — six barriers legitimately have none; an unconditional rule would have made them unbuildable |
 | No barrier has an empty `standards` array while `organisational` is false | The inverse guard: without it, "organisational" becomes a way to skip editorial work |
+| Every **part** of a combined barrier has non-empty `problem`, `affected`, `solution` | The explanation view renders a selected part's prose from `part.*`, never from its parent — the guarantee has to reach the shape with the most content to get wrong |
+| No **part** has an empty `standards` array while its own `organisational` is false | The same inverse guard one level down. `BarrierPart` carries the flag itself since `SPEC_v2.md` slice 17 (`ARCHITECTURE.md` §6): the event barrier is technical in one part and organisational in two, and the view states „verstößt gegen keine Norm" off an empty array |
+| No barrier whose parts are **all** organisational is marked `automatedDetection: 'axe'` | A part has no detection mode of its own, so the parent's reaches it. All parts organisational means no state can produce a finding. Deliberately `every`, not `some`: a mixed barrier — one detectable technical part beside organisational ones — is legitimate, and forbidding it would drop run-2 coverage for the part a tool really does find |
 | Every barrier has a valid `responsibleArea` | Drives the panel grouping label and the area summary line |
 | `urlKey` unique within a scenario | Collisions silently merge two barriers into one toggle |
 | No `urlKey` equals `alle` | Reserved word, `ARCHITECTURE.md` §8 |

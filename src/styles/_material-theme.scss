@@ -143,4 +143,22 @@ html {
 .mat-mdc-checkbox .mdc-form-field > label {
   padding-top: 9px;
   line-height: 1.4;
+
+  // …and it breaks a word that is wider than the column it has, rather than
+  // pushing the document sideways.
+  //
+  // Ordinary labels wrap on their own; a single German compound does not.
+  // „Gebärdensprachdolmetschung angeboten" (docs/UX-COPY.md §5.6) is the first
+  // one long enough to matter, and it arrives indented inside a combined
+  // barrier's parts list, where the column is narrowest — at 320 px it put the
+  // whole page into horizontal scrolling and failed e2e/reflow.spec.ts. WCAG
+  // 1.4.10 is a frame guarantee in every barrier state, so the fix belongs
+  // here: shortening a reviewed panel label to fit a viewport would be the
+  // wrong end of the problem.
+  //
+  // `anywhere`, not `break-word`: only `anywhere` also shrinks the element's
+  // min-content width, and the min-content width is what the surrounding flex
+  // layout measures. With `break-word` the label still reports its longest word
+  // as its minimum, and the row stays too wide however the text is painted.
+  overflow-wrap: anywhere;
 }

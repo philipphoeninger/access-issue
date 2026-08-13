@@ -302,7 +302,7 @@ type DisabilityCategory =
  * several areas, not one.
  */
 type ResponsibleArea =
-  | 'personal' | 'kommunikation' | 'it' | 'beschaffung' | 'management';
+  | 'personal' | 'kommunikation' | 'it' | 'beschaffung' | 'management' | 'csr';
 
 type Standard = 'WCAG_2_2' | 'BITV_2_0' | 'EN_301_549' | 'BFSG';
 
@@ -327,8 +327,13 @@ interface BarrierPart {
   id: string;
   urlKey: string;
   title: string;
+  /** As on `Barrier`, and carried per part rather than inherited — see the
+   *  note below. */
+  organisational: boolean;
+  /** May be empty if and only if `organisational` is true. */
   standards: StandardReference[];
   explanation: BarrierExplanation;
+  contentStatus: 'placeholder' | 'approved';
 }
 
 /**
@@ -414,14 +419,33 @@ Notes on the shape:
 - Combined barriers carry `parts`. A barrier with `parts` is *resolved* only when every
   part is resolved. Panel representation is covered in §12.1 — the earlier plan to use an
   indeterminate slide toggle was invalid ARIA and has been replaced.
+- **`BarrierPart` carries `organisational` itself; it does not inherit the parent's.**
+  Added in `SPEC_v2.md` slice 17 for the campaign's event barrier, which is technical in
+  one part (invitation as a PDF-only download, WCAG 1.3.1 and 4.1.2) and organisational in
+  the other two (no sign-language interpreting, no access information). Inheriting would
+  have forced a choice between citing a criterion for parts that break none and dropping
+  the references from the part that does — and the explanation view renders
+  „verstößt gegen keine Norm" off an empty `standards` array, so the wrong choice is a
+  false claim in teaching material, not a modelling inelegance. `data-contract.spec.ts`
+  mirrors the barrier-level rule onto parts: an empty array requires the flag, at either
+  level. What deliberately stays barrier-level is `responsibleArea` — the department whose
+  decision created a barrier is a property of the barrier, not of the half of it that is
+  missing, and no view renders an area for a part.
+- `contentStatus` is on `BarrierPart` as well as on `Barrier` (`SPEC_v1.md` §4.1): a part
+  is content in its own right, with its own prose and its own release gate.
 - `standards` is an array, deliberately. One barrier maps to several WCAG success
   criteria and to BITV/EN/BFSG references in parallel — or, for organisational barriers,
   to none at all.
 - `responsibleArea` and `organisational` both arrive from the finished module deck. They
   are not bookkeeping: `responsibleArea` carries chapter 3's actual thesis, and
   `organisational` is what lets the two most interesting barriers in the application
-  process — no named contact, no note that adjustments are possible — exist at all. Five
-  of the twenty-seven barriers are organisational.
+  process — no named contact, no note that adjustments are possible — exist at all. Six of
+  the twenty-nine barriers are organisational, counting the two parts of the campaign's
+  event barrier.
+- `csr` is the newest `ResponsibleArea` and was added only when a barrier carried it
+  (`SPEC_v2.md` slice 17). `UX-COPY.md` §5.6 had named it since before phase 2; it stayed
+  out of the union until then, because an area no barrier belongs to is an area the panel's
+  summary line can never name.
 - `automatedDetection` replaces an earlier `implementation: 'variant' | 'attribute'`
   field. That field described how a template was written but no runtime code read it, so
   it would have silently drifted out of date. `automatedDetection` is consumed by the

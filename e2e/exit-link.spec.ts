@@ -86,6 +86,13 @@ const STATES: Array<{ name: string; path: string; query: string }> = [
   // of their eight combinations — the section has no focusable element at all.
   // The two rows above already cover the section switched fully off and fully
   // on. A barrier that ever puts a control into that section brings its own row.
+  //
+  // Slice 17's event section adds none either, for the opposite reason: it does
+  // put a control into the region — the invitation's download link — but the
+  // same one in every state of all three parts. The resolved half of
+  // `einladung` adds text beside the link, not another stop, and neither
+  // `dolmetschung` nor `zugang` adds anything focusable at all. The two
+  // campaign rows above cover it switched fully off and fully on.
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

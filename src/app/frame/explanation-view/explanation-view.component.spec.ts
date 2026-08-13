@@ -9,6 +9,8 @@ import { provideLocationMocks } from '@angular/common/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { APPLICATION_PROCESS_SCENARIO } from '../../content/application-process/application-process.scenario';
+import { EVENT_BARRIER } from '../../content/csr-campaign/csr-campaign.content';
+import { CSR_CAMPAIGN_SCENARIO } from '../../content/csr-campaign/csr-campaign.scenario';
 import { Announcer } from '../../core/announcer.service';
 import { VIDEO_BARRIERS, makeScenario, simpleBarrier } from '../../core/testing/barrier-fixtures';
 import type { Barrier, Scenario, StandardReference } from '../../models/domain.model';
@@ -273,6 +275,49 @@ describe('ExplanationViewComponent (docs/SPEC_v1.md Slice 6)', () => {
               'Erfüllen von Vorgaben.',
           );
       }
+    });
+
+    // The same answer for a *part*, which became possible in docs/SPEC_v2.md
+    // slice 17: `BarrierPart` carries its own `organisational` flag, so two of
+    // the three parts of the campaign's event barrier can say they break no
+    // criterion while the third cites two.
+    //
+    // Read off shipped content for the same reason as the pair above — a
+    // fixture would keep passing if `zugang` ever quietly acquired a standards
+    // reference, and the whole point of that part is that it has none
+    // (CLAUDE.md rule 19, docs/SPEC_v2.md §4.3).
+    it('answers the rubric for an organisational part of a combined barrier', async () => {
+      const parts = (EVENT_BARRIER.parts ?? []).filter((part) => part.organisational);
+      expect(parts.length).toBe(2);
+
+      for (const part of parts) {
+        const harness = await setup({
+          scenario: CSR_CAMPAIGN_SCENARIO,
+          query: `?erklaerung=${part.urlKey}`,
+        });
+
+        expect(part.standards).withContext(part.urlKey).toEqual([]);
+        expect(text(harness, '.barrier-name')).withContext(part.urlKey).toBe(part.title);
+        expect(headings(harness)).withContext(part.urlKey).toContain('Was sagen die Normen?');
+        expect(view(harness).querySelector('.standards')).withContext(part.urlKey).toBeNull();
+        expect(text(harness, '.no-standard'))
+          .withContext(part.urlKey)
+          .toContain('Sie verstößt gegen keine Norm');
+      }
+    });
+
+    // The other half of the same barrier, and the reason the flag had to move
+    // to the part: `einladung` is a technical defect in a barrier whose other
+    // two parts are not. Inheriting from the parent would have forced one of
+    // the two claims to be wrong.
+    it('still lists the standards of a non-organisational part of the same barrier', async () => {
+      const harness = await setup({
+        scenario: CSR_CAMPAIGN_SCENARIO,
+        query: '?erklaerung=einladung',
+      });
+
+      expect(view(harness).querySelector('.no-standard')).toBeNull();
+      expect(view(harness).querySelectorAll('.standards li').length).toBe(2);
     });
   });
 

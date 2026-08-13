@@ -121,21 +121,66 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     });
   });
 
-  // Parts have no `organisational` field (docs/ARCHITECTURE.md §6), so nothing
-  // about a part could ever justify an empty `standards` array — while the
-  // explanation view renders exactly one thing for an empty array:
-  // „Sie verstößt gegen keine Norm" (docs/UX-COPY.md §5.8). Asserting that
-  // claim is never made for a part is the only way to keep the view from
-  // stating, in a teaching tool, something no one decided.
+  // The part-level mirror of the rule above, and the successor to the stricter
+  // one this file used to carry.
   //
-  // If a genuinely organisational part is ever needed, the fix is to add
-  // `organisational` to `BarrierPart` and mirror the barrier-level rule here —
-  // not to delete this test.
-  it('requires every part of a combined barrier to cite at least one standard', () => {
+  // Until docs/SPEC_v2.md slice 17, `BarrierPart` had no `organisational`
+  // field, so nothing about a part could justify an empty `standards` array —
+  // and the explanation view renders exactly one thing for an empty array:
+  // „Sie verstößt gegen keine Norm" (docs/UX-COPY.md §5.8). This test therefore
+  // demanded at least one reference per part, so that the view could not make
+  // that claim on behalf of nobody. The event barrier is the case the old note
+  // here anticipated: two of its three parts violate no criterion, and the flag
+  // moved to `BarrierPart` rather than the parts borrowing a reference they do
+  // not breach.
+  //
+  // What the guard was protecting is unchanged — the claim is only made where
+  // someone decided it — and it is now the same decision the barrier level
+  // records: an empty array requires `organisational: true`. Do not narrow this
+  // to non-organisational parts, and do not restore the biconditional; the
+  // reasoning above applies here verbatim.
+  it('allows a part with an empty standards array only when the part is organisational', () => {
     forEachPart(scenarios, (scenario, barrier, part) => {
-      expect(part.standards.length)
-        .withContext(`${scenario.path}/${barrier.urlKey}/${part.urlKey}`)
-        .toBeGreaterThan(0);
+      if (part.standards.length > 0) {
+        return;
+      }
+      expect(part.organisational)
+        .withContext(
+          `${scenario.path}/${barrier.urlKey}/${part.urlKey}: empty standards requires organisational: true`,
+        )
+        .toBeTrue();
+    });
+  });
+
+  // The counterpart to „never marks an organisational barrier as
+  // axe-detectable", one level down. A part carries no `automatedDetection` of
+  // its own, so the mode reaches it through its parent — and if *every* part is
+  // organisational, then nothing anywhere in the barrier is something a checker
+  // could see. Declaring it `'axe'` would demand an AXE_RULE_FIXTURES entry and
+  // send run 2 (docs/TESTING.md §5) hunting a violation no state can produce.
+  //
+  // **All parts, not any part.** A *mixed* combined barrier — one axe-detectable
+  // technical part beside organisational ones — is legitimate and is exactly the
+  // shape the campaign's event barrier has, minus the detectability: the fixture
+  // is keyed per barrier, and the rule genuinely fires while the technical part
+  // stands and is gone once it is repaired. An assertion on `some` rather than
+  // `every` would forbid authoring that barrier at all, forcing it to be
+  // declared `'manual'` and silently dropping run-2 coverage for the one part a
+  // tool really does find.
+  //
+  // Nothing in shipped content exercises this yet — the event barrier is
+  // `'manual'` throughout, and its parts are the only organisational ones. It is
+  // written against the case that comes next, which is why the boundary between
+  // `some` and `every` had to be got right the first time.
+  it('never marks a barrier whose parts are all organisational as axe-detectable', () => {
+    forEachBarrier(scenarios, (scenario, barrier) => {
+      const parts = barrier.parts ?? [];
+      if (parts.length === 0 || !parts.every((part) => part.organisational)) {
+        return;
+      }
+      expect(barrier.automatedDetection)
+        .withContext(`${scenario.path}/${barrier.urlKey}: every part is organisational`)
+        .toBe('manual');
     });
   });
 
@@ -235,6 +280,14 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     { scenarioPath: 'csr-kampagne', urlKey: 'alt' },
     { scenarioPath: 'csr-kampagne', urlKey: 'emoji' },
     { scenarioPath: 'csr-kampagne', urlKey: 'kontrast' },
+    // The event section of slice 17. Same reasoning as for `sprache`: the
+    // parent and all three parts are deep links of their own, and the partial
+    // states — a readable invitation to a venue with steps — are the ones a
+    // slide is most likely to show, because they are the argument.
+    { scenarioPath: 'csr-kampagne', urlKey: 'event' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'einladung' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'dolmetschung' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'zugang' },
   ];
 
   it('keeps every previously published {scenarioPath, urlKey} pair (add here on release)', () => {

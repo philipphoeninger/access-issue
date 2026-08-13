@@ -10,14 +10,12 @@ export type DisabilityCategory = 'visual' | 'auditory' | 'motor' | 'cognitive' |
  * Rendered in the panel so the user sees that resolving a scenario takes several
  * areas, not one.
  *
- * The five areas are verbatim from docs/ARCHITECTURE.md §6. Note the doc
- * discrepancy: docs/UX-COPY.md §5.6 and docs/PRD.md §6.2 introduce a sixth
- * label, `CSR`, for the event barrier of the campaign. Slice 14 made that
- * scenario available, but its first barrier is `it` and nothing references
- * `csr` yet; the areas it needs arrive with the event barrier
- * (docs/SPEC_v2.md slice 17). The type stays exactly as ARCHITECTURE.md §6
- * specifies until then — adding a value here before a barrier carries it would
- * put an area in the union that the area summary can never name.
+ * `csr` is the sixth area and the newest. It was held back deliberately while
+ * docs/UX-COPY.md §5.6 and docs/PRD.md §6.2 already named it: an area in the
+ * union that no barrier carries is an area the panel's summary line can never
+ * name. It arrived with the campaign's event barrier (docs/SPEC_v2.md slice
+ * 17), which is the first — and so far only — barrier assigned to it, and
+ * docs/ARCHITECTURE.md §6 records it as part of the type from that point on.
  *
  * Written as a `const` array with the type derived from it, rather than as the
  * bare union in ARCHITECTURE.md §6. The type is identical; the array is what
@@ -32,6 +30,7 @@ export const RESPONSIBLE_AREAS = [
   'it',
   'beschaffung',
   'management',
+  'csr',
 ] as const;
 
 export type ResponsibleArea = (typeof RESPONSIBLE_AREAS)[number];
@@ -65,6 +64,28 @@ export interface BarrierPart {
   id: string;
   urlKey: string;
   title: string;
+  /**
+   * Exactly what it means on `Barrier` below, and it had to be added here for
+   * the campaign's event barrier (docs/SPEC_v2.md slice 17): two of its three
+   * parts — no sign-language interpreting offered, no access information for a
+   * venue with steps — violate no success criterion, while the third (the
+   * invitation as a PDF-only download) violates two.
+   *
+   * **A part carries its own flag; it does not inherit the parent's.** That is
+   * the whole shape of this barrier: a combined barrier that is technical in
+   * one part and organisational in the others. Inheriting would have forced
+   * the choice between claiming a criterion for parts that break none and
+   * dropping the references from the part that does.
+   *
+   * Note what is *not* per part: `responsibleArea`. The department whose
+   * decision created a barrier is a property of the barrier, not of the half
+   * of it that is missing, and no view renders an area for a part
+   * (frame/barrier-panel renders it for barriers only). docs/UX-COPY.md §5.6
+   * lists an area per part in its label table, which is editorial context for
+   * whoever writes the prose rather than a field to model.
+   */
+  organisational: boolean;
+  /** May be empty if and only if `organisational` is true. */
   standards: StandardReference[];
   explanation: BarrierExplanation;
   contentStatus: ContentStatus;
