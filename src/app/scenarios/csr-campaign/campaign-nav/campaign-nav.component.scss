@@ -1,0 +1,101 @@
+// Elbwerk, nicht WERTE.IT: hier ausschließlich --sim-*-Tokens (CLAUDE.md
+// Regel 5). Beide Fassungen sehen gleich aus — das ist der Punkt der Barriere:
+// Am Bildschirm ist ihr nichts anzusehen, sie zeigt sich erst an der Tastatur.
+:host {
+  display: block;
+}
+
+// Ein Band innerhalb des ersten Abschnitts, nicht mehr direkt unter der
+// Kopfzeile — warum, steht im Template der Seite.
+.section-nav {
+  position: relative;
+  margin: 16px 0 0;
+  border-top: 1px solid var(--sim-border);
+  border-bottom: 1px solid var(--sim-border);
+  background: var(--sim-surface);
+  padding: 8px 12px;
+  font-family: var(--sim-font-family);
+  font-size: 0.9375rem;
+}
+
+.nav-trigger {
+  display: inline-flex;
+  align-items: center;
+  // 2.5.8 gilt auch hier: die behobene Fassung muss echt barrierefrei sein,
+  // und die aktive Fassung darf nicht zusätzlich an der Zielgröße scheitern —
+  // eine Barriere, die das Panel nicht erklärt, wäre eine undeklarierte
+  // (CLAUDE.md Regel 18).
+  min-height: var(--sim-target-min);
+  padding: 4px 0;
+  color: var(--sim-brand);
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+
+  &::after {
+    content: ' ▾';
+  }
+}
+
+// Nur die behobene Fassung hat hier ein echtes Bedienelement.
+button.nav-trigger {
+  border: 0;
+  background: none;
+}
+
+.nav-menu {
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  border: 1px solid var(--sim-border);
+  background: var(--sim-white);
+  padding: 4px 0;
+  // Bleibt bei 320 px im Fenster (WCAG 1.4.10, e2e/reflow.spec.ts). `min` statt
+  // eines nackten `min-width`, weil `min-width` sonst `max-width` schlägt und
+  // die Regel auf schmalen Fenstern das Gegenteil von dem täte, wofür sie da
+  // ist.
+  max-width: 100%;
+  min-width: min(12rem, 100%);
+  list-style: none;
+}
+
+// Behobene Fassung: `hidden` steuert die Sichtbarkeit, also darf `display`
+// hier nicht dagegenhalten.
+.nav-menu[hidden] {
+  display: none;
+}
+
+// Aktive Fassung: Das Menü öffnet ausschließlich bei Zeigerkontakt. Kein
+// `:focus-within` — das wäre die halbe Reparatur, und die Barriere wäre keine.
+.section-nav--pointer .nav-menu {
+  display: none;
+}
+
+.section-nav--pointer:hover .nav-menu {
+  display: block;
+}
+
+.nav-item {
+  display: block;
+  min-height: var(--sim-target-min);
+  padding: 6px 16px;
+  color: var(--sim-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.nav-item {
+  color: var(--sim-brand);
+  text-decoration: underline;
+}
+
+// **Kein Fokusring in dieser Datei, und das ist Absicht.** Den zeichnet
+// `[data-simulation-region] :focus-visible` in src/styles.scss global, und dort
+// steht auch, warum: Ein fehlender Fokusring ist nie eine zulässige Barriere
+// (CLAUDE.md Regel 8), deshalb darf die Regel nicht bei der Komponente liegen,
+// die die Barriere schreibt. Eine gleichlautende Kopie hier wäre unsichtbar
+// wirkungsgleich und genau die Stelle, die bei einer späteren Änderung an
+// `--sim-focus-width` zurückbliebe.
+//
+// `outline: none` steht deshalb nirgends in dieser Datei, und die aktive
+// Fassung unterdrückt nichts — sie hat schlicht kein fokussierbares Element.

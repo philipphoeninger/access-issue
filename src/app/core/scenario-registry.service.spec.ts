@@ -60,10 +60,15 @@ describe('ScenarioRegistry', () => {
     expect(procurement?.barriers).toEqual([]);
   });
 
-  it('resolves the CSR campaign scenario as planned, with no barriers', () => {
+  // Available since docs/SPEC_v2.md slice 14, as one page modelled as one step
+  // (docs/ARCHITECTURE.md §6). Its barriers arrive section by section in slices
+  // 15 to 18, so this asserts the shape rather than a count that would have to
+  // be edited four more times.
+  it('resolves the CSR campaign scenario as available, with one step and barriers', () => {
     const csr = registry.getScenario('csr-kampagne');
-    expect(csr?.status).toBe('planned');
-    expect(csr?.barriers).toEqual([]);
+    expect(csr?.status).toBe('available');
+    expect(csr?.steps.length).toBe(1);
+    expect(csr?.barriers.length).toBeGreaterThan(0);
   });
 
   it('resolves the application-process scenario as available', () => {

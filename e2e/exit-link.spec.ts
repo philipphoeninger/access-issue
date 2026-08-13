@@ -26,6 +26,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { gotoRendered } from './support/goto';
 
+const CAMPAIGN_PATH = '/szenario/csr-kampagne';
 const POSTING_PATH = '/szenario/bewerbung/stellenanzeige';
 const FORM_PATH = '/szenario/bewerbung/formular';
 const UPLOAD_PATH = '/szenario/bewerbung/dokumente';
@@ -64,6 +65,12 @@ const STATES: Array<{ name: string; path: string; query: string }> = [
     path: CONFIRM_PATH,
     query: '?frei=inklusionshinweis',
   },
+  // The CSR campaign (docs/SPEC_v2.md slice 14). Its first barrier is a
+  // navigation that is unreachable by keyboard while it is active, which makes
+  // this the state the trap detector in step 4 below exists for: a navigation
+  // nobody can Tab into must still be a page anybody can Tab out of.
+  { name: 'campaign — all barriers active (default)', path: CAMPAIGN_PATH, query: '' },
+  { name: 'campaign — all barriers resolved', path: CAMPAIGN_PATH, query: '?frei=alle' },
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

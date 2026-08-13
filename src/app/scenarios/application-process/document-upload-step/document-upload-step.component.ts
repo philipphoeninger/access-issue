@@ -35,7 +35,7 @@ import {
   UPLOAD_BARRIER,
 } from '../../../content/application-process/application-process.content';
 import { APPLICATION_PROCESS_SCENARIO } from '../../../content/application-process/application-process.scenario';
-import { ElbwerkPageComponent } from '../elbwerk-page/elbwerk-page.component';
+import { ElbwerkPageComponent } from '../../elbwerk-page/elbwerk-page.component';
 import { JobDescriptionComponent } from '../job-description/job-description.component';
 
 export interface UploadField {

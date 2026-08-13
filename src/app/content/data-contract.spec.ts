@@ -219,6 +219,12 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     { scenarioPath: 'bewerbung', urlKey: 'bestaetigung' },
     { scenarioPath: 'bewerbung', urlKey: 'ansprechperson' },
     { scenarioPath: 'bewerbung', urlKey: 'inklusionshinweis' },
+
+    // The CSR campaign, added section by section (docs/SPEC_v2.md slices 14 to
+    // 18). A key is locked here as soon as it ships, not once the scenario is
+    // complete: `?frei=navigation` is a working deep link from the moment the
+    // barrier exists, and that is the moment it can end up on a slide.
+    { scenarioPath: 'csr-kampagne', urlKey: 'navigation' },
   ];
 
   it('keeps every previously published {scenarioPath, urlKey} pair (add here on release)', () => {

@@ -1,12 +1,21 @@
-// The Elbwerk page chrome — logo, company name, menu line — shared by the four
-// steps of the application process (docs/UX-COPY.md §8.1). Plain HTML, plain
-// CSS, system font stack: no Angular Material inside the simulation region
+// The Elbwerk page chrome — logo, company name, menu line — shared by every
+// page of the fictional company: the four steps of the application process and
+// the CSR campaign page (docs/UX-COPY.md §8.1, §9). Plain HTML, plain CSS,
+// system font stack: no Angular Material inside the simulation region
 // (docs/ARCHITECTURE.md §11). Material is engineered to be accessible and
 // resists being made otherwise, and fighting it would produce markup no real
 // company site has.
 //
-// This component carries **no barrier**. The barriers of this scenario are
-// exactly the eleven in docs/PRD.md §6.1; the page chrome around them is
+// **It sits beside the scenario folders, not inside one.** It lived under
+// `application-process/` while that was the only scenario, which stopped being
+// true in docs/SPEC_v2.md slice 14: the campaign page shows the same header,
+// the same logo and the same typography (that is what makes both read as one
+// company), and importing it from a sibling scenario's folder would have said
+// the opposite. docs/ARCHITECTURE.md §14 already called it "shared Elbwerk
+// chrome"; this is the directory catching up with the label.
+//
+// This component carries **no barrier**, in any scenario. The barriers are
+// exactly those in docs/PRD.md §6.1 and §6.2; the page chrome around them is
 // written as a competent developer would write it, which is also what makes
 // the barriers legible as barriers rather than as general sloppiness.
 //

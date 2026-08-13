@@ -16,6 +16,7 @@ const PAGES = [
   '/szenario/bewerbung/rueckmeldung',
   '/gibt-es-nicht',
   '/szenario/softwarebeschaffung',
+  '/szenario/csr-kampagne',
 ];
 
 test.describe('Reflow at 320px width (docs/DESIGN.md §5, §8)', () => {

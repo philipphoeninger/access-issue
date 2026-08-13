@@ -24,6 +24,7 @@ export const WCAG_1_4_1 = wcag('1.4.1', 'A', 'Benutzung von Farbe');
 export const WCAG_1_4_5 = wcag('1.4.5', 'AA', 'Bilder eines Textes');
 export const WCAG_2_1_1 = wcag('2.1.1', 'A', 'Tastatur');
 export const WCAG_2_1_2 = wcag('2.1.2', 'A', 'Keine Tastaturfalle');
+export const WCAG_2_4_7 = wcag('2.4.7', 'AA', 'Fokus sichtbar');
 export const WCAG_3_1_5 = wcag('3.1.5', 'AAA', 'Lesbarkeit');
 export const WCAG_3_3_1 = wcag('3.3.1', 'A', 'Fehlererkennung');
 export const WCAG_3_3_2 = wcag('3.3.2', 'A', 'Beschriftungen oder Anweisungen');

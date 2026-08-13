@@ -181,12 +181,11 @@ test.describe('Barrier panel — effect on the rest of the page', () => {
 // no focus, with every unit test, every contract test and every axe run
 // green. That is the failure this suite exists to make impossible.
 //
-// The cases are generated from the declared groups, so the five sections of
-// the CSR campaign are covered the moment slice 14 declares them, without
-// anyone remembering to come back here. Today that generates nothing: no
-// shipped scenario declares an `anchorId`, which is asserted rather than
-// assumed below — a suite that quietly stops testing anything is the thing
-// this file cannot afford.
+// The cases are generated from the declared groups, so each section of the CSR
+// campaign is covered the moment its slice declares it, without anyone
+// remembering to come back here. Slice 14 declares the first of the five; the
+// negative control below has become a positive one and now asserts that the
+// generator produces cases at all.
 const ANCHORED_GROUPS = SCENARIOS.filter((scenario) => scenario.status === 'available').flatMap(
   (scenario) =>
     scenario.groups
@@ -249,15 +248,16 @@ test.describe('Barrier panel — section anchors (docs/ARCHITECTURE.md §12.1.1)
     });
   }
 
-  // The negative control for the generator above. Without it, a renamed
-  // `groups` field or a filter that stops matching would empty ANCHORED_GROUPS
-  // and every case above would silently cease to exist.
-  test('no available scenario declares an anchor yet — remove this once one does', async () => {
+  // The control for the generator above. Without it, a renamed `groups` field
+  // or a filter that stops matching would empty ANCHORED_GROUPS and every case
+  // above would silently cease to exist — a suite that quietly stops testing
+  // anything is the thing this file cannot afford.
+  test('the anchored-group generator produces cases (docs/SPEC_v2.md slice 14)', async () => {
     const declared = SCENARIOS.filter((scenario) => scenario.status === 'available').flatMap(
       (scenario) => scenario.groups,
     );
 
     expect(declared.length).toBeGreaterThan(0);
-    expect(ANCHORED_GROUPS.length).toBe(0);
+    expect(ANCHORED_GROUPS.length).toBeGreaterThan(0);
   });
 });

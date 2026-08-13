@@ -1,0 +1,28 @@
+// Nur --sim-*-Tokens, nie ein --wi-* (CLAUDE.md Regel 5). docs/DESIGN.md §4.2:
+// Systemschrift, keine auffällige Skala — die Simulation soll aussehen, als
+// hätte niemand lange darüber nachgedacht.
+:host {
+  display: block;
+}
+
+.campaign-section {
+  margin: 0 0 32px;
+
+  h3 {
+    margin: 0 0 8px;
+    color: var(--sim-brand);
+    font-size: 1.25rem;
+  }
+
+  // Der Sprung aus dem Panel setzt den Fokus auf die Überschrift, und sichtbar
+  // muss er dabei sein. Den Ring zeichnet `[data-simulation-region]
+  // :focus-visible` in src/styles.scss — global und bewusst nicht in der
+  // Komponente, die die Barriere schreibt (CLAUDE.md Regel 8). Hier steht
+  // deshalb nichts; eine Kopie wäre wirkungsgleich und würde bei der nächsten
+  // Änderung am globalen Ring zurückbleiben.
+}
+
+.lead {
+  margin: 0;
+  max-width: 60ch;
+}

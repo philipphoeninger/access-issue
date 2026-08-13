@@ -860,11 +860,13 @@ src/app/
     simulation-region/
   scenarios/
     scenario-step-views.ts   step → component + simulated path
+    elbwerk-page/            shared Elbwerk chrome, all scenarios
     application-process/
-      elbwerk-page/          shared Elbwerk chrome
       job-posting-step/
       application-form-step/
     csr-campaign/
+      campaign-nav/
+      campaign-page-step/
     software-procurement/  (later)
   content/                 §13
   models/                  §6 interfaces

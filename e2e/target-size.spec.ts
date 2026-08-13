@@ -19,6 +19,7 @@ const PAGES = [
   '/szenario/bewerbung/rueckmeldung',
   '/gibt-es-nicht',
   '/szenario/softwarebeschaffung',
+  '/szenario/csr-kampagne',
 ];
 const MIN_TARGET_PX = 24;
 

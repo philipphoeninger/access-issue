@@ -53,7 +53,7 @@ import {
 } from '../../../content/application-process/application-process.content';
 import { APPLICATION_PROCESS_SCENARIO } from '../../../content/application-process/application-process.scenario';
 import { FragmentLink } from '../../../shared/fragment-link.directive';
-import { ElbwerkPageComponent } from '../elbwerk-page/elbwerk-page.component';
+import { ElbwerkPageComponent } from '../../elbwerk-page/elbwerk-page.component';
 
 /** How a field is rendered. `textarea` and `file` are their own elements. */
 type ControlKind = 'text' | 'email' | 'tel' | 'date' | 'textarea' | 'file';

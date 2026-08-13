@@ -142,7 +142,7 @@ betreten zu haben, will praktisch niemand — der Link ist dafür da, einen Bere
 | `scenario.procurement.title` | Softwarebeschaffung |
 | `scenario.procurement.summary` | Ein Ticketsystem wird eingekauft — nach Funktionsumfang, Bedienbarkeit und Preis. Erst im Arbeitsalltag zeigt sich, wer es nicht nutzen kann. |
 | `scenario.csr.title` | CSR-Kampagne |
-| `scenario.csr.summary` | Die Kampagne „Inklusiv. Nachhaltig. Sichtbar." mit Video, Spendenaufruf, Social Media und Event. Die Barrieren stecken überwiegend in Medien, Sprache und Bewegung. |
+| `scenario.csr.summary` | Die Kampagne „Inklusiv. Nachhaltig. Sichtbar." mit Spendenaufruf, Social Media und Event. Die Barrieren stecken überwiegend in Medien, Sprache und Bewegung. |
 | `scenario.barrierCount` | {count} Barrieren |
 
 **Keine Zahlen im Fließtext.** Ein früherer Entwurf schrieb „Fünf Barrieren" und „Sechs
@@ -154,6 +154,12 @@ Startseite wäre am Starttag falsch gewesen.
 Wo eine Zahl gebraucht wird, wird sie aus den Szenariodaten erzeugt
 (`scenario.barrierCount`). Das ist derselbe Alterungsmechanismus, den `ARCHITECTURE.md` §8
 für aufgezählte URLs beschreibt, nur in der Copy.
+
+**„mit Video" ist aus `scenario.csr.summary` gestrichen** (Slice 14). Das Kampagnenvideo
+entfällt, es liegt kein Material vor (`PRD.md` §6.2, Abschnitt 9 oben). Solange die
+Kampagne „In Vorbereitung" war, hat der Satz niemanden erreicht; mit dem Freischalten des
+Szenarios stünde auf der Startseite eine Ankündigung für etwas, das die Seite nicht hat.
+Der Rest des Satzes bleibt unverändert.
 
 ### 5.3 Szenarioseite: Kopf und Schritte
 
@@ -1008,6 +1014,28 @@ Eine Seite mit fünf Abschnitten, die zugleich die Panel-Gruppen bilden
 | --- | --- |
 | `csr.h3` | Inklusiv. Nachhaltig. Sichtbar. |
 | `csr.lead` | Mit der Aktion „Elbwerk hilft" unterstützen wir seit 2019 gemeinnützige Projekte in unserem Stadtteil. In diesem Jahr sammeln wir für die Ausstattung des Nachbarschaftstreffs an der Veringstraße. |
+| `csr.text.h3` | Unser Ziel |
+
+**`csr.text.h3` ist bei der Umsetzung ergänzt worden** (Slice 14). Die fünf Abschnitte
+tragen je eine `h3`, und für den Abschnitt „Texte und Inhalte" gab es als einzigen keine:
+`csr.h3`, `csr.social.h3`, `csr.event.h3` und `csr.donate.h3` decken die übrigen vier ab.
+Ohne Überschrift hätte der Abschnitt kein Sprungziel, und die Bereichsnavigation zeigte ins
+Leere. Die Wortwahl greift den Menüpunkt „Unser Ziel" aus `csr.nav.items` auf, damit
+Linktext und Zielüberschrift dasselbe sagen. **Redaktionell zu bestätigen** (Abschnitt 10).
+
+Die Abschnittsüberschriften und ihre Sprungziele im Simulationsbereich:
+
+| Abschnitt (Panel-Gruppe) | Überschrift (`h3`) | Sprungziel |
+| --- | --- | --- |
+| Kampagnenseite | `csr.h3` | `sim-kampagne` |
+| Texte und Inhalte | `csr.text.h3` | `sim-texte` |
+| Medien | `csr.social.h3` | `sim-medien` |
+| Event und Podiumsdiskussion | `csr.event.h3` | `sim-event` |
+| Spendenaufruf | `csr.donate.h3` | `sim-spende` |
+
+`csr.carousel.h3` steht trotz seines Namens im Abschnitt „Spendenaufruf" und wird dort als
+`h4` ausgezeichnet — die Ebenen legt `ARCHITECTURE.md` §5.6 fest, nicht der Schlüsselname
+(dieselbe Lage wie bei `elbwerk.jobs.h2`, Abschnitt 8.1).
 
 **Kein Kampagnenvideo.** Es liegt kein Material vor, und ohne Untertiteldatei und Transkript
 gäbe es keinen barrierefreien Zustand (`PRD.md` §6.2). Die Schlüssel `csr.video.*` und
@@ -1026,6 +1054,20 @@ Tab-Reihenfolge, ohne sichtbaren Fokus. Ein Aufklappmenü öffnet nur bei `mouse
 
 **Behoben:** echte Links in einer `<nav>` mit `aria-label`, in der Tab-Reihenfolge, mit
 `--sim-focus-ring`; das Aufklappmenü öffnet auch bei Fokus und `Enter`.
+
+**Wohin die fünf Menüpunkte führen** (ergänzt in Slice 14, redaktionell zu bestätigen):
+
+| Menüpunkt | Abschnitt | Sprungziel |
+| --- | --- | --- |
+| Die Aktion | Kampagnenseite | `sim-kampagne` |
+| Unser Ziel | Texte und Inhalte | `sim-texte` |
+| Stimmen | Medien | `sim-medien` |
+| Mitmachen | Spendenaufruf | `sim-spende` |
+| Veranstaltung | Event und Podiumsdiskussion | `sim-event` |
+
+Die Menüreihenfolge weicht damit in den letzten beiden Punkten von der Seitenreihenfolge ab
+(auf der Seite steht das Event vor dem Spendenaufruf). Das bleibt so: Ein Kampagnenmenü
+folgt dem, was beworben werden soll, und `csr.nav.items` ist geprüfte Copy.
 
 Diese Barriere ist die einzige, die den Nutzer beim Erkunden der Seite selbst behindert —
 sie erschwert das Erreichen der anderen Abschnitte. Das ist gewollt und harmlos: Die Seite
@@ -1261,6 +1303,7 @@ der automatische Wechsel unterbleibt.
 | Transkripttext des Kampagnenvideos — hängt am Videomaterial (`PRD.md` §10) | WERTE.IT-Team |
 | **Prüfung der Fassung in Leichter Sprache (Abschnitt 9.8) durch eine Fachstelle.** Der Entwurf folgt den Regeln nur annähernd. Eine schlecht gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine. | WERTE.IT-Team / Fachstelle |
 | Namen und Kontaktdaten der fiktiven Ansprechpersonen (Miriam Kessler, Torben Kruse) — sollen sie so bleiben oder neutraler werden? | WERTE.IT-Team |
+| `csr.text.h3` („Unser Ziel") und die Zuordnung der fünf Menüpunkte zu den Abschnitten (Abschnitt 9, 9.1) — in Slice 14 ergänzt, weil die Bereichsnavigation ohne Ziele nicht baubar ist | WERTE.IT-Team |
 | Soll die Stellenanzeige eine reale BSVH-nahe Tätigkeit abbilden oder bewusst neutral bleiben? | WERTE.IT-Team |
 
 **Ein Hinweis zur Prüfung.** Die beiden Sprachfassungen in Abschnitt 8.3 sind der einzige

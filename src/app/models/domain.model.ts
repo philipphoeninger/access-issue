@@ -11,11 +11,13 @@ export type DisabilityCategory = 'visual' | 'auditory' | 'motor' | 'cognitive' |
  * areas, not one.
  *
  * The five areas are verbatim from docs/ARCHITECTURE.md §6. Note the doc
- * discrepancy for later: docs/UX-COPY.md §5.6 and docs/PRD.md §6.3 introduce a
- * sixth label, `CSR`, for one CSR-campaign barrier. That scenario is still a
- * `status: 'planned'` stub with no barriers, so nothing references it yet; the
- * type stays exactly as ARCHITECTURE.md §6 specifies until CSR content lands and
- * the docs are reconciled.
+ * discrepancy: docs/UX-COPY.md §5.6 and docs/PRD.md §6.2 introduce a sixth
+ * label, `CSR`, for the event barrier of the campaign. Slice 14 made that
+ * scenario available, but its first barrier is `it` and nothing references
+ * `csr` yet; the areas it needs arrive with the event barrier
+ * (docs/SPEC_v2.md slice 17). The type stays exactly as ARCHITECTURE.md §6
+ * specifies until then — adding a value here before a barrier carries it would
+ * put an area in the union that the area summary can never name.
  *
  * Written as a `const` array with the type derived from it, rather than as the
  * bare union in ARCHITECTURE.md §6. The type is identical; the array is what

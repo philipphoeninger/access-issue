@@ -1,0 +1,64 @@
+<app-elbwerk-page>
+  <!-- Fünf Abschnitte, fünf `h3`, fünf Sprungziele. Jedes Ziel trägt
+       `tabindex="-1"`: Eine Überschrift ist nicht fokussierbar, ein Sprung
+       dorthin würde also scrollen und den Fokus zurücklassen — nutzlos für
+       genau die Nutzerin, für die der Sprung gedacht ist
+       (docs/ARCHITECTURE.md §6 zu `BarrierGroup.anchorId`).
+
+       Jede Id im Simulationsbereich trägt das Präfix `sim-` (CLAUDE.md
+       Regel 2). Ohne das Präfix könnte sie eine `for`- oder
+       `aria-labelledby`-Beziehung im Panel überschreiben.
+
+       `<section>` ohne zugänglichen Namen, absichtlich: mit `aria-labelledby`
+       würde jeder Abschnitt zu einer eigenen `region`-Landmarke, und die
+       Landmarkenstruktur des Rahmens soll eindeutig bleiben
+       (docs/ARCHITECTURE.md §5.6 Regel 4). -->
+  <section class="campaign-section">
+    <h3 id="sim-kampagne" tabindex="-1">Inklusiv. Nachhaltig. Sichtbar.</h3>
+    <p class="lead">
+      Mit der Aktion „Elbwerk hilft" unterstützen wir seit 2019 gemeinnützige Projekte in unserem
+      Stadtteil. In diesem Jahr sammeln wir für die Ausstattung des Nachbarschaftstreffs an der
+      Veringstraße.
+    </p>
+
+    <!-- Die Bereichsnavigation trägt die Barriere `navigation` (docs/UX-COPY.md
+         §9.1) und steht **innerhalb** des ersten Abschnitts, hinter dessen
+         Überschrift.
+
+         Sie stand zunächst darüber, ganz oben auf der Seite. Das war eine
+         gewöhnliche Anordnung und trotzdem falsch: Das Sprungziel der
+         Panel-Gruppe „Kampagnenseite" ist `sim-kampagne`, und die einzige
+         Barriere dieser Gruppe ist diese Navigation. Wer sie behebt und dann
+         „Zu diesem Bereich springen" folgt, landete hinter dem einzigen
+         Bedienelement, das sich gerade geändert hat — vorwärts mit `Tab` nicht
+         mehr erreichbar, weil hinter der Überschrift nichts Fokussierbares
+         mehr kommt. Genau das sollen die Anker verhindern
+         (docs/ARCHITECTURE.md §12.1.1: den Teil erreichen, der sich geändert
+         hat).
+
+         Hinter der Überschrift ist sie außerdem in der Lesereihenfolge
+         richtiger: erst wie die Seite heißt, dann wohin sie führt. -->
+    <app-campaign-nav />
+  </section>
+
+  <!-- Die vier folgenden Abschnitte tragen vorerst nur Überschrift und
+       Sprungziel. Ihre Inhalte und Barrieren bringen die Schnitte 15 bis 18
+       (docs/SPEC_v2.md §5): Texte, Medien, Event, Spendenaufruf — je ein
+       Schnitt, je ein Abschnitt. Erfundener Fülltext stünde hier nur so lange,
+       bis ihn jemand für redaktionell geprüft hält (CLAUDE.md Regel 14). -->
+  <section class="campaign-section">
+    <h3 id="sim-texte" tabindex="-1">Unser Ziel</h3>
+  </section>
+
+  <section class="campaign-section">
+    <h3 id="sim-medien" tabindex="-1">Aus unserem Instagram-Feed</h3>
+  </section>
+
+  <section class="campaign-section">
+    <h3 id="sim-event" tabindex="-1">Podiumsdiskussion „Inklusiv. Nachhaltig. Sichtbar."</h3>
+  </section>
+
+  <section class="campaign-section">
+    <h3 id="sim-spende" tabindex="-1">Jetzt spenden</h3>
+  </section>
+</app-elbwerk-page>

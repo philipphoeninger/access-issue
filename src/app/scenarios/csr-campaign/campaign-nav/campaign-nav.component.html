@@ -1,0 +1,66 @@
+<!-- Barriere `navigation`, Muster B (docs/UX-COPY.md §9.1). Zwei ausgeschriebene
+     Fassungen derselben fünf Ziele; keine ist eine Reparatur der anderen. -->
+@if (keyboardOperable()) {
+  <!-- Behoben: echtes `<nav>` mit Bezeichnung, echte Links, echte Schaltfläche.
+       Das Menü öffnet bei Zeigerkontakt, bei Fokus und mit der Eingabetaste
+       (docs/UX-COPY.md §9.1) — deshalb liegen `mouseenter` und `focusin` auf
+       demselben Element, das auch die Schaltfläche enthält.
+
+       Beim Schließen sind die beiden Wege nicht symmetrisch: Der Fokus darf
+       ein Menü offen halten, das der Zeiger verlassen hat, aber nicht
+       umgekehrt (siehe `onPointerLeave`).
+
+       `[hidden]` statt `@if`: `aria-controls` zeigt sonst auf ein Element, das
+       es im geschlossenen Zustand nicht gibt. Ausgeblendete Inhalte sind nicht
+       fokussierbar, die Links stehen also trotzdem nur im geöffneten Menü in
+       der Tab-Reihenfolge. -->
+  <nav
+    class="section-nav"
+    [attr.aria-label]="label"
+    (mouseenter)="open()"
+    (mouseleave)="onPointerLeave($event)"
+    (focusin)="open()"
+    (focusout)="onFocusOut($event)"
+  >
+    <button
+      type="button"
+      class="nav-trigger"
+      [attr.aria-expanded]="expanded()"
+      [attr.aria-controls]="menuId"
+      (click)="toggle()"
+    >
+      {{ label }}
+    </button>
+
+    <ul class="nav-menu" [id]="menuId" [hidden]="!expanded()">
+      @for (item of items; track item.anchorId) {
+        <li>
+          <!-- appFragmentLink, kein nacktes href="#…": das würde gegen den
+               <base href> aufgelöst und lüde die Anwendung neu
+               (shared/fragment-link.directive.ts). So springt der Browser
+               wirklich im Dokument — und nimmt den Fokus mit, weil die
+               Zielüberschriften tabindex="-1" tragen. -->
+          <a class="nav-item" [appFragmentLink]="item.anchorId">{{ item.label }}</a>
+        </li>
+      }
+    </ul>
+  </nav>
+} @else {
+  <!-- Aktiv: `<div>`-Konstrukt mit Klick-Handlern. Kein `nav`, kein `a`, kein
+       `button`, kein `tabindex`, kein `role` — nichts, was den Fokus erhalten
+       könnte. Das Menü öffnet ausschließlich über `:hover` im Stylesheet.
+
+       Ausgelassen, nicht abgefangen (CLAUDE.md Regel 6): Hier wird keine
+       Tastenbedienung unterdrückt, es gibt sie nur nicht. -->
+  <div class="section-nav section-nav--pointer">
+    <div class="nav-trigger">{{ label }}</div>
+
+    <ul class="nav-menu">
+      @for (item of items; track item.anchorId) {
+        <li>
+          <div class="nav-item" (click)="scrollToSection(item.anchorId)">{{ item.label }}</div>
+        </li>
+      }
+    </ul>
+  </div>
+}

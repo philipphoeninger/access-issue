@@ -73,8 +73,12 @@ test.describe('Link to a planned scenario (docs/UX-COPY.md §5.10 `planned.*`)',
     });
   }
 
+  // Was `/szenario/csr-kampagne` until docs/SPEC_v2.md slice 14 made the
+  // campaign available. The second documented path shape of the procurement
+  // scenario is the same case — a scenario link from a slide that is merely
+  // early — and it is the one still in preparation.
   test('offers a way to the scenarios that do exist', async ({ page }) => {
-    await gotoRendered(page, '/szenario/csr-kampagne');
+    await gotoRendered(page, '/szenario/softwarebeschaffung/vergabe');
     await page.getByRole('link', { name: 'Zu den verfügbaren Szenarien' }).click();
 
     await expect(page.locator('h1')).toHaveText('AccessIssue: Barrieren sichtbar machen');

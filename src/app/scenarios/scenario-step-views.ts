@@ -70,4 +70,16 @@ export const SCENARIO_STEP_VIEWS: Readonly<Record<string, ScenarioStepView>> = {
         (m) => m.ConfirmationStepComponent,
       ),
   },
+
+  // The CSR campaign is one page and therefore one entry (docs/UX-COPY.md §9,
+  // docs/SPEC_v2.md slice 14). Its five sections are sections of that page, not
+  // steps: they group the panel (docs/ARCHITECTURE.md §12.1.1) and are reached
+  // by an in-page anchor, so none of them appears here.
+  [stepViewKey('csr-campaign', 'kampagne')]: {
+    simulatedPath: '/engagement/inklusiv-nachhaltig-sichtbar',
+    load: () =>
+      import('./csr-campaign/campaign-page-step/campaign-page-step.component').then(
+        (m) => m.CampaignPageStepComponent,
+      ),
+  },
 };
