@@ -10,10 +10,11 @@
 // (docs/ARCHITECTURE.md §6 notes on the domain model); its route therefore
 // has no trailing step segment.
 //
-// Only 'available' scenarios get routes. A 'planned' scenario (no steps, no
-// barriers) is reachable only from the home page's "in Vorbereitung" entry,
-// never by a real route — building that page is Slice 9's job
-// (docs/SPEC_v1.md §3, §5 Slice 9).
+// A 'planned' scenario (no steps, no barriers) gets no step routes — there
+// is nothing to render — but it does get the two routes its documented paths
+// need, both pointing at the informative "noch in Vorbereitung" page
+// (docs/ARCHITECTURE.md §17, docs/SPEC_v1.md §5 Slice 11). See
+// `plannedScenarioRoutes` for why exactly two.
 import type { Route } from '@angular/router';
 import type { Scenario, ScenarioStep } from '../models/domain.model';
 
@@ -85,11 +86,44 @@ export function firstStepPath(scenario: Scenario): string[] {
   return scenarioStepPath(scenario, scenario.steps[0]);
 }
 
+/**
+ * The routes a `planned` scenario answers on: its bare path, and one step
+ * below it. Both render PlannedScenarioPageComponent
+ * (docs/ARCHITECTURE.md §17, docs/UX-COPY.md §5.10).
+ *
+ * Two, because those are the two shapes the path grammar can produce for a
+ * scenario — `szenario/{scenario}` for a single-page one, and
+ * `szenario/{scenario}/{step}` for a multi-step one — and both already appear
+ * in the route list of docs/ARCHITECTURE.md §9 for scenarios that do not
+ * exist yet (`/szenario/softwarebeschaffung/vergabe`, `/szenario/csr-kampagne`).
+ * A slide written against that list has to land somewhere defined, and "your
+ * link is broken" would be the wrong thing to tell a lecturer whose link is
+ * merely early.
+ *
+ * `:step` rather than a nested wildcard: Angular only treats `**` as a
+ * wildcard when it is the *entire* path, so `szenario/x/**` would match the
+ * literal segment "**" and nothing else. A single parameter segment covers
+ * the whole documented grammar; anything deeper is genuinely unknown and
+ * belongs to the not-found route.
+ */
+function plannedScenarioRoutes(scenario: Scenario): Route[] {
+  const loadComponent = () =>
+    import('../frame/planned-scenario-page/planned-scenario-page.component').then(
+      (m) => m.PlannedScenarioPageComponent,
+    );
+
+  return [
+    { path: `szenario/${scenario.path}`, loadComponent },
+    { path: `szenario/${scenario.path}/:step`, loadComponent },
+  ];
+}
+
 export function buildScenarioRoutes(scenarios: readonly Scenario[]): Route[] {
   const routes: Route[] = [];
 
   for (const scenario of scenarios) {
     if (scenario.status !== 'available') {
+      routes.push(...plannedScenarioRoutes(scenario));
       continue;
     }
 

@@ -1,0 +1,36 @@
+// Identical page frame to the not-found page (docs/DESIGN.md §5) — the two
+// special states are the same kind of page and must not drift apart
+// visually.
+:host {
+  display: block;
+  padding: var(--wi-space-8) var(--wi-space-4);
+  max-width: 75rem;
+  margin-inline: auto;
+}
+
+h1 {
+  margin: 0;
+  color: var(--wi-text-heading);
+  font-size: var(--wi-size-h1);
+  line-height: var(--wi-leading-tight);
+  font-weight: var(--wi-weight-bold);
+}
+
+.body {
+  max-width: var(--wi-measure);
+  margin: var(--wi-space-4) 0 0;
+  font-size: var(--wi-size-body);
+  line-height: var(--wi-leading-body);
+}
+
+.action {
+  margin: var(--wi-space-8) 0 0;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--wi-target-min);
+    padding: var(--wi-space-2) var(--wi-space-4);
+    font-weight: var(--wi-weight-semibold);
+  }
+}

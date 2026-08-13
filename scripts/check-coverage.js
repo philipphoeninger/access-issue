@@ -27,6 +27,7 @@ const GATED_MODULES = [
   'src/app/core/url-state.ts',
   'src/app/core/barrier-state.service.ts',
   'src/app/core/scenario-registry.service.ts',
+  'src/app/core/tolerant-url-serializer.ts',
 ];
 
 function parseLcov(text) {

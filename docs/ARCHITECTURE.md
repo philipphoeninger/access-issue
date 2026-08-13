@@ -536,6 +536,13 @@ lands on the German side despite being technical.
 /**                                      Not found → link back to home
 ```
 
+Every route above is generated from the registry (`core/scenario-routes.ts`), including
+the ones for scenarios that do not exist yet: while a scenario is `planned`, its bare path
+and one step below it answer with the "noch in Vorbereitung" page (§17), and the step
+routes listed here take over unchanged the moment its content lands. The paths in this
+list are therefore safe to put on a slide before the scenario is built — which is the only
+reason a link to a planned scenario needs a defined state at all.
+
 **Path-based routing**, not hash-based. It is cleaner, and hash fragments interact badly
 with in-page anchors, which this application uses for skip links.
 
@@ -938,12 +945,31 @@ listed as release criteria in the PRD.
 | --- | --- |
 | Unknown `frei` key | Ignored; valid keys applied; no error surfaced |
 | Unknown `erklaerung` key | Ignored; explanation view shows its empty state |
-| Malformed query string | Falls back to default state (all barriers active) |
-| Unknown scenario path | Not-found route with a link home and a plain-language explanation |
-| Link to a `planned` scenario | Informative page stating the scenario is not yet available |
-| JavaScript disabled | Application does not run. `<noscript>` explains this and links to the module. Accepted trade-off: an SPA is the right tool for the interaction model, and WCAG does not require script-off operation. |
+| Malformed query string | Falls back to default state (all barriers active); the valid parameters beside it still apply. Needs a serialiser of its own — see below |
+| Unknown scenario path | Not-found route with a link home and a plain-language explanation. The address is **kept**, not redirected away |
+| Link to a `planned` scenario | Informative page stating the scenario is not yet available, on the bare scenario path and one step below it |
+| JavaScript disabled | Application does not run. `<noscript>` explains this and names where the module's content is. Accepted trade-off: an SPA is the right tool for the interaction model, and WCAG does not require script-off operation. |
 | Focus lost after a subtree swap | Prevented by design — focus lives in the panel (§12) |
 | A step's simulation chunk fails to load | The frame states it above the simulation bar (`simulation.loadFailed`, `UX-COPY.md` §5.10) and names what still works. Panel, explanations and the exit link are unaffected: they are frame code, in the initial bundle. Not announced through the live region — it would cut off the page-title announcement that has just been made. |
+
+**Malformed input needs `TolerantUrlSerializer`, not just a defensive parse.**
+`core/url-state.ts` decodes every `frei` and `erklaerung` segment defensively and has done
+since slice 2 — and until slice 11 it never got the chance. Angular's
+`DefaultUrlSerializer` decodes the URL before any route is matched, and
+`decodeURIComponent` throws on an incomplete escape such as `?frei=%E0%A4%A`; the whole
+navigation then fails and the user lands on the home page with the address silently
+rewritten to `/`. Not an error page, technically — and precisely the outcome the row above
+exists to forbid, since the scenario the link pointed at is gone and nothing says so.
+`core/tolerant-url-serializer.ts` parses normally and reacts only after the default parse
+has thrown: the undecodable tokens are re-encoded to their literal selves, everything else
+is left untouched, and `url-state.ts` then rejects the nonsense as the unknown key it is.
+A URL the default serialiser understands never reaches that path, so this cannot change
+the meaning of a well-formed address.
+
+**The wildcard renders, it does not redirect.** A redirect to home would swallow the
+address that was actually followed. Deep links into this application live in module
+slides (D2, `PRD.md` §8.1 G), and a stale one that quietly looks like the home page is a
+stale one nobody reports and nobody fixes.
 
 ---
 

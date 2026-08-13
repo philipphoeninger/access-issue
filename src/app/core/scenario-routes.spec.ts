@@ -49,10 +49,24 @@ describe('buildScenarioRoutes (docs/ARCHITECTURE.md §9)', () => {
     ]);
   });
 
-  it('skips planned scenarios entirely', () => {
+  // docs/ARCHITECTURE.md §17: a link to a planned scenario lands on an
+  // informative page, not on "diese Seite gibt es nicht". Its two paths are
+  // the two shapes the grammar can produce — bare scenario and one step
+  // below it — because both are already written down in §9 for scenarios
+  // whose content does not exist yet.
+  it('gives a planned scenario the two routes of the "in Vorbereitung" page, and no step route', () => {
     const planned = scenario({ path: 'softwarebeschaffung', status: 'planned', steps: [] });
 
-    expect(buildScenarioRoutes([planned])).toEqual([]);
+    const routes = buildScenarioRoutes([planned]);
+
+    expect(routes.map((r) => r.path)).toEqual([
+      'szenario/softwarebeschaffung',
+      'szenario/softwarebeschaffung/:step',
+    ]);
+    expect(routes.every((r) => typeof r.loadComponent === 'function')).toBeTrue();
+    // No panel on that page, so SkipLinksComponent must not offer to skip to
+    // one (frame/app-shell/app-shell.component.ts reads `data.hasPanel`).
+    expect(routes.every((r) => r.data === undefined)).toBeTrue();
   });
 
   it('every generated route lazy-loads a component', () => {

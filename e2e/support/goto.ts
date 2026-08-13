@@ -25,8 +25,27 @@ export async function gotoRendered(page: Page, url: string): Promise<void> {
   // Every route renders exactly one `h1` inside `main` (docs/ARCHITECTURE.md §9).
   await expect(page.locator('main h1')).toHaveCount(1);
 
-  // A scenario step additionally renders both halves of the layout.
-  if (url.startsWith('/szenario')) {
+  // A scenario step additionally renders both halves of the layout. Decided
+  // by what is on the page rather than by the shape of the URL: a planned
+  // scenario's "in Vorbereitung" page (slice 11) sits under `/szenario` and
+  // has neither half, so a path-prefix test would wait forever for a panel
+  // that is correctly absent.
+  //
+  // The marker is `[data-step-view]`, which exists for the test suite and is
+  // documented as such (docs/ARCHITECTURE.md §15, the same standing
+  // `[data-simulation-region]` has) — deliberately not a styling class. A
+  // class carries no such promise: renaming one is an ordinary CSS
+  // refactoring, and it would turn the three waits below off *silently*,
+  // leaving every scenario suite racing the step's chunk and an axe run 2
+  // analysing a region that may still be empty. A vacuous pass is worse than
+  // a flaky failure, which is the whole reason this helper exists.
+  //
+  // Not a race: the element carrying the attribute and the `h1` above come
+  // from the same component template and therefore appear in the same
+  // change-detection pass.
+  const stepView = page.locator('[data-step-view]');
+
+  if ((await stepView.count()) > 0) {
     await expect(page.locator('#panel .panel')).toHaveCount(1);
     await expect(page.locator('[data-simulation-region]')).toHaveCount(1);
 
@@ -37,9 +56,6 @@ export async function gotoRendered(page: Page, url: string): Promise<void> {
     // Without this, an axe run scoped to the region would analyse an empty
     // region and report zero violations — passing vacuously, which is exactly
     // what run 2 exists to prevent.
-    await expect(page.locator('.simulation-column')).not.toHaveAttribute(
-      'data-step-view',
-      'pending',
-    );
+    await expect(stepView).not.toHaveAttribute('data-step-view', 'pending');
   }
 }

@@ -62,3 +62,16 @@ button:focus-visible:not([data-simulation-region] *):not(.mat-mdc-button-base),
 h1[tabindex='-1']:focus {
   outline: none;
 }
+
+// The <noscript> paragraph in src/index.html (docs/UX-COPY.md §5.10). It is
+// styled here rather than inline because this stylesheet is a <link> in the
+// head and therefore arrives with scripting off, when no component style
+// ever will — the one piece of frame text that has to look like the frame
+// without a single Angular component having run.
+.noscript-note {
+  max-width: var(--wi-measure);
+  margin: var(--wi-space-8) var(--wi-space-4);
+  color: var(--wi-text-primary);
+  font-size: var(--wi-size-body);
+  line-height: var(--wi-leading-body);
+}

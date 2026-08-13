@@ -513,8 +513,12 @@ few enough to name explicitly.
 - `core/url-state.ts`
 - `core/barrier-state.service.ts`
 - `core/scenario-registry.service.ts`
+- `core/tolerant-url-serializer.ts`
 
-These three are where a bug corrupts published links or silently drops a barrier.
+These four are where a bug corrupts published links or silently drops a barrier. The
+serialiser joined them in slice 11: it is the layer that decides whether a URL is read at
+all, and its failure mode is the quietest one in the application — a deep link that lands
+on the wrong page with the address rewritten behind it (`ARCHITECTURE.md` §17).
 
 **Measured, reported, not gated:** everything else. Coverage is generated on every CI run
 and visible in the job summary so a downward trend is noticeable, but it does not block a

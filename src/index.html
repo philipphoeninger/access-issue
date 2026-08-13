@@ -8,6 +8,26 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
   <body>
+    <!-- docs/ARCHITECTURE.md §17 "JavaScript disabled", docs/UX-COPY.md §5.10
+         `noscript.body`, verbatim. The application does not run without
+         scripting and is not meant to: an SPA is the right tool for switching
+         barriers at runtime, and WCAG does not require script-off operation.
+         What is required is that the page say so instead of standing empty —
+         which is what an <app-root> with nothing in it would do.
+
+         The last sentence is the substantive one: the module's content is in
+         Moodle, so nobody is cut off from the teaching material by this page
+         failing. No link, because no URL for the module has been given to
+         this project yet — inventing one would be worse than naming the
+         place in words (CLAUDE.md rule 14). -->
+    <noscript>
+      <p class="noscript-note">
+        AccessIssue braucht JavaScript, weil sich die Barrieren zur Laufzeit umschalten lassen.
+        Bitte aktiviere JavaScript. Die Inhalte des Moduls stehen auch ohne dieses Werkzeug
+        vollständig in Moodle zur Verfügung.
+      </p>
+    </noscript>
+
     <app-root></app-root>
   </body>
 </html>
