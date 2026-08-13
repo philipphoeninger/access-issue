@@ -1,5 +1,5 @@
 <!--
-  Elbwerk GmbH — Wort-Bild-Marke der fiktiven Firma (docs/UX-COPY.md §8.1).
+  Elbwerk AG — Wort-Bild-Marke der fiktiven Firma (docs/UX-COPY.md §8.1).
 
   Simulationsasset, kein Rahmen-Asset: Die Farben spiegeln die Token sim-brand
   (#1F3A5F) und sim-muted (#5A6B7B) aus src/styles/_tokens.scss — hier ohne die
@@ -52,5 +52,5 @@
     font-weight="400"
     letter-spacing="2.4"
     fill="#5A6B7B"
-  >GMBH · HAMBURG</text>
+  >AG · HAMBURG</text>
 </svg>

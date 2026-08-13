@@ -62,9 +62,18 @@ Elbwerk is a mid-sized Hamburg engineering and services firm. The name carries a
 connection to the BSVH without being a real company. Fictional domain: `elbwerk.de`, used
 in the simulation bar only — never as a live link.
 
-> **Open item.** Check `Elbwerk` against the German trade register and the DPMA trademark
-> database before implementation. A collision is unlikely but cheap to rule out and
-> expensive to discover after the slides are printed.
+The legal form is **AG**, and that is the one part of the name that was not a free choice:
+an `Elbwerk GmbH` turned out to exist. `Elbwerk AG` does not, so the company keeps its name
+— which the module deck and the URL `elbwerk.de` both rely on — and changes only its form.
+
+Two consequences worth stating, because both are easy to undo by accident. The legal form
+appears in the logo wordmark, so the logo carries `AG · HAMBURG`; and it appears inside the
+generated benefits graphic, which has to be re-rendered rather than edited
+(`CLAUDE.md`, "Stack and conventions"). A rename that misses either leaves the real
+company's name visible in a picture, where no search finds it.
+
+The check that produced this — trade register and DPMA — was the open item here and is now
+closed.
 
 ---
 

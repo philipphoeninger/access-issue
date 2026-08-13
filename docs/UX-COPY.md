@@ -198,7 +198,7 @@ sichtbaren Schrittindikator gar nicht, weil die `h1` unmittelbar darüber ihn sc
 | `simBar.counter.some` | {active} von {total} Barrieren aktiv |
 | `simBar.counter.none` | Keine Barriere aktiv |
 | `simBar.counter.all` | Alle {total} Barrieren aktiv |
-| `simBar.description` | Nachbau der Website der fiktiven Elbwerk GmbH. Kein echtes Unternehmen, keine echte Bewerbung, keine Datenübertragung. |
+| `simBar.description` | Nachbau der Website der fiktiven Elbwerk AG. Kein echtes Unternehmen, keine echte Bewerbung, keine Datenübertragung. |
 
 `simBar.description` ist der Text, auf den `aria-describedby` des Simulationsbereichs
 zeigt (`ARCHITECTURE.md` §5.1). Er ist Teil des Rahmens, nicht der Simulation.
@@ -213,7 +213,7 @@ akustisch richtig.
 
 | Schlüssel | Text |
 | --- | --- |
-| `simRegion.label` | Simulation: Website der Elbwerk GmbH |
+| `simRegion.label` | Simulation: Website der Elbwerk AG |
 | `simRegion.exitLink` | Simulation verlassen — zurück zum Barriere-Panel |
 | `simRegion.endAnchor` | Ende des Simulationsbereichs |
 
@@ -528,9 +528,9 @@ nicht besonders — gewöhnlich. Das ist die Vorgabe.
 
 | Schlüssel | Text |
 | --- | --- |
-| `elbwerk.nav.brand` | Elbwerk GmbH |
+| `elbwerk.nav.brand` | Elbwerk AG |
 | `elbwerk.nav.items` | Unternehmen · Leistungen · Karriere · Kontakt |
-| `elbwerk.logo.alt` | Elbwerk GmbH |
+| `elbwerk.logo.alt` | Elbwerk AG |
 | `elbwerk.jobs.h2` | Offene Stellen |
 | `elbwerk.job.title` | IT-Projektmanager (m/w/d) |
 | `elbwerk.job.meta` | Vollzeit · Hamburg-Wilhelmsburg · ab sofort |
@@ -558,7 +558,7 @@ den die Leiste hinter `elbwerk.de` anzeigt.
 Die Pfade der Schritte 2 bis 4 kommen mit ihren Slices hinzu.
 
 **Das Elbwerk-Logo.** Eine Wort-Bild-Marke (Wortmarke „ELBWERK", darunter
-„GMBH · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
+„AG · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
 (`ARCHITECTURE.md` §16). Es trägt `elbwerk.logo.alt` als Alternativtext — Logotypen sind
 von WCAG 1.4.5 ausdrücklich ausgenommen, und ein Firmenlogo mit korrektem Alternativtext
 ist genau das, was eine gewöhnliche Unternehmensseite richtig macht. Das Logo ist **keine**
@@ -954,7 +954,7 @@ als zusätzliche Option und ist tastaturbedienbar.
 | `csr.carousel.position` | Beitrag {current} von {total} |
 | `csr.carousel.quote1` | „Ohne die Unterstützung hätten wir den Treff im Winter schließen müssen." — Regina Ohlsen, Leiterin des Nachbarschaftstreffs |
 | `csr.carousel.quote2` | „Meine Kinder gehen zweimal die Woche zur Hausaufgabenhilfe. Das ist Gold wert." — Aylin Demir, Anwohnerin |
-| `csr.carousel.quote3` | „Wir kommen aus dem Stadtteil. Da hilft man sich." — Torben Kruse, Elbwerk GmbH |
+| `csr.carousel.quote3` | „Wir kommen aus dem Stadtteil. Da hilft man sich." — Torben Kruse, Elbwerk AG |
 
 **Aktiv:** Wechsel alle vier Sekunden, keine Pause-Schaltfläche.
 **Behoben:** Pause-Schaltfläche als erstes Element der Gruppe, Positionsanzeige, Wechsel
@@ -1045,7 +1045,7 @@ ohne die eine gehörlose Person nicht weiß, ob sie hingehen kann.
 | --- | --- |
 | Fachliche Freigabe aller Elbwerk-Texte | WERTE.IT-Team |
 | Erklärtexte je Barriere (Abschnitt 5.8 liefert nur die Rubriken) | WERTE.IT-Team |
-| Prüfung „Elbwerk GmbH" gegen Handelsregister und DPMA (`DESIGN.md` §2.1) | Philipp |
+| ~~Prüfung „Elbwerk" gegen Handelsregister und DPMA~~ — erledigt: Eine `Elbwerk GmbH` existiert, eine `Elbwerk AG` nicht. Die Firma ist jetzt eine AG (`DESIGN.md` §2.1) | Philipp — geschlossen |
 | Sind die Personennamen in den Testimonials unbedenklich, oder sollen sie neutraler werden? | WERTE.IT-Team |
 | Transkripttext des Kampagnenvideos — hängt am Videomaterial (`PRD.md` §10) | WERTE.IT-Team |
 | **Prüfung der Fassung in Leichter Sprache (Abschnitt 9.8) durch eine Fachstelle.** Der Entwurf folgt den Regeln nur annähernd. Eine schlecht gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine. | WERTE.IT-Team / Fachstelle |

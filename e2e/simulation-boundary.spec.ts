@@ -24,7 +24,7 @@ test.describe('The simulation region on the page', () => {
 
     const describedBy = await region.getAttribute('aria-describedby');
     const description = page.locator(`#${describedBy}`);
-    await expect(description).toHaveText(/Nachbau der Website der fiktiven Elbwerk GmbH/);
+    await expect(description).toHaveText(/Nachbau der Website der fiktiven Elbwerk AG/);
 
     // The description is frame-owned and static — it must not live inside the
     // region it describes (docs/ARCHITECTURE.md §5.1).

@@ -37,5 +37,5 @@ export class ElbwerkPageComponent {
   protected readonly logoSrc = 'simulation/elbwerk-logo.svg';
 
   /** docs/UX-COPY.md §8.1 `elbwerk.logo.alt`. */
-  protected readonly logoAlt = 'Elbwerk GmbH';
+  protected readonly logoAlt = 'Elbwerk AG';
 }
