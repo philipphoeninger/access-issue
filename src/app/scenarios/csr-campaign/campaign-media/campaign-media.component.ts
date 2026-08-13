@@ -212,7 +212,11 @@ export class CampaignMediaComponent {
     // das System Farben und ist die Barriere behoben, wird nichts überstimmt.
     effect(() => {
       const suppressed = this.forcedColors() && !this.readableOverlay();
-      this.notices.publish(KONTRAST_BARRIER.urlKey, suppressed ? this.forcedColorsNote : undefined);
+      this.notices.publish(
+        this.scenario.path,
+        KONTRAST_BARRIER.urlKey,
+        suppressed ? this.forcedColorsNote : undefined,
+      );
     });
 
     // Zurücknehmen beim Zerstören, und **nicht** über `onCleanup` des Effekts:
@@ -223,6 +227,8 @@ export class CampaignMediaComponent {
     // Nötig ist es trotzdem: Der Dienst ist root-provided und überlebt diese
     // Komponente. Ein liegengebliebener Hinweis behauptete auf der nächsten
     // Seite eine Barriere, die sie nicht hat.
-    inject(DestroyRef).onDestroy(() => this.notices.publish(KONTRAST_BARRIER.urlKey, undefined));
+    inject(DestroyRef).onDestroy(() =>
+      this.notices.publish(this.scenario.path, KONTRAST_BARRIER.urlKey, undefined),
+    );
   }
 }

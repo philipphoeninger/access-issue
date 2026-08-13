@@ -348,6 +348,42 @@ The snapshot test deserves a note on discipline: when it fails, the correct resp
 almost always to restore the key, not to update the snapshot. A comment in the test file
 should say so, because the reflex is the opposite.
 
+### 8.1 The token boundary
+
+`scripts/check-token-boundary.js`, run by `npm run check:tokens` and in CI before the
+build. It enforces `CLAUDE.md` rule 5 over the stylesheets and templates of both trees:
+
+| Scope | Forbidden | Exceptions |
+| --- | --- | --- |
+| `src/app/scenarios/**` | `--wi-*` | none |
+| `src/app/frame/**`, `src/app/shared/**` | `--sim-*` | `frame/simulation-region/simulation-region.component.scss` |
+
+Three things about it are deliberate:
+
+- **Comments are stripped before matching.** Both token sets are discussed at length in
+  the comments of precisely the files that must not *use* them. A checker that could not
+  tell prose from a declaration is one people learn to work around.
+- **The simulation side has no exceptions**, and that is what the shared partial buys:
+  the Simulationshinweis (`UX-COPY.md` §8.4) is the one text type that reaches from the
+  frame into the simulation, and its `--wi-*` declarations live in
+  `src/styles/_simulation-note.scss` — outside the scanned tree — with the scenario
+  stylesheets only including the mixin. Adding an exception here is the wrong repair;
+  moving declarations into the partial is the right one.
+- **A stale exemption fails the check.** If the exempted file stops using the token it was
+  exempted for, the script says so rather than carrying the entry forever. Same instinct
+  as the snapshot test above: an allowlist nobody prunes is how a boundary erodes without
+  a single failing test.
+
+The one frame exception is the component that draws the boundary itself: `.skip-simulation`
+sits outside the region and is frame-styled, while `.simulation-region` and `.exit-link`
+are inside it and must carry Elbwerk's tokens. The file states this at the top.
+
+This is the only rule in `CLAUDE.md` §Boundary that no other test can see. A simulation
+set in WERTE.IT's typeface and colours renders correctly, passes all three axe runs and
+every structural assertion — and destroys the didactic point of the boundary, because a
+participant is meant to recognise a barrier from the behaviour, not from the styling
+(`DESIGN.md` §2).
+
 ---
 
 ## 9. Unit and Component Tests
@@ -579,9 +615,10 @@ GitHub Actions, since the repository is already on GitHub. Hosting remains undec
 **On every pull request** (target: under 8 minutes)
 
 ```
-1. install, `npm run lint`, `prettier --check`
+1. install, `npm run lint`, `prettier --check`, `npm run check:tokens`
    Template a11y rules run as errors in the frame; `src/app/scenarios/**` is exempt
    (deliberate barriers — see `SPEC_v1.md` slice 0)
+   The token boundary (§8.1) is static, so it runs here rather than after the build
 2. ng build                          catches template and type errors early
 3. ng test --watch=false             unit + component + data contract tests
 4. playwright test --project=chromium

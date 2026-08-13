@@ -1,3 +1,5 @@
+@use '../../../../styles/simulation-note' as note;
+
 // --sim-* tokens only, with the one documented exception at the bottom of this
 // file (CLAUDE.md rule 5). Ordinary corporate styling, nothing distinctive —
 // docs/DESIGN.md §4.2.
@@ -142,26 +144,10 @@ p {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// The Simulationshinweis, and with it --wi-* tokens inside the simulation —
-// the named exception to CLAUDE.md rule 5, settled in the slice 8 review and
-// written into the rule itself. docs/UX-COPY.md §8.4 designates the note as the
-// one text type that reaches from the frame into the simulation and sets it „im
-// Rahmenstil"; §8.8 adds this fourth one, because a file field is an input
-// point and the rule says every input point has one.
-//
-// The exception covers the four Simulationshinweise and nothing else. It does
-// not run the other way: no --sim-* token in the frame, ever.
-// ─────────────────────────────────────────────────────────────────────────────
+// The Simulationshinweis — the named exception to CLAUDE.md rule 5, and the
+// only --wi-* tokens inside the simulation region. The rationale, the text
+// type and the declarations live in one place, src/styles/_simulation-note.scss;
+// this is only the call site.
 .simulation-note {
-  max-width: 44rem;
-  margin-bottom: 20px;
-  padding: 10px 14px;
-  border: 2px dashed var(--wi-navy);
-  border-radius: var(--wi-radius-sm);
-  background: var(--wi-surface-card);
-  color: var(--wi-text-primary);
-  font-family: var(--wi-font-family);
-  font-size: var(--wi-size-meta);
-  line-height: var(--wi-leading-body);
+  @include note.simulation-note;
 }

@@ -11,6 +11,7 @@
     "test:release-gate": "CONTENT_RELEASE_GATE=1 ng test --watch=false",
     "test:coverage-gate": "ng test --watch=false --code-coverage && node scripts/check-coverage.js",
     "lint": "ng lint",
+    "check:tokens": "node scripts/check-token-boundary.js",
     "e2e": "playwright test"
   },
   "repository": {

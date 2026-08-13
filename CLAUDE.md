@@ -46,6 +46,7 @@ npm start              # dev server
 npm run build          # production build
 npm test               # unit + component tests (Karma/Jasmine)
 npm run lint           # angular-eslint, template a11y rules as errors
+npm run check:tokens   # frame/simulation token boundary (rule 5)
 npx prettier --check . # formatting (printWidth 100, singleQuote)
 npx playwright test    # e2e + accessibility suites
 ```
@@ -119,6 +120,17 @@ in a screenshot.
    new input point gets a fifth.
    Nothing else in a scenario component may reach across, and the exception does not run
    the other way — no `--sim-*` token in the frame, ever.
+
+   **The exception has exactly one implementation**: `src/styles/_simulation-note.scss`.
+   Scenario stylesheets `@include note.simulation-note` and never write a `--wi-*` token
+   themselves — which is what keeps the simulation side of this rule at zero exceptions.
+   If a note needs a different look, change the partial.
+
+   `npm run check:tokens` enforces all of this and runs in CI (`TESTING.md` §8.1). It
+   strips comments before matching, so discussing a token is always allowed; it fails on a
+   stale exemption as well as on a violation. The frame's single exemption is
+   `frame/simulation-region/simulation-region.component.scss`, the component that draws the
+   boundary itself and therefore legitimately holds both sets.
 
 ### Barriers
 

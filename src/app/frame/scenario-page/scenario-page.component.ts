@@ -55,16 +55,7 @@ export class ScenarioPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly registry = inject(ScenarioRegistry);
 
-  /**
-   * Notes about barriers a system preference has overridden (docs/UX-COPY.md
-   * §5.9, CLAUDE.md rule 9). Published by the scenario component that
-   * implements the suppressed barrier, rendered by the simulation bar, passed
-   * through here because the bar's input already runs down this path.
-   *
-   * Text, and nothing else: this component's own semantics do not change
-   * because a note exists (CLAUDE.md rule 4).
-   */
-  protected readonly suppressionNotes = inject(SuppressionNoticeService).notes;
+  private readonly notices = inject(SuppressionNoticeService);
 
   private readonly routeData = toSignal(this.route.data, { requireSync: true });
 
@@ -75,6 +66,29 @@ export class ScenarioPageComponent {
       throw new Error(`ScenarioPageComponent: unknown scenario path "${scenarioPath}"`);
     }
     return scenario;
+  });
+
+  /**
+   * Notes about barriers a system preference has overridden (docs/UX-COPY.md
+   * §5.9, CLAUDE.md rule 9). Published by the scenario component that
+   * implements the suppressed barrier, rendered by the simulation bar, passed
+   * through here because the bar's input already runs down this path.
+   *
+   * **Filtered to this scenario**, the same way every other lookup in this
+   * application is scoped: a `urlKey` is unique within its scenario and nowhere
+   * else (core/suppression-notice.service.ts). Without the filter a note about
+   * the campaign's contrast barrier could describe the procurement page, which
+   * has a contrast barrier of its own with the same key and a different story.
+   *
+   * Text, and nothing else: this component's own semantics do not change
+   * because a note exists (CLAUDE.md rule 4).
+   */
+  protected readonly suppressionNotes = computed<readonly string[]>(() => {
+    const path = this.scenario().path;
+    return this.notices
+      .all()
+      .filter((notice) => notice.scenarioPath === path)
+      .map((notice) => notice.note);
   });
 
   readonly step = computed<ScenarioStep>(() => {

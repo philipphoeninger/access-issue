@@ -242,8 +242,16 @@ contrast-based barriers regardless of toggle state. The same note mechanism cove
   the preference took away and what would otherwise be on screen, and only the simulation
   bar may say it, because there is exactly one place such a note appears. The service is a
   keyed set of strings, published by the simulation and read by the frame — nothing more.
-- `ScenarioPageComponent` binds the service's notes into the region's existing
-  `suppressionNotes` input.
+- **Notes are keyed by `{scenarioPath, urlKey}`**, like every other lookup in this
+  application (§8, `ScenarioRegistry.getBarrier`, `AXE_RULE_FIXTURES`). A `urlKey` is
+  unique within its scenario and nowhere else: `sprache` already exists twice, and §6.3's
+  procurement scenario has a second contrast barrier coming that will reasonably want the
+  key `kontrast` the campaign already uses. On a bare key the two would overwrite each
+  other, and one component's retraction on destroy would clear the other's note — a note
+  that silently *disappears*, which is harder to notice than a wrong one.
+- `ScenarioPageComponent` filters the notes to its own scenario and binds them into the
+  region's existing `suppressionNotes` input, so a note can never surface on a page whose
+  barriers it does not describe.
 
 This is not the frame reading barrier state (§5.2): nothing about the bar's semantics,
 labelling or focusability changes: it renders one more paragraph. The note is text.

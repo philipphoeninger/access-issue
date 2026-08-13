@@ -17,6 +17,7 @@ import {
   EMOJI_BARRIER,
   KONTRAST_BARRIER,
 } from '../../../content/csr-campaign/csr-campaign.content';
+import { CSR_CAMPAIGN_SCENARIO } from '../../../content/csr-campaign/csr-campaign.scenario';
 import { SuppressionNoticeService } from '../../../core/suppression-notice.service';
 import { CampaignMediaComponent } from './campaign-media.component';
 
@@ -257,19 +258,31 @@ describe('CampaignMediaComponent (docs/SPEC_v2.md Slice 16)', () => {
     // nicht (e2e/csr-campaign.spec.ts).
     it('publishes nothing while the system leaves colours alone', () => {
       setup();
-      expect(TestBed.inject(SuppressionNoticeService).notes()).toEqual([]);
+      expect(TestBed.inject(SuppressionNoticeService).all()).toEqual([]);
     });
 
     // Der Hinweis darf nicht stehen bleiben, wenn die Seite verschwindet: Der
     // Dienst ist root-provided und überlebt die Komponente.
-    it('retracts its note when the component goes away', () => {
+    //
+    // Zurückgenommen wird unter demselben Paar aus Szenariopfad und
+    // `urlKey`, unter dem veröffentlicht wird — sonst räumte diese Komponente
+    // beim Verschwinden den Hinweis eines fremden Szenarios ab
+    // (core/suppression-notice.service.spec.ts prüft genau das).
+    it('retracts its note when the component goes away, and only its own', () => {
       const fixture = setup();
       const notices = TestBed.inject(SuppressionNoticeService);
-      notices.publish(KONTRAST_BARRIER.urlKey, 'Hinweis');
-      expect(notices.notes().length).toBe(1);
+      notices.publish(CSR_CAMPAIGN_SCENARIO.path, KONTRAST_BARRIER.urlKey, 'Hinweis');
+      notices.publish('softwarebeschaffung', KONTRAST_BARRIER.urlKey, 'fremder Hinweis');
 
       fixture.destroy();
-      expect(notices.notes()).toEqual([]);
+
+      expect(notices.all()).toEqual([
+        {
+          scenarioPath: 'softwarebeschaffung',
+          urlKey: KONTRAST_BARRIER.urlKey,
+          note: 'fremder Hinweis',
+        },
+      ]);
     });
   });
 });

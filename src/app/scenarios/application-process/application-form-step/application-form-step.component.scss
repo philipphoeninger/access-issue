@@ -1,3 +1,5 @@
+@use '../../../../styles/simulation-note' as note;
+
 // --sim-* tokens only, with one documented exception at the bottom of this
 // file (CLAUDE.md rule 5). Ordinary corporate form styling, nothing
 // distinctive — docs/DESIGN.md §4.2.
@@ -161,30 +163,10 @@ textarea.field-control {
   font-size: 0.9375rem;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// The Simulationshinweis, and with it the only --wi-* tokens inside the
-// simulation anywhere in this project.
-//
-// This is the named exception to CLAUDE.md rule 5, settled in the slice 8
-// review and written into the rule itself — it is not a local decision this
-// file took. docs/UX-COPY.md §8.4 designates the note as „der einen Textsorte,
-// die aus dem Rahmen in die Simulation hineinragt" and sets it „im
-// Rahmenstil"; the reason is the point of the note: a warning that nothing is
-// transmitted, set in Elbwerk's own typeface and colours, reads as part of the
-// fiction it exists to interrupt.
-//
-// The exception covers the three Simulationshinweise and nothing else. It does
-// not run the other way: no --sim-* token in the frame, ever.
-// ─────────────────────────────────────────────────────────────────────────────
+// The Simulationshinweis — the named exception to CLAUDE.md rule 5, and the
+// only --wi-* tokens inside the simulation region. The rationale, the text
+// type and the declarations live in one place, src/styles/_simulation-note.scss;
+// this is only the call site.
 .simulation-note {
-  max-width: 44rem;
-  margin-bottom: 20px;
-  padding: 10px 14px;
-  border: 2px dashed var(--wi-navy);
-  border-radius: var(--wi-radius-sm);
-  background: var(--wi-surface-card);
-  color: var(--wi-text-primary);
-  font-family: var(--wi-font-family);
-  font-size: var(--wi-size-meta);
-  line-height: var(--wi-leading-body);
+  @include note.simulation-note;
 }

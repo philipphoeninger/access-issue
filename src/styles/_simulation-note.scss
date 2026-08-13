@@ -1,0 +1,41 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// The Simulationshinweis — the one text type that reaches from the frame into
+// the simulation, and with it the only --wi-* tokens inside the simulation
+// region anywhere in this project.
+//
+// This is the named exception to CLAUDE.md rule 5, settled in the slice 8
+// review and written into the rule itself. docs/UX-COPY.md §8.4 designates the
+// note as „der einen Textsorte, die aus dem Rahmen in die Simulation
+// hineinragt" and sets it „im Rahmenstil"; the reason is the point of the note:
+// a warning that nothing is transmitted, set in Elbwerk's own typeface and
+// colours, reads as part of the fiction it exists to interrupt.
+//
+// A Simulationshinweis stands wherever someone could enter real data or trigger
+// a real action. There are four of them — `elbwerk.form.simulationNote`,
+// `elbwerk.upload.simulationNote`, `csr.donate.simulationNote` and
+// `csr.social.disclaimer` — and a new input point gets a fifth.
+//
+// **Why this is a mixin and not three copies.** It was three, one per component
+// (slices 8, 9 and 16), and they had already drifted in their margins. Every
+// copy is a place the exception can be widened by accident, and the boundary
+// checker (scripts/check-token-boundary.js) can only be zero-exception on
+// `src/app/scenarios/**` because the --wi-* tokens live here instead — outside
+// the tree it scans. One definition, one place to audit, one thing to change.
+//
+// The exception does not run the other way: no --sim-* token in the frame,
+// ever. The single frame stylesheet that carries both sets is
+// frame/simulation-region/simulation-region.component.scss, which draws the
+// region boundary itself and says so at the top.
+// ─────────────────────────────────────────────────────────────────────────────
+@mixin simulation-note {
+  max-width: 44rem;
+  margin-bottom: 20px;
+  border: 2px dashed var(--wi-navy);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-surface-card);
+  padding: 10px 14px;
+  color: var(--wi-text-primary);
+  font-family: var(--wi-font-family);
+  font-size: var(--wi-size-meta);
+  line-height: var(--wi-leading-body);
+}

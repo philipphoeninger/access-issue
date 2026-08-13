@@ -1,3 +1,5 @@
+@use '../../../../styles/simulation-note' as note;
+
 // Elbwerk, nicht WERTE.IT: ausschließlich --sim-*-Tokens (CLAUDE.md Regel 5).
 // Die eine Ausnahme ist der Simulationshinweis am Ende dieser Datei, und sie
 // ist als solche benannt.
@@ -91,26 +93,12 @@
   line-height: var(--sim-leading-body);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Der Simulationshinweis, und damit die --wi-*-Tokens: die benannte Ausnahme zu
-// CLAUDE.md Regel 5 (docs/UX-COPY.md §8.4). Dieselbe Gestalt wie in
-// application-form-step und document-upload-step — ein Hinweis, dass nichts
-// übertragen wird, in Elbwerks eigener Schrift gesetzt, läse sich als Teil der
-// Fiktion, die er unterbrechen soll.
-//
-// Die Ausnahme gilt nur in dieser Richtung: kein --sim-*-Token im Rahmen, nie.
-// ─────────────────────────────────────────────────────────────────────────────
+// Der Simulationshinweis — die benannte Ausnahme zu CLAUDE.md Regel 5 und die
+// einzigen --wi-*-Tokens im Simulationsbereich. Begründung, Textsorte und
+// Deklarationen stehen an einer Stelle: src/styles/_simulation-note.scss.
+// Hier wird sie nur aufgerufen.
 .simulation-note {
-  max-width: 44rem;
-  margin: 0 0 20px;
-  border: 2px dashed var(--wi-navy);
-  border-radius: var(--wi-radius-sm);
-  background: var(--wi-surface-card);
-  padding: 10px 14px;
-  color: var(--wi-text-primary);
-  font-family: var(--wi-font-family);
-  font-size: var(--wi-size-meta);
-  line-height: var(--wi-leading-body);
+  @include note.simulation-note;
 }
 
 // Kein Fokusring in dieser Datei: den zeichnet `[data-simulation-region]

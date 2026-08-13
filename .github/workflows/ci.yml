@@ -25,6 +25,12 @@ jobs:
       - name: Format check
         run: npx prettier --check .
 
+      # CLAUDE.md rule 5. Static, so it runs before the build: a simulation
+      # styled in WERTE.IT's tokens renders fine and passes every axe run — the
+      # boundary it breaks is invisible to everything else in this pipeline.
+      - name: Token boundary (CLAUDE.md rule 5, docs/TESTING.md §8.1)
+        run: npm run check:tokens
+
       - name: Build
         run: npm run build
 
