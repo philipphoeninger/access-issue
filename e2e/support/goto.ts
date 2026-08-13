@@ -29,5 +29,17 @@ export async function gotoRendered(page: Page, url: string): Promise<void> {
   if (url.startsWith('/szenario')) {
     await expect(page.locator('#panel .panel')).toHaveCount(1);
     await expect(page.locator('[data-simulation-region]')).toHaveCount(1);
+
+    // The step's simulation component arrives in its own chunk (slice 7,
+    // src/app/scenarios/scenario-step-views.ts), so the region is briefly
+    // present and empty. `'none'` (no view built for this step yet) and
+    // `'ready'` are both settled states; `'pending'` is the one to wait out.
+    // Without this, an axe run scoped to the region would analyse an empty
+    // region and report zero violations — passing vacuously, which is exactly
+    // what run 2 exists to prevent.
+    await expect(page.locator('.simulation-column')).not.toHaveAttribute(
+      'data-step-view',
+      'pending',
+    );
   }
 }

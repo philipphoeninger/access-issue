@@ -1,0 +1,27 @@
+<div class="elbwerk-page">
+  <!-- `<header>` here is a plain grouping element, not a `banner` landmark: it
+       is a descendant of the `<section role="region">` the frame wraps every
+       scenario in, and HTML-AAM maps it to `banner` only at top level. The
+       frame's landmark structure therefore stays unambiguous
+       (docs/ARCHITECTURE.md §5.6, rule 4). -->
+  <header class="site-header">
+    <!-- A logotype with a correct text alternative — what an ordinary company
+         site gets right, and exempt from WCAG 1.4.5 in any case
+         (docs/UX-COPY.md §8.1). It is not one of the barriers and must not
+         become one: the barrier on this page is the *benefits* graphic below.
+         Width and height are set so the reserved space is right before the
+         file loads. -->
+    <img class="logo" [src]="logoSrc" [alt]="logoAlt" width="216" height="48" />
+
+    <!-- Text, not links. The simulation only has the pages the scenario knows
+         as steps, so a menu entry would either lead nowhere — a barrier nobody
+         declared and nobody explains — or need a link-shaped element that is
+         not a link, which is worse. The way on to step 2 belongs to the frame
+         (docs/UX-COPY.md §5.3, §8.1). -->
+    <p class="site-menu">{{ menu }}</p>
+  </header>
+
+  <div class="site-content">
+    <ng-content />
+  </div>
+</div>

@@ -53,3 +53,16 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+// Frame text about a frame-level failure (docs/UX-COPY.md §5.10
+// `simulation.loadFailed`), so frame tokens — and the barrier-active surface,
+// because that is what this palette means throughout the application: "the
+// thing you are looking at is not the thing you expected". Not a barrier
+// state; the tokens are shared, the meaning is not.
+.load-failed {
+  margin: 0 0 var(--wi-space-4);
+  padding: var(--wi-space-4);
+  border-left: 4px solid var(--wi-state-active);
+  background: var(--wi-state-active-surface);
+  color: var(--wi-text-primary);
+}

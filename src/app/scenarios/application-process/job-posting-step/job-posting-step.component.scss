@@ -1,0 +1,62 @@
+// --sim-* tokens only (CLAUDE.md rule 5). Ordinary corporate styling, nothing
+// distinctive — docs/DESIGN.md §4.2.
+:host {
+  display: block;
+}
+
+h3 {
+  margin: 0 0 16px;
+  color: var(--sim-brand);
+  font-size: 1.5rem;
+}
+
+.job {
+  max-width: 44rem;
+}
+
+h4 {
+  margin: 0 0 4px;
+  color: var(--sim-brand);
+  font-size: 1.25rem;
+}
+
+h5 {
+  margin: 24px 0 8px;
+  font-size: 1.0625rem;
+}
+
+.job-meta {
+  margin: 0 0 12px;
+  color: var(--sim-muted);
+  font-size: 0.9375rem;
+}
+
+.job-teaser {
+  margin: 0;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+ul,
+ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+li {
+  margin-bottom: 4px;
+}
+
+// Rendered at natural width and no larger: scaling a raster graphic *up* would
+// blur it for everyone rather than only under magnification, which would make
+// the barrier look like a rendering bug instead of the authoring decision it
+// is. `max-width: 100%` keeps it inside a 320px viewport (WCAG 1.4.10).
+.benefits-graphic {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: 16px;
+  border: 1px solid var(--sim-border);
+}

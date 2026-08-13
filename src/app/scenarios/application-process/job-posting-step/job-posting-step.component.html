@@ -1,0 +1,119 @@
+<app-elbwerk-page>
+  <!-- Heading levels are fixed by docs/ARCHITECTURE.md §5.6 rule 1 and not left
+       to this component: page h1 = scenario title (frame), region h2 = the
+       region's own heading, and all scenario content starts at h3. „Offene
+       Stellen" is therefore h3, the job title h4, the sections inside the
+       posting h5 — regardless of what the key names in docs/UX-COPY.md §8.1
+       call them. A broken outline is never an admissible barrier: it would
+       corrupt the frame's own document outline, which no scoped axe run can
+       repair. -->
+  <h3 id="sim-jobs-heading">Offene Stellen</h3>
+
+  <article class="job" aria-labelledby="sim-job-title">
+    <h4 id="sim-job-title">IT-Projektmanager (m/w/d)</h4>
+    <p class="job-meta">Vollzeit · Hamburg-Wilhelmsburg · ab sofort</p>
+    <p class="job-teaser">
+      Zur Verstärkung unserer IT suchen wir zum nächstmöglichen Zeitpunkt eine engagierte
+      Persönlichkeit.
+    </p>
+
+    <!-- Barriere `sprache`, Muster A (docs/UX-COPY.md §8.3). Beide Fassungen
+         tragen denselben Sachinhalt — das ist die Bedingung dafür, dass das
+         Szenario Sprachkomplexität misst und nicht Informationsmenge. Der
+         Unterschied liegt in vier benennbaren Merkmalen: kürzere Sätze, Aktiv
+         statt Passiv, Verben statt Nominalisierungen, Listen statt
+         Schachtelsätzen. -->
+    @if (plainLanguage()) {
+      <h5>Ihre Aufgaben</h5>
+      <p>
+        Sie leiten unsere IT-Projekte von der Planung bis zum Abschluss. Dabei achten Sie auf die
+        Termine, das Budget und die Qualität.
+      </p>
+      <p>
+        Sie stimmen sich mit anderen Abteilungen und mit externen Dienstleistern ab. Auch wenn viel
+        zu tun ist, behalten Sie den Überblick.
+      </p>
+
+      <h5>Das bringen Sie mit</h5>
+      <ul>
+        <li>Ein abgeschlossenes Studium der Informatik oder eine vergleichbare Qualifikation</li>
+        <li>Mehrere Jahre Erfahrung in der Leitung von IT-Projekten</li>
+        <li>
+          Erfahrung mit gängigen Projektmanagement-Methoden ist hilfreich, aber keine Bedingung
+        </li>
+      </ul>
+    } @else {
+      <h5>Aufgabenprofil</h5>
+      <p>
+        Im Rahmen der Ihnen obliegenden Tätigkeit verantworten Sie die eigenverantwortliche
+        Steuerung sämtlicher IT-seitiger Projektvorhaben unter Berücksichtigung der
+        unternehmensinternen Prozessvorgaben sowie der einschlägigen fachbereichsseitigen
+        Anforderungen, wobei die Sicherstellung einer termin- und budgetgerechten Umsetzung unter
+        gleichzeitiger Wahrung der Qualitätsstandards als wesentlicher Erfolgsfaktor anzusehen ist.
+      </p>
+      <p>
+        Darüber hinaus obliegt Ihnen die Abstimmung mit den beteiligten Fachabteilungen sowie
+        externen Dienstleistern, wobei ein hohes Maß an Eigeninitiative und Durchsetzungsvermögen
+        ebenso vorausgesetzt wird wie die Fähigkeit, auch in Situationen erhöhten Arbeitsaufkommens
+        strukturiert und lösungsorientiert zu agieren.
+      </p>
+
+      <h5>Anforderungsprofil</h5>
+      <p>
+        Vorausgesetzt wird ein abgeschlossenes Studium der Informatik bzw. eine vergleichbare
+        Qualifikation nebst einschlägiger mehrjähriger Berufserfahrung in der Leitung von
+        IT-Projekten, wünschenswerterweise ergänzt um vertiefte Kenntnisse gängiger
+        Projektmanagement-Methoden.
+      </p>
+    }
+
+    <!-- Barriere `grafik`, Muster A (docs/UX-COPY.md §8.6). Aktiv stehen
+         Leistungen und Vergütung ausschließlich in der Rastergrafik, und das
+         `alt`-Attribut fehlt ganz — Screenreader lesen dann den Dateinamen
+         vor, und `grafik_benefits_final.png` ist genau das, was in der
+         Realität hochgeladen wird. Das ist die Barriere, die axe sieht
+         (Regel `image-alt`, src/app/content/axe-rule-fixtures.ts).
+
+         Behoben stehen dieselben Angaben als Text mit Überschrift und Liste,
+         und die Grafik bleibt als Dekoration erhalten: `alt=""` plus
+         `aria-hidden="true"`, weil ihre Information vollständig danebensteht.
+         Ein zusätzlich beschriftetes Bild ließe dieselbe Aufzählung zweimal
+         vorlesen — deshalb wird `elbwerk.job.graphicAlt` hier bewusst nicht
+         ausgegeben (docs/UX-COPY.md §8.6). -->
+    @if (benefitsAsText()) {
+      <h5>Was wir bieten</h5>
+      <ul>
+        @for (benefit of benefits; track benefit) {
+          <li>{{ benefit }}</li>
+        }
+      </ul>
+      <p>Vergütung nach Haustarif, Entgeltgruppe 11 (58.000 – 68.000 € brutto/Jahr)</p>
+
+      <!-- Der Ablauf steckt in derselben Grafik und kommt mit ihr zurück
+           (docs/PRD.md §6.1 nennt Gehalt, Benefits *und* Ablauf). Nummerierte
+           Liste, weil die Reihenfolge hier Information ist. -->
+      <h5>So geht es weiter</h5>
+      <ol>
+        @for (step of processSteps; track step) {
+          <li>{{ step }}</li>
+        }
+      </ol>
+
+      <img
+        class="benefits-graphic"
+        [src]="benefitsGraphic"
+        alt=""
+        aria-hidden="true"
+        [width]="graphicSize.width"
+        [height]="graphicSize.height"
+      />
+    } @else {
+      <img
+        class="benefits-graphic"
+        [src]="benefitsGraphic"
+        [width]="graphicSize.width"
+        [height]="graphicSize.height"
+      />
+    }
+  </article>
+</app-elbwerk-page>

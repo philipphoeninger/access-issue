@@ -11,15 +11,27 @@
 // =============================================================================
 
 // Self-hosted Poppins — no third-party font requests (docs/ARCHITECTURE.md §16).
-// Adjust the url() paths to wherever the WOFF2 files actually live in the build
-// output (e.g. Angular 20's `public/` asset folder). Latin subset covers the
-// German alphabet including ä/ö/ü/ß.
+// Latin subset, covering the German alphabet including ä/ö/ü/ß.
+//
+// The files live in `src/styles/fonts/`, next to this partial, and NOT in
+// `public/`. That is deliberate and it is about deployment, not tidiness:
+// a file in `public/` can only be referenced by an absolute `/fonts/…` URL,
+// which resolves against the origin root and 404s the moment the application
+// is served from a subpath — and `base href` is explicitly configurable, with
+// the host still undecided (docs/ARCHITECTURE.md §16, docs/SPEC_v1.md §9). The
+// frame would then silently fall back to `system-ui`, which is the one thing
+// the corporate design fixes.
+//
+// Resolved from here, the build emits each file as `media/<name>-<hash>.woff2`
+// and rewrites the reference to `./media/…` — relative to the stylesheet, so it
+// follows the bundle wherever it is served from, and gets content hashing for
+// free. Keep the paths relative; do not move the files back to `public/`.
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/poppins-latin-400.woff2') format('woff2');
+  src: url('./fonts/poppins-latin-400.woff2') format('woff2');
 }
 
 @font-face {
@@ -27,7 +39,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('/fonts/poppins-latin-600.woff2') format('woff2');
+  src: url('./fonts/poppins-latin-600.woff2') format('woff2');
 }
 
 @font-face {
@@ -35,7 +47,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('/fonts/poppins-latin-700.woff2') format('woff2');
+  src: url('./fonts/poppins-latin-700.woff2') format('woff2');
 }
 
 :root {

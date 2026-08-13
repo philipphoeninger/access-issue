@@ -37,13 +37,30 @@
   <div class="panel-column" id="panel" tabindex="-1">
     <app-barrier-panel [scenario]="scenario()" />
   </div>
-  <div class="simulation-column">
-    <!-- `simulatedPath` stays unset until the step components exist: the
-         Elbwerk address is simulation content (docs/UX-COPY.md §8), and the
-         frame does not invent it. Scenario content is projected into the
-         region from slice 7 on; until then the region is deliberately
-         rendered and empty (docs/SPEC_v1.md slice 4 acceptance). -->
-    <app-simulation-region [scenario]="scenario()" />
+  <div class="simulation-column" [attr.data-step-view]="stepViewState()">
+    <!-- Before the bar, so it is read before the region it is about, and
+         frame-owned: the simulation is precisely the part that failed to
+         arrive, so the explanation cannot live inside it. Deliberately not
+         announced through the live region — the frame has exactly one
+         (docs/ARCHITECTURE.md §12.2), it belongs to the page-change and toggle
+         announcements, and speaking here would cut off the page title that
+         FocusManager has just announced (docs/UX-COPY.md §5.10). -->
+    @if (stepViewState() === 'failed') {
+      <p class="load-failed">{{ loadFailedNote }}</p>
+    }
+
+    <!-- Content projection is the only way a scenario component reaches the
+         page: there is no route that renders one directly, so the boundary the
+         region guarantees cannot be bypassed (docs/ARCHITECTURE.md §5.1).
+         `simulatedPath` comes from the step's own entry — the Elbwerk address
+         is simulation content (docs/UX-COPY.md §8) and the frame does not
+         invent it. A step whose view has not been built yet renders the region
+         empty, which stays a defined state. -->
+    <app-simulation-region [scenario]="scenario()" [simulatedPath]="simulatedPath()">
+      @if (stepComponent(); as component) {
+        <ng-container *ngComponentOutlet="component" />
+      }
+    </app-simulation-region>
   </div>
 </div>
 

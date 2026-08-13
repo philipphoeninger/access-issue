@@ -2,10 +2,25 @@
 // navigation, and the two-column layout from docs/DESIGN.md §5 — panel column
 // first in the DOM and on the left, so visual order matches reading order.
 // It composes the parts and owns none of them: BarrierPanelComponent renders
-// the controls, SimulationRegionComponent the boundary and (from slice 7) the
+// the controls, SimulationRegionComponent the boundary and the projected
 // scenario content, ExplanationViewComponent the textual channel underneath
 // both.
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+//
+// Loading the step's simulation component is the one asynchronous thing this
+// component does; the lookup itself lives in scenarios/scenario-step-views.ts
+// so the frame never imports a scenario component directly. That is the
+// one-way dependency of docs/ARCHITECTURE.md §5.2 in file form: the frame
+// knows *that* a step has a view, never what is in it.
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  type Type,
+} from '@angular/core';
+import { NgComponentOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +31,7 @@ import {
   type ScenarioRouteData,
 } from '../../core/scenario-routes';
 import type { Scenario, ScenarioStep } from '../../models/domain.model';
+import { SCENARIO_STEP_VIEWS, stepViewKey } from '../../scenarios/scenario-step-views';
 import { BarrierPanelComponent } from '../barrier-panel/barrier-panel.component';
 import { ExplanationViewComponent } from '../explanation-view/explanation-view.component';
 import { SimulationRegionComponent } from '../simulation-region/simulation-region.component';
@@ -24,6 +40,7 @@ import { SimulationRegionComponent } from '../simulation-region/simulation-regio
   selector: 'app-scenario-page',
   imports: [
     RouterLink,
+    NgComponentOutlet,
     MatButtonModule,
     BarrierPanelComponent,
     ExplanationViewComponent,
@@ -86,5 +103,109 @@ export class ScenarioPageComponent {
 
   stepLink(step: ScenarioStep): string[] {
     return scenarioStepPath(this.scenario(), step);
+  }
+
+  private readonly stepView = computed(() =>
+    // `Record` lookups are typed as always present; a step without an entry is
+    // a defined state here, not an error (see scenario-step-views.ts).
+    Object.hasOwn(SCENARIO_STEP_VIEWS, this.viewKey())
+      ? SCENARIO_STEP_VIEWS[this.viewKey()]
+      : undefined,
+  );
+
+  private viewKey(): string {
+    return stepViewKey(this.scenario().id, this.step().id);
+  }
+
+  /**
+   * The fictional Elbwerk address shown in the simulation bar. Empty for a
+   * step with no view yet, which is what the bar's `simulatedPath` default
+   * already expects — it then shows the bare domain rather than inventing a
+   * path for an empty region.
+   */
+  readonly simulatedPath = computed(() => {
+    const view = this.stepView();
+    return view === undefined ? '' : view.simulatedPath;
+  });
+
+  /**
+   * The step's simulation component once its chunk has arrived. `null` until
+   * then, and again immediately on every step change: leaving the previous
+   * step's component up while the next one loads would show step 1's posting
+   * under step 2's heading for as long as the network takes.
+   */
+  protected readonly stepComponent = signal<Type<unknown> | null>(null);
+
+  /**
+   * Set when the step's chunk could not be fetched — a network blip, or a page
+   * still pointing at a hashed chunk a redeploy has removed. Without it the
+   * region would simply stay empty for good, beside a panel announcing eleven
+   * active barriers and nothing saying why none of them are visible
+   * (docs/ARCHITECTURE.md §17: every non-happy path has a defined state).
+   */
+  protected readonly loadFailed = signal(false);
+
+  /** docs/UX-COPY.md §5.10 `simulation.loadFailed`. */
+  protected readonly loadFailedNote =
+    'Die Simulation konnte nicht geladen werden. Bitte lade die Seite neu. ' +
+    'Das Barriere-Panel und die Erklärungen funktionieren weiter.';
+
+  /**
+   * Rendered as `data-step-view` on the simulation column, and the reason it
+   * exists is the test suite (docs/ARCHITECTURE.md §15, the same role
+   * `[data-simulation-region]` plays for the axe runs). A Playwright test that
+   * reads the region before the chunk lands sees an empty region: assertions
+   * about a barrier would fail intermittently, and an axe run scoped to the
+   * region would report zero violations and *pass* — a barrier assertion that
+   * proves nothing is worse than a flaky one. Everything except `'pending'` is
+   * a settled state; only `'pending'` means "come back later".
+   */
+  protected readonly stepViewState = computed<'none' | 'pending' | 'ready' | 'failed'>(() => {
+    if (this.stepView() === undefined) {
+      return 'none';
+    }
+    if (this.loadFailed()) {
+      return 'failed';
+    }
+    return this.stepComponent() === null ? 'pending' : 'ready';
+  });
+
+  constructor() {
+    effect((onCleanup) => {
+      const view = this.stepView();
+      this.stepComponent.set(null);
+      this.loadFailed.set(false);
+
+      if (view === undefined) {
+        return;
+      }
+
+      // Navigating on before the chunk resolves must not let a late promise
+      // overwrite the newer step's component — the classic out-of-order
+      // async render, and it would put the wrong simulation in the region.
+      // The same guard keeps a stale *failure* from raising a note about a
+      // step the user has already left.
+      let cancelled = false;
+      onCleanup(() => {
+        cancelled = true;
+      });
+
+      void view.load().then(
+        (component) => {
+          if (!cancelled) {
+            this.stepComponent.set(component);
+          }
+        },
+        (error: unknown) => {
+          if (!cancelled) {
+            this.loadFailed.set(true);
+          }
+          // Reported rather than swallowed: `void promise.then(…)` with no
+          // rejection handler turns this into an unhandled rejection that no
+          // error handler sees and no log records.
+          console.error('Failed to load the simulation for this step.', error);
+        },
+      );
+    });
   }
 }

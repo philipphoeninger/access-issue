@@ -802,7 +802,9 @@ src/app/
     explanation-view/
     simulation-region/
   scenarios/
+    scenario-step-views.ts   step → component + simulated path
     application-process/
+      elbwerk-page/          shared Elbwerk chrome
       job-posting-step/
       application-form-step/
     csr-campaign/
@@ -813,6 +815,32 @@ src/app/
 
 `scenarios/` components are pure presentation driven by injected barrier signals. They
 own no state and perform no navigation beyond the flow's own next/back links.
+
+**How a step's component reaches the region.** `scenario-step-views.ts` maps
+`{scenario.id}/{step.id}` to a dynamically imported component and to the fictional Elbwerk
+path the simulation bar shows. `ScenarioPageComponent` looks the entry up and projects the
+component into `SimulationRegionComponent`; there is still no route that renders a scenario
+component directly (§5.1).
+
+Three things follow, and each is the reason the map exists rather than a field on
+`ScenarioStep`:
+
+- **The domain model stays serialisable.** §13 keeps open the option of moving the content
+  layer to JSON in `public/`. A component constructor cannot be expressed in JSON.
+- **Lazy loading survives.** Every route already loads the same `ScenarioPageComponent`, so
+  a static import would pull every scenario's markup into that one chunk (§9).
+- **A step with no entry is a defined state**, not an error: the region renders empty and
+  the bar shows the bare domain. That is what an unbuilt step looks like while the
+  remaining scenario slices land.
+
+A chunk that fails to arrive is the fourth state (`failed`, §17): the frame renders
+`simulation.loadFailed` above the bar, saying that the simulation could not be loaded and
+that panel and explanations still work — which is true, because both live in the frame, and
+they are what carries the learning content for anyone who could not see the simulation
+anyway.
+
+The dependency direction is unchanged (§5.2): the frame knows *that* a step has a view,
+never what is in it.
 
 ---
 
@@ -853,6 +881,14 @@ knowing which is which is itself worth encoding in the barrier metadata.
 **Deep-link tests.** For every tested state: serialise to URL, reload, assert the DOM
 matches. This covers PRD 8.1 G directly.
 
+**Two DOM hooks, and no more.** `[data-simulation-region]` marks the boundary the three
+runs scope by. `data-step-view` on the simulation column reports whether the step's
+component has arrived (`none` · `pending` · `ready`, §14): a step's markup loads in its own
+chunk, so a test that reads the region too early sees it empty — and an axe run scoped to
+an empty region reports zero violations and *passes*. A barrier assertion that passes
+vacuously is worse than one that fails, so the settled state has to be observable rather
+than guessed at with a timeout.
+
 **Manual passes** (NVDA, VoiceOver, keyboard-only) cannot be automated away and are
 listed as release criteria in the PRD.
 
@@ -863,6 +899,14 @@ listed as release criteria in the PRD.
 - `ng build` produces a static bundle; no SSR, no prerendering needed for two scenarios,
   though prerendering remains available if first-paint becomes a concern.
 - Lazy-loaded routes per scenario. The home page should not carry the CSR video markup.
+- **Assets that a stylesheet references live in `src/`, not in `public/`.** A file in
+  `public/` can only be addressed by a root-absolute URL, which breaks the moment the
+  application is served from a subpath — and `base href` is configurable here, with the
+  host still undecided. The Poppins WOFF2 files therefore sit in `src/styles/fonts/` and
+  are referenced relatively: the build emits them as `media/<name>-<hash>.woff2` and
+  rewrites the reference relative to the stylesheet, which survives any base path and adds
+  content hashing. `public/` keeps what markup references (`simulation/`, `favicon.ico`),
+  where a base-href-relative URL does the same job.
 - **No third-party runtime requests.** Fonts self-hosted. Any embedded social media in
   the CSR scenario is a *simulation* of an embed — static local markup, never a real
   third-party iframe. A real embed would leak user data, contradicting the no-tracking
@@ -899,6 +943,7 @@ listed as release criteria in the PRD.
 | Link to a `planned` scenario | Informative page stating the scenario is not yet available |
 | JavaScript disabled | Application does not run. `<noscript>` explains this and links to the module. Accepted trade-off: an SPA is the right tool for the interaction model, and WCAG does not require script-off operation. |
 | Focus lost after a subtree swap | Prevented by design — focus lives in the panel (§12) |
+| A step's simulation chunk fails to load | The frame states it above the simulation bar (`simulation.loadFailed`, `UX-COPY.md` §5.10) and names what still works. Panel, explanations and the exit link are unaffected: they are frame code, in the initial bundle. Not announced through the live region — it would cut off the page-title announcement that has just been made. |
 
 ---
 

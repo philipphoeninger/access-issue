@@ -3,10 +3,11 @@
 // four steps of §7 verbatim, with real key events: a trap that a test can
 // bypass with `.focus()` is not being tested at all.
 //
-// Slice 4 runs it against a region with no scenario content in it. The states
-// loop below is where the tested states of docs/TESTING.md §4 enter from
-// slice 7 on — the shape is here so adding a barrier means adding a row, not
-// rewriting the suite.
+// Slice 7 filled the region with real content, so from here the suite runs
+// against the n + 2 states of step 1 rather than against an empty region. Each
+// later step slice adds its own rows: the promise is that the exit works in
+// *every* barrier state, and a state nobody runs it in is a state where nobody
+// knows.
 import { expect, test, type Page } from '@playwright/test';
 import { gotoRendered } from './support/goto';
 
@@ -16,6 +17,8 @@ const PATH = '/szenario/bewerbung/stellenanzeige';
 const STATES: Array<{ name: string; query: string }> = [
   { name: 'all barriers active (default)', query: '' },
   { name: 'all barriers resolved', query: '?frei=alle' },
+  { name: 'only `grafik` resolved', query: '?frei=grafik' },
+  { name: 'only `sprache` resolved', query: '?frei=sprache' },
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

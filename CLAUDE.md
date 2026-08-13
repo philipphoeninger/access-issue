@@ -175,8 +175,23 @@ in a screenshot.
 - **Barrier panel uses checkboxes throughout**, not slide toggles. Combined barriers are a
   `fieldset` + `legend` + indeterminate parent. `role="switch"` does not accept
   `aria-checked="mixed"`.
+- **A scenario step reaches the page through `scenarios/scenario-step-views.ts`.** That map
+  gives each `{scenario.id}/{step.id}` a dynamically imported component and the fictional
+  Elbwerk path the simulation bar shows; `ScenarioPageComponent` projects the component
+  into the region. A new step is an entry there, not a route change and not a field on
+  `ScenarioStep` — the content layer has to stay serialisable (`ARCHITECTURE.md` §13, §14).
 - **No third-party runtime requests.** Fonts self-hosted, video self-hosted, social embeds
   simulated with local markup. No analytics, no tracking.
+- **Assets a stylesheet references live in `src/`; assets markup references live in
+  `public/` and are addressed with a relative URL.** `public/` can only be reached by a
+  root-absolute path, which 404s under a configurable `base href` (`ARCHITECTURE.md` §16).
+  The Poppins WOFF2 files sit in `src/styles/fonts/` for exactly that reason. Never write
+  a leading `/` into an asset URL.
+- **`public/simulation/grafik_benefits_final.png` is generated**, from
+  `assets-src/simulation/grafik_benefits_final.svg`; the regeneration command is in that
+  file's header. It is a raster image on purpose — an SVG would stay sharp under
+  magnification and take half of the text-graphic barrier away. Editing the copy in
+  `UX-COPY.md` §8.6 means re-rendering it *and* updating the resolved text variant.
 - **No backend.** Nothing is submitted, stored, or transmitted.
 - **No browser storage** — no `localStorage`, no `sessionStorage`. State lives in the URL.
 - Prettier: `printWidth: 100`, `singleQuote: true`.

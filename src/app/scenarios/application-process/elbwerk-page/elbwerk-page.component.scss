@@ -1,0 +1,42 @@
+// Elbwerk, not WERTE.IT: only --sim-* tokens here, never a --wi-* one
+// (CLAUDE.md rule 5). docs/DESIGN.md §4.2 sets the brief for this styling —
+// system stack, 16px/1.5, no distinctive scale, "make it look like nobody
+// thought about it very hard".
+:host {
+  display: block;
+}
+
+.elbwerk-page {
+  background: var(--sim-white);
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  line-height: var(--sim-leading-body);
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 3px solid var(--sim-brand);
+}
+
+.logo {
+  // Scales down on narrow viewports rather than forcing the page wide
+  // (WCAG 1.4.10 — the reflow suite runs at 320px, docs/TESTING.md §13).
+  max-width: 100%;
+  height: auto;
+}
+
+.site-menu {
+  margin: 0;
+  color: var(--sim-muted);
+  font-size: 0.9375rem;
+}
+
+.site-content {
+  padding: 20px;
+}

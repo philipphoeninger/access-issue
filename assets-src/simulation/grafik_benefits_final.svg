@@ -1,0 +1,115 @@
+<!--
+  Quelle der Textgrafik aus docs/UX-COPY.md §8.6 — der Barriere `grafik` in
+  Schritt 1 des Bewerbungsprozesses.
+
+  ACHTUNG: Diese Datei wird NICHT ausgeliefert. Ausgeliefert wird die daraus
+  gerenderte Rastergrafik public/simulation/grafik_benefits_final.png. Ein SVG
+  bliebe beim Vergrößern scharf und nähme der Barriere damit die Hälfte ihrer
+  Wirkung — verpixelnde Buchstaben bei 400 % Zoom sind der Teil, den sehende
+  Teilnehmende am eigenen Bildschirm nachvollziehen (docs/UX-COPY.md §8.6).
+
+  Neu rendern nach jeder Textänderung, aus dem Projektwurzelverzeichnis:
+
+    rsvg-convert -w 640 -h 460 \
+      assets-src/simulation/grafik_benefits_final.svg \
+      -o public/simulation/grafik_benefits_final.png
+
+  Die Texte hier sind Kopien der Schlüssel `elbwerk.job.benefits.h3`,
+  `elbwerk.job.benefits.items`, `elbwerk.job.salary`, `elbwerk.job.process.h3`
+  und `elbwerk.job.process.items`. Sie müssen mit der behobenen Textfassung im
+  Template übereinstimmen — beide Zustände tragen denselben Sachinhalt, das ist
+  die Bedingung dafür, dass das Szenario Barrierefreiheit misst und nicht
+  Informationsmenge (docs/UX-COPY.md §1). job-posting-step.component.spec.ts
+  prüft das für die Textfassung; für die Grafik ist es Handarbeit.
+
+  Die Grafik trägt Leistungen, Vergütung UND Ablauf — alle drei Angaben, die
+  docs/PRD.md §6.1 für diese Barriere nennt. Der Ablauf ist dabei der Teil, nach
+  dem jemand handelt; ihn wegzulassen würde die Barriere harmloser aussehen
+  lassen, als sie ist.
+
+  Farben (Token-Namen ohne führende Doppelbindestriche, die ein XML-Kommentar
+  nicht enthalten darf): sim-brand #1F3A5F, sim-text #33475B, sim-muted
+  #5A6B7B, sim-surface #F5F6F7, sim-border #D8DDE2 (src/styles/_tokens.scss).
+-->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 640 460"
+  width="640"
+  height="460"
+  font-family="Arial, Helvetica, sans-serif"
+>
+  <rect width="640" height="460" fill="#FFFFFF" />
+  <rect x="0.5" y="0.5" width="639" height="459" fill="#F5F6F7" stroke="#D8DDE2" />
+
+  <rect x="0" y="0" width="640" height="6" fill="#1F3A5F" />
+
+  <text x="40" y="62" font-size="30" font-weight="700" fill="#1F3A5F">Was wir bieten</text>
+  <text x="40" y="88" font-size="15" fill="#5A6B7B">Elbwerk GmbH · Hamburg-Wilhelmsburg</text>
+
+  <!-- Fünf Leistungs-Kacheln, wie sie eine Marketingabteilung exportiert. -->
+  <g>
+    <rect x="40" y="110" width="180" height="60" rx="4" fill="#FFFFFF" stroke="#D8DDE2" />
+    <circle cx="70" cy="140" r="13" fill="#1F3A5F" />
+    <text x="70" y="145" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">30</text>
+    <text x="94" y="145" font-size="15" fill="#33475B">Urlaubstage</text>
+  </g>
+  <g>
+    <rect x="230" y="110" width="180" height="60" rx="4" fill="#FFFFFF" stroke="#D8DDE2" />
+    <circle cx="260" cy="140" r="13" fill="#1F3A5F" />
+    <path d="M260 133 v7 h5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+    <text x="284" y="145" font-size="15" fill="#33475B">Gleitzeit</text>
+  </g>
+  <g>
+    <rect x="420" y="110" width="180" height="60" rx="4" fill="#FFFFFF" stroke="#D8DDE2" />
+    <circle cx="450" cy="140" r="13" fill="#1F3A5F" />
+    <circle cx="446" cy="143" r="3.5" fill="none" stroke="#FFFFFF" stroke-width="1.6" />
+    <circle cx="455" cy="143" r="3.5" fill="none" stroke="#FFFFFF" stroke-width="1.6" />
+    <text x="474" y="145" font-size="15" fill="#33475B">Jobrad</text>
+  </g>
+  <g>
+    <rect x="40" y="182" width="275" height="60" rx="4" fill="#FFFFFF" stroke="#D8DDE2" />
+    <circle cx="70" cy="212" r="13" fill="#1F3A5F" />
+    <rect x="64" y="206" width="12" height="12" rx="2" fill="none" stroke="#FFFFFF" stroke-width="1.6" />
+    <text x="94" y="207" font-size="15" fill="#33475B">Zuschuss zum</text>
+    <text x="94" y="225" font-size="15" fill="#33475B">Deutschlandticket</text>
+  </g>
+  <g>
+    <rect x="325" y="182" width="275" height="60" rx="4" fill="#FFFFFF" stroke="#D8DDE2" />
+    <circle cx="355" cy="212" r="13" fill="#1F3A5F" />
+    <path d="M349 216 l4 -6 l4 4 l5 -8" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="379" y="207" font-size="15" fill="#33475B">Betriebliche</text>
+    <text x="379" y="225" font-size="15" fill="#33475B">Altersvorsorge</text>
+  </g>
+
+  <!-- Vergütung: die Angabe, deren Verlust am unmittelbarsten einleuchtet. -->
+  <rect x="40" y="262" width="560" height="62" rx="4" fill="#1F3A5F" />
+  <text x="60" y="288" font-size="14" letter-spacing="1.2" fill="#8FADCB">VERGÜTUNG</text>
+  <text x="60" y="310" font-size="17" font-weight="700" fill="#FFFFFF">
+    Haustarif, Entgeltgruppe 11 (58.000 – 68.000 € brutto/Jahr)
+  </text>
+
+  <!-- Ablauf der Bewerbung: die handlungsleitende Angabe (docs/PRD.md §6.1). -->
+  <text x="40" y="360" font-size="20" font-weight="700" fill="#1F3A5F">So geht es weiter</text>
+
+  <g>
+    <circle cx="52" cy="392" r="12" fill="#1F3A5F" />
+    <text x="52" y="397" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+    <text x="72" y="397" font-size="14" fill="#33475B">Online bewerben</text>
+
+    <circle cx="212" cy="392" r="12" fill="#1F3A5F" />
+    <text x="212" y="397" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+    <text x="232" y="390" font-size="14" fill="#33475B">Rückmeldung in</text>
+    <text x="232" y="406" font-size="14" fill="#33475B">zwei Wochen</text>
+
+    <circle cx="392" cy="392" r="12" fill="#1F3A5F" />
+    <text x="392" y="397" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+    <text x="412" y="390" font-size="14" fill="#33475B">Gespräch per Video</text>
+    <text x="412" y="406" font-size="14" fill="#33475B">oder vor Ort</text>
+
+    <circle cx="52" cy="430" r="12" fill="#1F3A5F" />
+    <text x="52" y="435" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+    <text x="72" y="435" font-size="14" fill="#33475B">Start nach Absprache</text>
+  </g>
+
+  <text x="392" y="437" font-size="12" fill="#5A6B7B">Stand 2026 · Änderungen vorbehalten</text>
+</svg>

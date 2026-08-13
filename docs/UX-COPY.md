@@ -477,9 +477,23 @@ und macht einen Screenshot, der nicht zur Beschreibung passt.
 | `planned.body` | Wir arbeiten daran. Die anderen Szenarien kannst du schon durchgehen. |
 | `planned.action` | Zu den verfügbaren Szenarien |
 | `noscript.body` | AccessIssue braucht JavaScript, weil sich die Barrieren zur Laufzeit umschalten lassen. Bitte aktiviere JavaScript. Die Inhalte des Moduls stehen auch ohne dieses Werkzeug vollständig in Moodle zur Verfügung. |
+| `simulation.loadFailed` | Die Simulation konnte nicht geladen werden. Bitte lade die Seite neu. Das Barriere-Panel und die Erklärungen funktionieren weiter. |
 
 Keine Entschuldigung, kein „Ups", kein Fehlercode. Was ist passiert, warum, was jetzt zu
 tun ist.
+
+**`simulation.loadFailed`** steht im Rahmen, unmittelbar vor der Simulationsleiste, und
+gehört zu den seltenen Texten, die überhaupt einen technischen Fehlschlag benennen: Der
+Nachbau jedes Schritts wird als eigenes Paket nachgeladen, und das kann scheitern — ein
+Aussetzer im Netz, oder eine Seite, die nach einem Update auf ein Paket zeigt, das es nicht
+mehr gibt. Der Satz nennt deshalb zusätzlich, was *weiter* funktioniert: Panel und
+Erklärungen liegen im Rahmen und sind von dem Fehlschlag nicht betroffen — und genau sie
+tragen den Lehrinhalt für alle, die die Simulation ohnehin nicht sehen können.
+
+Der Hinweis wird **nicht** über die Live-Region angesagt. Der Rahmen hat genau eine
+(`ARCHITECTURE.md` §12.2), sie gehört den Ansagen zu Seitenwechsel und Umschaltung, und
+eine Ansage, die unmittelbar nach dem Seitenwechsel dazwischenfunkt, würde den Seitentitel
+abschneiden — ausgerechnet für die Gruppe, die ihn am dringendsten braucht.
 
 ---
 
@@ -516,10 +530,40 @@ nicht besonders — gewöhnlich. Das ist die Vorgabe.
 | --- | --- |
 | `elbwerk.nav.brand` | Elbwerk GmbH |
 | `elbwerk.nav.items` | Unternehmen · Leistungen · Karriere · Kontakt |
+| `elbwerk.logo.alt` | Elbwerk GmbH |
 | `elbwerk.jobs.h2` | Offene Stellen |
-| `elbwerk.job.title` | Sachbearbeitung Auftragsabwicklung (m/w/d) |
+| `elbwerk.job.title` | IT-Projektmanager (m/w/d) |
 | `elbwerk.job.meta` | Vollzeit · Hamburg-Wilhelmsburg · ab sofort |
-| `elbwerk.job.teaser` | Zur Verstärkung unseres Teams in der Auftragsabwicklung suchen wir zum nächstmöglichen Zeitpunkt eine engagierte Persönlichkeit. |
+| `elbwerk.job.teaser` | Zur Verstärkung unserer IT suchen wir zum nächstmöglichen Zeitpunkt eine engagierte Persönlichkeit. |
+
+**Zur Ebene in den Schlüsselnamen.** `elbwerk.jobs.h2` heißt historisch so, wird aber als
+`h3` ausgezeichnet: Die Überschriftenebenen im Simulationsbereich sind in
+`ARCHITECTURE.md` §5.6 festgelegt (Seiten-`h1` = Szenariotitel, Bereichsüberschrift = `h2`,
+**Szenarioinhalt ab `h3`**) und gehen den Schlüsselnamen vor. „Offene Stellen" ist `h3`,
+der Stellentitel `h4`, die Abschnitte innerhalb der Anzeige `h5`.
+
+**Die Navigationspunkte sind keine Links.** Die Simulation hat nur die Seiten, die das
+Szenario als Schritte kennt; ein Menüpunkt, der nirgendwohin führt, wäre eine Barriere,
+die niemand erklärt hat, und ein Link-Attrappen-Element wäre eine zweite. `elbwerk.nav.items`
+steht deshalb als Text in der Kopfzeile. Der Weg zum nächsten Schritt liegt im Rahmen
+(`scenario.stepNav`, §5.3).
+
+**Adresse in der Simulationsleiste** (`simBar.url`, §5.4): Jeder Schritt liefert den Pfad,
+den die Leiste hinter `elbwerk.de` anzeigt.
+
+| Schritt | Pfad |
+| --- | --- |
+| 1 — Stellenanzeige | `/karriere/it-projektmanager` |
+
+Die Pfade der Schritte 2 bis 4 kommen mit ihren Slices hinzu.
+
+**Das Elbwerk-Logo.** Eine Wort-Bild-Marke (Wortmarke „ELBWERK", darunter
+„GMBH · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
+(`ARCHITECTURE.md` §16). Es trägt `elbwerk.logo.alt` als Alternativtext — Logotypen sind
+von WCAG 1.4.5 ausdrücklich ausgenommen, und ein Firmenlogo mit korrektem Alternativtext
+ist genau das, was eine gewöhnliche Unternehmensseite richtig macht. Das Logo ist **keine**
+der Barrieren und wird auch nie eine: Barrieren dieses Szenarios sind ausschließlich die in
+`PRD.md` §6.1 gelisteten.
 
 ### 8.2 Barriere „Stellenanzeige als PDF"
 
@@ -528,7 +572,7 @@ nicht besonders — gewöhnlich. Das ist die Vorgabe.
 | Schlüssel | Text |
 | --- | --- |
 | `elbwerk.job.pdfIntro` | Die vollständige Stellenbeschreibung entnehmen Sie bitte dem beigefügten Dokument. |
-| `elbwerk.job.pdfLink` | Stellenausschreibung_2026_Auftragsabwicklung_final_v3.pdf (412 KB) |
+| `elbwerk.job.pdfLink` | Stellenausschreibung_2026_IT-Projektmanagement_final_v3.pdf (412 KB) |
 
 Der Dateiname ist die halbe Miete: `final_v3` mit Unterstrichen ist genau das, was in der
 Realität hochgeladen wird. Kein erfundenes Negativbeispiel, sondern der Normalfall.
@@ -553,39 +597,39 @@ Sprachkomplexität misst und nicht Informationsmenge.
 > **Aufgabenprofil**
 >
 > Im Rahmen der Ihnen obliegenden Tätigkeit verantworten Sie die eigenverantwortliche
-> Abwicklung sämtlicher auftragsbezogener Vorgänge unter Berücksichtigung der
-> unternehmensinternen Prozessvorgaben sowie der einschlägigen kundenseitigen
-> Anforderungen, wobei die Sicherstellung einer termingerechten Bearbeitung unter
-> gleichzeitiger Wahrung der Qualitätsstandards als wesentlicher Erfolgsfaktor
+> Steuerung sämtlicher IT-seitiger Projektvorhaben unter Berücksichtigung der
+> unternehmensinternen Prozessvorgaben sowie der einschlägigen fachbereichsseitigen
+> Anforderungen, wobei die Sicherstellung einer termin- und budgetgerechten Umsetzung
+> unter gleichzeitiger Wahrung der Qualitätsstandards als wesentlicher Erfolgsfaktor
 > anzusehen ist.
 >
-> Darüber hinaus obliegt Ihnen die Kommunikation mit den beteiligten Fachabteilungen
-> sowie externen Ansprechpartnern, wobei ein hohes Maß an Eigeninitiative und
+> Darüber hinaus obliegt Ihnen die Abstimmung mit den beteiligten Fachabteilungen
+> sowie externen Dienstleistern, wobei ein hohes Maß an Eigeninitiative und
 > Durchsetzungsvermögen ebenso vorausgesetzt wird wie die Fähigkeit, auch in Situationen
 > erhöhten Arbeitsaufkommens strukturiert und lösungsorientiert zu agieren.
 >
 > **Anforderungsprofil**
 >
-> Vorausgesetzt wird eine abgeschlossene kaufmännische Berufsausbildung bzw. eine
-> vergleichbare Qualifikation nebst einschlägiger mehrjähriger Berufserfahrung im
-> beschriebenen Aufgabengebiet, wünschenswerterweise ergänzt um vertiefte Kenntnisse
-> gängiger ERP-Systeme.
+> Vorausgesetzt wird ein abgeschlossenes Studium der Informatik bzw. eine
+> vergleichbare Qualifikation nebst einschlägiger mehrjähriger Berufserfahrung in der
+> Leitung von IT-Projekten, wünschenswerterweise ergänzt um vertiefte Kenntnisse
+> gängiger Projektmanagement-Methoden.
 
 **Behoben — klare Sprache, gleicher Inhalt**
 
 > **Ihre Aufgaben**
 >
-> Sie bearbeiten Kundenaufträge von der Bestellung bis zur Auslieferung. Dabei achten Sie
-> auf die Termine und auf die Qualität.
+> Sie leiten unsere IT-Projekte von der Planung bis zum Abschluss. Dabei achten Sie auf
+> die Termine, das Budget und die Qualität.
 >
-> Sie stimmen sich mit anderen Abteilungen und mit Kunden ab. Auch wenn viel zu tun ist,
-> behalten Sie den Überblick.
+> Sie stimmen sich mit anderen Abteilungen und mit externen Dienstleistern ab. Auch wenn
+> viel zu tun ist, behalten Sie den Überblick.
 >
 > **Das bringen Sie mit**
 >
-> - Eine abgeschlossene kaufmännische Ausbildung oder eine vergleichbare Qualifikation
-> - Mehrere Jahre Erfahrung in der Auftragsabwicklung
-> - Erfahrung mit einem ERP-System ist hilfreich, aber keine Bedingung
+> - Ein abgeschlossenes Studium der Informatik oder eine vergleichbare Qualifikation
+> - Mehrere Jahre Erfahrung in der Leitung von IT-Projekten
+> - Erfahrung mit gängigen Projektmanagement-Methoden ist hilfreich, aber keine Bedingung
 
 Vier Merkmale unterscheiden die Fassungen, und sie sind genau die, die im Modul benannt
 werden können: kürzere Sätze, aktive statt passiver Konstruktionen, Verben statt
@@ -671,11 +715,41 @@ Alternativtext oder mit einem nichtssagenden (`grafik_benefits_final.png`).
 | --- | --- |
 | `elbwerk.job.benefits.h3` | Was wir bieten |
 | `elbwerk.job.benefits.items` | 30 Urlaubstage · Gleitzeit · Jobrad · Zuschuss zum Deutschlandticket · Betriebliche Altersvorsorge |
-| `elbwerk.job.salary` | Vergütung nach Haustarif, Entgeltgruppe 8 (44.000 – 52.000 € brutto/Jahr) |
-| `elbwerk.job.graphicAlt` | Übersicht der Leistungen: 30 Urlaubstage, Gleitzeit, Jobrad, Zuschuss zum Deutschlandticket, betriebliche Altersvorsorge. |
+| `elbwerk.job.salary` | Vergütung nach Haustarif, Entgeltgruppe 11 (58.000 – 68.000 € brutto/Jahr) |
+| `elbwerk.job.process.h3` | So geht es weiter |
+| `elbwerk.job.process.items` | Online bewerben · Rückmeldung innerhalb von zwei Wochen · Gespräch per Video oder vor Ort · Start nach Absprache |
+| `elbwerk.job.graphicAlt` | Leistungen, Vergütung und Ablauf der Bewerbung: 30 Urlaubstage, Gleitzeit, Jobrad, Zuschuss zum Deutschlandticket, betriebliche Altersvorsorge. Vergütung nach Haustarif, Entgeltgruppe 11 (58.000 – 68.000 € brutto/Jahr). Ablauf: online bewerben, Rückmeldung innerhalb von zwei Wochen, Gespräch per Video oder vor Ort, Start nach Absprache. |
 
 Die Gehaltsangabe ist Absicht: Wenn ausgerechnet sie in einer Grafik steckt, ist die
 Auswirkung unmittelbar einleuchtend.
+
+**Der Ablauf gehört mit in die Grafik**, und zwar aus demselben Grund. `PRD.md` §6.1 nennt
+für diese Barriere ausdrücklich *Gehalt, Benefits und Ablauf* — und der Ablauf ist die
+Angabe, nach der man handelt: Wer nicht erfährt, dass eine Rückmeldung binnen zwei Wochen
+kommt und das Gespräch auch per Video möglich ist, kann weder nachfassen noch die
+Videovariante erfragen. Eine Barriere, die nur Beschreibendes verschluckt, unterschätzt den
+Effekt; eine, die auch das Handlungsleitende verschluckt, trifft ihn.
+
+Der Alternativtext deckt **alles** ab, was die Grafik enthält — Leistungen, Vergütung und
+Ablauf. Ein Alternativtext, der nur einen Teil des Bildinhalts nennt, wäre selbst ein
+Negativbeispiel, und ausgerechnet an der Stelle, an der das Modul zeigt, wie es richtig
+geht.
+
+**Wozu `elbwerk.job.graphicAlt` dient — und wo er nicht steht.** Er beschreibt, wie ein
+korrekter Alternativtext für genau diese Grafik lauten würde, und ist damit Lehrmaterial
+für den Erklärbereich und für die manuellen Prüfdurchgänge. Im behobenen Zustand wird er
+**nicht** als `alt` ausgegeben: Dort stehen dieselben Angaben bereits als Text mit
+Überschrift und Liste auf der Seite, und eine zusätzlich beschriftete Grafik ließe einen
+Screenreader dieselbe Aufzählung zweimal vorlesen. Die Grafik wird deshalb dekorativ
+(`alt=""` plus `aria-hidden="true"`) — der richtige Umgang mit einem Bild, dessen
+Information vollständig danebensteht. Im aktiven Zustand fehlt das `alt`-Attribut ganz;
+Screenreader lesen dann den Dateinamen vor, und `grafik_benefits_final.png` ist genau das,
+was in der Realität hochgeladen wird.
+
+**Die Grafik ist eine Rastergrafik (PNG), kein SVG.** Das ist kein Versehen: Ein SVG würde
+beim Vergrößern scharf bleiben und damit die halbe Auswirkung wegnehmen. Verpixelnde
+Buchstaben bei 400 % Zoom sind der Teil der Barriere, den sehende Teilnehmende am eigenen
+Bildschirm nachvollziehen können.
 
 ### 8.7 Schritt 2 — Barriere „Pflichtfelder"
 
