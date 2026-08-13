@@ -890,11 +890,12 @@ matches. This covers PRD 8.1 G directly.
 
 **Two DOM hooks, and no more.** `[data-simulation-region]` marks the boundary the three
 runs scope by. `data-step-view` on the simulation column reports whether the step's
-component has arrived (`none` · `pending` · `ready`, §14): a step's markup loads in its own
-chunk, so a test that reads the region too early sees it empty — and an axe run scoped to
-an empty region reports zero violations and *passes*. A barrier assertion that passes
-vacuously is worse than one that fails, so the settled state has to be observable rather
-than guessed at with a timeout.
+component has arrived (`none` · `pending` · `ready` · `failed`, §14): a step's markup loads
+in its own chunk, so a test that reads the region too early sees it empty — and an axe run
+scoped to an empty region reports zero violations and *passes*. A barrier assertion that
+passes vacuously is worse than one that fails, so the settled state has to be observable
+rather than guessed at with a timeout. Only `pending` means "come back later"; the other
+three are settled, `failed` included — the chunk that will never arrive is an answer too.
 
 **Manual passes** (NVDA, VoiceOver, keyboard-only) cannot be automated away and are
 listed as release criteria in the PRD.
