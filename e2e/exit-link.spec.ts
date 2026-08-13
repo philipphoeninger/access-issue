@@ -12,11 +12,17 @@
 // Slice 8 added step 2 — and with it the simulated keyboard trap, which is the
 // state this suite exists for. `tastatur` makes one control unreachable; if it
 // ever held the user inside the region instead, step 4 below is what says so.
+//
+// Slice 9 added step 3, whose resolved `pdf` state puts a link inside the
+// region for the first time. A download link is the one element that can take
+// the browser somewhere else entirely, so the four steps below are worth
+// running there too.
 import { expect, test, type Page } from '@playwright/test';
 import { gotoRendered } from './support/goto';
 
 const POSTING_PATH = '/szenario/bewerbung/stellenanzeige';
 const FORM_PATH = '/szenario/bewerbung/formular';
+const UPLOAD_PATH = '/szenario/bewerbung/dokumente';
 
 /** docs/TESTING.md §4: the tested states. Grows with the barriers. */
 const STATES: Array<{ name: string; path: string; query: string }> = [
@@ -30,6 +36,10 @@ const STATES: Array<{ name: string; path: string; query: string }> = [
   { name: 'step 2 — only `tastatur` resolved', path: FORM_PATH, query: '?frei=tastatur' },
   { name: 'step 2 — only `pflichtfeld` resolved', path: FORM_PATH, query: '?frei=pflichtfeld' },
   { name: 'step 2 — only `fehler` resolved', path: FORM_PATH, query: '?frei=fehler' },
+  { name: 'step 3 — all barriers active (default)', path: UPLOAD_PATH, query: '' },
+  { name: 'step 3 — all barriers resolved', path: UPLOAD_PATH, query: '?frei=alle' },
+  { name: 'step 3 — only `pdf` resolved', path: UPLOAD_PATH, query: '?frei=pdf' },
+  { name: 'step 3 — only `upload` resolved', path: UPLOAD_PATH, query: '?frei=upload' },
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

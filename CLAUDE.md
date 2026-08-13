@@ -114,8 +114,9 @@ in a screenshot.
    `UX-COPY.md` §8.4 designates it as the one text type that reaches from the frame into
    the simulation, and the reason is the point of it: a warning that nothing is
    transmitted, set in Elbwerk's own typeface and colours, reads as part of the fiction it
-   exists to interrupt. There are three of them (`elbwerk.form.simulationNote`,
-   `csr.donate.simulationNote`, `csr.social.disclaimer`); a new input point gets a fourth.
+   exists to interrupt. There are four of them (`elbwerk.form.simulationNote`,
+   `elbwerk.upload.simulationNote`, `csr.donate.simulationNote`, `csr.social.disclaimer`); a
+   new input point gets a fifth.
    Nothing else in a scenario component may reach across, and the exception does not run
    the other way — no `--sim-*` token in the frame, ever.
 

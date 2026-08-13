@@ -172,11 +172,15 @@ describe('ScenarioPageComponent (docs/SPEC_v1.md Slice 3)', () => {
       }
     });
 
-    // Steps 3 and 4 have no view yet (slices 9 and 10). That is a defined
-    // state, not an error: the region renders empty and the bar falls back to
-    // the bare domain rather than to a path the frame invented.
+    // Step 4 has no view yet (slice 10). That is a defined state, not an
+    // error: the region renders empty and the bar falls back to the bare
+    // domain rather than to a path the frame invented.
     it('renders the region empty for a step whose view does not exist yet', async () => {
-      const fixture = setup({ scenarioPath: 'bewerbung', stepPath: 'dokumente', hasPanel: true });
+      const fixture = setup({
+        scenarioPath: 'bewerbung',
+        stepPath: 'rueckmeldung',
+        hasPanel: true,
+      });
 
       await settled(fixture);
 

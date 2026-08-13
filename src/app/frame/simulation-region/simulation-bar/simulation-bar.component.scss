@@ -42,8 +42,17 @@
 
 // Low emphasis, per docs/DESIGN.md §6 — white at 85 % on navy still measures
 // well above AA, so the de-emphasis costs no legibility.
+//
+// The address is one unbroken token, and the steps supply it — step 3's
+// `/karriere/it-projektmanager/bewerbung/unterlagen` is already longer than
+// 320 px at this size. Without a break opportunity it sets the minimum width
+// of the grid column and pushes the whole page into horizontal scrolling
+// (WCAG 1.4.10). `min-width: 0` is the half of the fix that lets the flex item
+// shrink below its content in the first place.
 .address {
+  min-width: 0;
   opacity: 0.85;
+  overflow-wrap: anywhere;
 }
 
 .counter {

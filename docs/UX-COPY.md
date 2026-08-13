@@ -555,8 +555,9 @@ den die Leiste hinter `elbwerk.de` anzeigt.
 | --- | --- |
 | 1 — Stellenanzeige | `/karriere/it-projektmanager` |
 | 2 — Bewerbungsformular | `/karriere/it-projektmanager/bewerbung` |
+| 3 — Unterlagen hochladen | `/karriere/it-projektmanager/bewerbung/unterlagen` |
 
-Die Pfade der Schritte 3 und 4 kommen mit ihren Slices hinzu.
+Der Pfad des Schritts 4 kommt mit seinem Slice hinzu.
 
 **Das Elbwerk-Logo.** Eine Wort-Bild-Marke (Wortmarke „ELBWERK", darunter
 „KG · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
@@ -567,6 +568,20 @@ der Barrieren und wird auch nie eine: Barrieren dieses Szenarios sind ausschlie�
 `PRD.md` §6.1 gelisteten.
 
 ### 8.2 Barriere „Stellenanzeige als PDF"
+
+**Diese Barriere steht in Schritt 3**, nicht in Schritt 1. `PRD.md` §6.1 ordnet sie dem
+Schritt „Dokumente" zu, und der Schritt trägt beides: das Dokument, das Elbwerk der
+Bewerberin gibt, und die Dokumente, die sie Elbwerk gibt. Die Schlüsselnamen beginnen
+trotzdem mit `elbwerk.job.`, weil sie die Stellenausschreibung benennen und nicht die
+Seite, auf der sie steht — ein Schlüssel wird nicht umbenannt, nur weil der Abschnitt
+umzieht.
+
+Der Block braucht auf der Unterlagen-Seite eine eigene Überschrift, die es in Schritt 1
+nicht brauchte:
+
+| Schlüssel | Text |
+| --- | --- |
+| `elbwerk.job.pdfHeading` | Stellenausschreibung |
 
 **Aktiv** — die Anzeige ist nur als Download verfügbar:
 
@@ -586,6 +601,14 @@ verschwindet nicht, es ist nur nicht mehr der einzige Weg.
 | Schlüssel | Text |
 | --- | --- |
 | `elbwerk.job.htmlNote` | Sie können die Stellenbeschreibung hier lesen oder als PDF herunterladen. |
+
+**Der Text auf der Seite ist derselbe wie in Schritt 1** — wörtlich derselbe, aus einer
+Quelle. Es ist ein Dokument, also ist es ein Wortlaut; zwei Fassungen derselben
+Ausschreibung wären der Fehler, nicht die Ersparnis. Daraus folgt, dass der Textkörper
+hier der Barriere „Komplexe Sprache" (Abschnitt 8.3) folgt, obwohl die im Panel unter
+Schritt 1 steht: Sprachkomplexität ist eine Eigenschaft des Textes, nicht der Seite. Wer
+in Schritt 3 die PDF-Barriere behebt und die Sprachbarriere stehen lässt, liest den Text
+in Behördendeutsch — und das ist die ehrliche Auskunft, nicht ein Versehen.
 
 ### 8.3 Barriere „Komplexe Sprache"
 
@@ -649,8 +672,9 @@ Schachtelsätzen.
 | `elbwerk.form.simulationNote` | Diese Bewerbung wird nicht übertragen. Es werden keine Daten gespeichert. |
 
 `elbwerk.form.simulationNote` gehört zu den **Simulationshinweisen** — der einen Textsorte,
-die aus dem Rahmen in die Simulation hineinragt. Es sind drei:
-`elbwerk.form.simulationNote`, `csr.donate.simulationNote` und `csr.social.disclaimer`.
+die aus dem Rahmen in die Simulation hineinragt. Es sind vier:
+`elbwerk.form.simulationNote`, `elbwerk.upload.simulationNote` (Abschnitt 8.8),
+`csr.donate.simulationNote` und `csr.social.disclaimer`.
 
 Die Regel dahinter: Ein Simulationshinweis steht überall dort, wo jemand echte Daten
 eingeben oder eine echte Handlung auslösen könnte. Er wird im Rahmenstil gesetzt, ist
@@ -807,6 +831,10 @@ Fall „Vorname Stern" oder gar nichts.
 
 ### 8.8 Schritt 3 — Unterlagen hochladen
 
+Auf dieser Seite steht auch der Block zur Stellenausschreibung (Abschnitt 8.2). Die Seite
+trägt damit beide Richtungen des Schritts „Dokumente": das Dokument, das Elbwerk bereit
+stellt, und die Dokumente, die die Bewerberin hochlädt.
+
 | Schlüssel | Text |
 | --- | --- |
 | `elbwerk.upload.h2` | Unterlagen hochladen |
@@ -814,6 +842,14 @@ Fall „Vorname Stern" oder gar nichts.
 | `elbwerk.upload.cvLabel` | Lebenslauf |
 | `elbwerk.upload.certLabel` | Zeugnisse |
 | `elbwerk.upload.submit` | Unterlagen übermitteln |
+| `elbwerk.upload.simulationNote` | Diese Unterlagen werden nicht übertragen. Es werden keine Dateien gespeichert. |
+
+`elbwerk.upload.simulationNote` ist der vierte **Simulationshinweis** (Abschnitt 8.4). Die
+Regel dort verlangt ihn: Ein Dateiauswahlfeld ist ein Eingabepunkt, an dem jemand echte
+Unterlagen anhängen könnte. Er steht im Rahmenstil, ist in jedem Barrierezustand vorhanden
+und wird nie zur Barriere gemacht — wie die drei anderen. Der Wortlaut folgt
+`elbwerk.form.simulationNote` und benennt statt der Übertragung der Bewerbung die der
+Dateien, weil genau das hier die Sorge ist.
 
 **Barriere „Upload-Formate" aktiv:** keine Angabe, welche Formate und Größen zulässig sind;
 Fehlermeldung erst nach dem Absenden, ohne Nennung des Grundes.
@@ -829,11 +865,23 @@ Fehlermeldung erst nach dem Absenden, ohne Nennung des Grundes.
 | `elbwerk.upload.formatHint` | Zulässig sind PDF, DOCX und ODT bis 10 MB je Datei. |
 | `elbwerk.upload.structureHint` | Bitte verwenden Sie in Ihren Dokumenten echte Überschriften statt vergrößerter Textzeilen. Das erleichtert uns die Auswertung — und Ihnen die Wiederverwendung. |
 | `elbwerk.upload.error.format` | Die Datei „{name}" hat das Format {ext}. Zulässig sind PDF, DOCX und ODT. |
+| `elbwerk.upload.error.formatUnknown` | Die Datei „{name}" hat kein erkennbares Format. Zulässig sind PDF, DOCX und ODT. |
 | `elbwerk.upload.error.size` | Die Datei „{name}" ist {size} groß. Erlaubt sind bis zu 10 MB. |
+
+`elbwerk.upload.error.formatUnknown` deckt den Dateinamen ohne Endung ab — bei einem Scan
+oder einem Export aus einem Textprogramm kommt der regelmäßig vor. Ohne diese Fassung
+setzte `{ext}` nichts ein und die Meldung lautete „hat das Format ." — ein kaputter Satz,
+den ein Screenreader wörtlich vorliest, und das ausgerechnet in der Fassung, die das Modul
+als die richtige vorführt.
 
 `elbwerk.upload.structureHint` ist die einzige Stelle, an der Elbwerk im behobenen Zustand
 selbst etwas über Barrierefreiheit sagt. Das ist bewusst: Es zeigt, dass ein Unternehmen
 Zugänglichkeit auch nach außen weitergeben kann, ohne belehrend zu wirken.
+
+**Nachgetragen mit Slice 9**: `elbwerk.upload.simulationNote`, `elbwerk.job.pdfHeading`
+(Abschnitt 8.2) und `elbwerk.upload.error.formatUnknown`. Alle drei folgen dem Muster
+bereits abgenommener Texte und stehen unter demselben Vorbehalt der fachlichen Freigabe
+wie alle Elbwerk-Texte (Abschnitt 10).
 
 ### 8.9 Schritt 4 — Rückmeldung
 

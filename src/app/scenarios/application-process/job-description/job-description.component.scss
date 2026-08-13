@@ -1,0 +1,31 @@
+// --sim-* tokens only (CLAUDE.md rule 5). Ordinary corporate styling, nothing
+// distinctive — docs/DESIGN.md §4.2.
+//
+// These rules repeat what job-posting-step.component.scss says about the same
+// elements, and they have to: view encapsulation scopes a component's styles to
+// its own template, so the parent's `h5` rule does not reach the headings this
+// component renders. The alternative — `::ng-deep` from the two hosts — would
+// leak out of both of them for the sake of six declarations.
+//
+// Nothing here is a barrier. The barrier `sprache` lives in the words.
+:host {
+  display: block;
+}
+
+h5 {
+  margin: 24px 0 8px;
+  font-size: 1.0625rem;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+li {
+  margin-bottom: 4px;
+}

@@ -9,7 +9,9 @@
 //    `alt` attribute; resolved, the same figures are text with a heading and a
 //    list and the graphic stays on as decoration (docs/UX-COPY.md §8.6).
 //  - `sprache` — nested officialese against plain language, same substance
-//    either way (docs/UX-COPY.md §8.3).
+//    either way (docs/UX-COPY.md §8.3). It is rendered by
+//    JobDescriptionComponent, which step 3 also uses: the posting is one
+//    document, so its wording has one source (docs/UX-COPY.md §8.2).
 //
 // Neither variant is a repair layer bolted onto the other. Both are written
 // the way a competent and a careless author would each have written them —
@@ -22,16 +24,14 @@
 // the frame's step navigation.
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { BarrierStateService } from '../../../core/barrier-state.service';
-import {
-  GRAFIK_BARRIER,
-  SPRACHE_BARRIER,
-} from '../../../content/application-process/application-process.content';
+import { GRAFIK_BARRIER } from '../../../content/application-process/application-process.content';
 import { APPLICATION_PROCESS_SCENARIO } from '../../../content/application-process/application-process.scenario';
 import { ElbwerkPageComponent } from '../elbwerk-page/elbwerk-page.component';
+import { JobDescriptionComponent } from '../job-description/job-description.component';
 
 @Component({
   selector: 'app-job-posting-step',
-  imports: [ElbwerkPageComponent],
+  imports: [ElbwerkPageComponent, JobDescriptionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './job-posting-step.component.html',
   styleUrl: './job-posting-step.component.scss',
@@ -57,10 +57,6 @@ export class JobPostingStepComponent {
    */
   protected readonly benefitsAsText = computed(() =>
     this.barrierState.isResolved(this.scenario, GRAFIK_BARRIER.urlKey),
-  );
-
-  protected readonly plainLanguage = computed(() =>
-    this.barrierState.isResolved(this.scenario, SPRACHE_BARRIER.urlKey),
   );
 
   /**

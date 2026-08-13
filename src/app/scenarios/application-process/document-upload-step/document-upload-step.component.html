@@ -1,0 +1,97 @@
+<app-elbwerk-page>
+  <!-- Heading levels are fixed by docs/ARCHITECTURE.md §5.6 rule 1: page h1 =
+       scenario title (frame), region h2 = the region's own heading, all
+       scenario content from h3. `elbwerk.upload.h2` is therefore an h3 and the
+       document heading below it an h4, whatever the key names in
+       docs/UX-COPY.md §8.8 say — the copy document records the same rule. A
+       broken outline is never an admissible barrier. -->
+  <h3 id="sim-upload-heading">{{ heading }}</h3>
+  <p class="upload-intro">{{ intro }}</p>
+
+  <!-- Simulationshinweis (docs/UX-COPY.md §8.8). Ein Dateiauswahlfeld ist ein
+       Eingabepunkt, an dem jemand echte Unterlagen anhängen könnte; der
+       Hinweis steht deshalb hier, ist unabhängig vom Barrierezustand immer
+       vorhanden und wird nie zur Barriere gemacht. -->
+  <p class="simulation-note">{{ simulationNote }}</p>
+
+  <!-- Barriere `upload`, Muster A (docs/UX-COPY.md §8.8). Zwei eigenständig
+       geschriebene Fassungen desselben Formulars.
+
+       Aktiv: kein Wort über Formate oder Größen, das Auswahlfeld nimmt genau
+       ein Format, und die Absage nach dem Absenden nennt den Grund nicht.
+
+       Behoben: Formate, Größenbegrenzung und Strukturhinweis stehen vor dem
+       Auswahlfeld, und schlägt etwas fehl, sagt die Meldung, welche Datei es
+       war und woran es lag.
+
+       Die Beschriftungen sind in beiden Zuständen `<label for>` — fehlende
+       Beschriftungen sind die Barriere von Schritt 2, und eine Barriere, die
+       das Panel hier nicht erklärt, darf auf dieser Seite nicht vorkommen. -->
+  <form class="upload-form" novalidate (submit)="onSubmit($event)">
+    @if (uploadGuidance()) {
+      <p class="format-hint" [id]="formatHintId">{{ formatHint }}</p>
+      <p class="structure-hint">{{ structureHint }}</p>
+    } @else if (hasErrors()) {
+      <p class="error-generic">{{ errorGeneric }}</p>
+    }
+
+    @for (field of fields; track field.id) {
+      <div class="form-field">
+        <label class="field-label" [for]="field.id">{{ field.label }}</label>
+        <input
+          class="field-control"
+          type="file"
+          [id]="field.id"
+          [attr.name]="field.id"
+          [attr.accept]="acceptAttribute()"
+          [attr.aria-invalid]="ariaInvalidFor(field)"
+          [attr.aria-describedby]="describedByFor(field)"
+          (change)="onFileChange(field.id, $event)"
+        />
+
+        <!-- Meldung am Feld nur in der behobenen Fassung, und `role="alert"`,
+             weil sie erst nach dem Absenden entsteht. Zwei Felder, also
+             höchstens zwei Meldungen — eine Sammelmeldung mit Sprunglinks wie
+             im Formular in Schritt 2 wäre hier Aufwand ohne Gewinn. -->
+        @if (fieldErrorFor(field); as error) {
+          <p class="field-error" role="alert" [id]="error.messageId">{{ error.message }}</p>
+        }
+      </div>
+    }
+
+    <button class="submit-button" type="submit">{{ submitLabel }}</button>
+  </form>
+
+  <!-- Barriere `pdf`, Muster A (docs/UX-COPY.md §8.2).
+
+       Aktiv: die Stellenbeschreibung gibt es ausschließlich als Download. Der
+       Dateiname ist die halbe Miete — `final_v3` mit Unterstrichen ist das,
+       was in der Realität hochgeladen wird.
+
+       Behoben: dieselbe Beschreibung steht als Text auf der Seite, und der
+       Download bleibt daneben stehen. Der barrierefreie Zustand ist „auch als
+       Text", nicht „PDF entfernt": Das Dokument verschwindet nicht, es ist nur
+       nicht mehr der einzige Weg. Deshalb steht der Link außerhalb der
+       Verzweigung.
+
+       Der Textkörper kommt aus derselben Komponente wie in Schritt 1. Ein
+       Dokument, ein Wortlaut — und damit folgt er der Barriere `sprache`, die
+       das Panel unter Schritt 1 führt (docs/UX-COPY.md §8.2). -->
+  <section class="posting-document" aria-labelledby="sim-posting-heading">
+    <h4 id="sim-posting-heading">{{ postingHeading }}</h4>
+
+    @if (postingAsText()) {
+      <p>{{ htmlNote }}</p>
+    } @else {
+      <p>{{ pdfIntro }}</p>
+    }
+
+    <p class="document-download">
+      <a [href]="postingPdf">{{ pdfLinkText }}</a>
+    </p>
+
+    @if (postingAsText()) {
+      <app-job-description />
+    }
+  </section>
+</app-elbwerk-page>
