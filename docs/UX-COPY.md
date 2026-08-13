@@ -2,7 +2,7 @@
 
 **Projekt:** AccessIssue
 **Grundlagen:** `docs/PRD.md` (v1.1), `docs/ARCHITECTURE.md` (v1.1), `docs/DESIGN.md` (v1)
-**Status:** Entwurf v2.0 — überarbeitet nach der fertigen Modulpräsentation
+**Status:** Entwurf v2.1 — CSR-Kampagne neu gefasst, ohne Video
 **Stand:** August 2026
 
 > **Sprache dieses Dokuments.** Deutsch, abweichend von `ARCHITECTURE.md`, `TESTING.md`
@@ -294,17 +294,41 @@ Schritt, mit Fachbereich als Kennzeichnung (`ARCHITECTURE.md` §12.1.1):
 | Screenreader-Erfassung | Tabellen und Status für Screenreader lesbar | IT |
 | Kontrast im System | Ausreichende Farbkontraste | IT |
 
-*CSR-Kampagne*
+*CSR-Kampagne — Bereich „Kampagnenseite"*
 
 | Barriere | Beschriftung | Bereich |
 | --- | --- | --- |
-| Video (Sammelbegriff) | Video barrierefrei | Kommunikation |
-| → Teil: Untertitel | Untertitel vorhanden | Kommunikation |
-| → Teil: Transkript | Transkript vorhanden | Kommunikation |
-| Anglizismen | Kampagnentext verständlich, mit Leichter Sprache | Kommunikation |
+| Navigation | Navigation per Tastatur bedienbar | IT |
+
+*Bereich „Texte und Inhalte"*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Sprache (Sammelbegriff) | Texte verständlich | Kommunikation |
+| → Teil: Jargon | Kampagnentext ohne Fachjargon | Kommunikation |
+| → Teil: Leichte Sprache | Fassung in Leichter Sprache vorhanden | Kommunikation |
+
+*Bereich „Medien"*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Alternativtexte | Bilder mit Alternativtexten | Kommunikation |
 | Emojis | Emojis ergänzen den Text, statt ihn zu ersetzen | Kommunikation |
-| Social-Media-Einbettung | Bilder mit Alternativtexten und gutem Kontrast | Kommunikation |
-| Event-Angaben | Angaben zu Zugang und Dolmetschung beim Event | CSR |
+| Kontrast | Text auf Bildern gut lesbar | Kommunikation |
+
+*Bereich „Event und Podiumsdiskussion"*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
+| Event (Sammelbegriff) | Veranstaltung für alle zugänglich | CSR |
+| → Teil: Einladung | Einladung als Text auf der Seite | Kommunikation |
+| → Teil: Dolmetschung | Gebärdensprachdolmetschung angeboten | CSR |
+| → Teil: Zugang | Stufenloser Zugang und Angabe dazu | CSR |
+
+*Bereich „Spendenaufruf"*
+
+| Barriere | Beschriftung | Bereich |
+| --- | --- | --- |
 | Fortschrittsbalken | Spendenstand als Text lesbar | IT |
 | Countdown | Countdown wird vorgelesen | IT |
 | Spenden-Slider | Betrag auch als Eingabefeld | IT |
@@ -322,6 +346,13 @@ von Kapitel 3 trägt:
 | `panel.areaSummary` | Diese {count} Barrieren stammen aus {areaCount} Bereichen: {areas}. |
 | `panel.areaSummary.single` | Alle {count} Barrieren stammen aus einem Bereich: {area}. |
 | `panel.groupLabel` | Barrieren in diesem Schritt |
+| `panel.groupLabel.section` | Barrieren in diesem Bereich |
+| `panel.groupAnchor` | Zu diesem Bereich springen |
+| `csr.group.page` | Kampagnenseite |
+| `csr.group.texts` | Texte und Inhalte |
+| `csr.group.media` | Medien |
+| `csr.group.event` | Event und Podiumsdiskussion |
+| `csr.group.donation` | Spendenaufruf |
 | `area.personal` | Personal |
 | `area.kommunikation` | Kommunikation |
 | `area.it` | IT |
@@ -967,37 +998,185 @@ und stehen unter demselben Vorbehalt der fachlichen Freigabe wie alle Elbwerk-Te
 
 ## 9. Elbwerk-Texte: CSR-Kampagne
 
-### 9.1 Seitenrahmen
+Eine Seite mit fünf Abschnitten, die zugleich die Panel-Gruppen bilden
+(`ARCHITECTURE.md` §12.1.1). Überschriftenebenen wie in Abschnitt 8.1: Bereichsüberschrift
+`h2`, Seitenabschnitte `h3`, alles darunter `h4` und tiefer.
+
+**Adresse in der Simulationsleiste:** `/engagement/inklusiv-nachhaltig-sichtbar`
 
 | Schlüssel | Text |
 | --- | --- |
-| `csr.h2` | Gemeinsam für ein barrierefreies Wilhelmsburg |
+| `csr.h3` | Inklusiv. Nachhaltig. Sichtbar. |
 | `csr.lead` | Mit der Aktion „Elbwerk hilft" unterstützen wir seit 2019 gemeinnützige Projekte in unserem Stadtteil. In diesem Jahr sammeln wir für die Ausstattung des Nachbarschaftstreffs an der Veringstraße. |
-| `csr.videoCaption` | Elbwerk hilft 2026: Der Nachbarschaftstreff stellt sich vor (2:14 Min.) |
 
-### 9.2 Kombinierte Barriere „Video"
+**Kein Kampagnenvideo.** Es liegt kein Material vor, und ohne Untertiteldatei und Transkript
+gäbe es keinen barrierefreien Zustand (`PRD.md` §6.2). Die Schlüssel `csr.video.*` und
+`csr.videoCaption` aus einer früheren Fassung sind entfallen und werden **nicht** vergeben —
+falls das Video später kommt, sind sie frei.
 
-**Aktiv:** `<video>` ohne `<track>`, ohne Transkript.
-
-**Teil „Untertitel" behoben:** WebVTT-Untertitelspur vorhanden.
-
-| Schlüssel | Text |
-| --- | --- |
-| `csr.video.captionTrackLabel` | Deutsch (Untertitel) |
-
-**Teil „Transkript" behoben:** aufklappbares Transkript unter dem Video.
+### 9.1 Bereich „Kampagnenseite" — Barriere „Navigation"
 
 | Schlüssel | Text |
 | --- | --- |
-| `csr.video.transcriptToggle` | Transkript anzeigen |
-| `csr.video.transcriptToggleClose` | Transkript ausblenden |
-| `csr.video.transcriptHeading` | Transkript des Videos |
+| `csr.nav.label` | Bereiche dieser Seite |
+| `csr.nav.items` | Die Aktion · Unser Ziel · Stimmen · Mitmachen · Veranstaltung |
 
-**Wenn nur ein Teil behoben ist,** zeigt der Rahmen (nicht Elbwerk) den Hinweis aus
-`panel.combinedHint`. Elbwerk selbst kommentiert das nicht — ein Unternehmen, das die
-Lücke bemerkt hätte, hätte sie geschlossen.
+**Aktiv:** Die Bereichsnavigation ist ein `<div>`-Konstrukt mit Klick-Handlern, nicht in der
+Tab-Reihenfolge, ohne sichtbaren Fokus. Ein Aufklappmenü öffnet nur bei `mouseover`.
 
-### 9.3 Barriere „Spendenstand"
+**Behoben:** echte Links in einer `<nav>` mit `aria-label`, in der Tab-Reihenfolge, mit
+`--sim-focus-ring`; das Aufklappmenü öffnet auch bei Fokus und `Enter`.
+
+Diese Barriere ist die einzige, die den Nutzer beim Erkunden der Seite selbst behindert —
+sie erschwert das Erreichen der anderen Abschnitte. Das ist gewollt und harmlos: Die Seite
+lässt sich weiterhin scrollen, und die Panel-Gruppen im Rahmen führen ohnehin zu jedem
+Abschnitt (`ARCHITECTURE.md` §12.1.1).
+
+### 9.2 Bereich „Texte und Inhalte" — kombinierte Barriere, 2 Teile
+
+**Teil 1 aktiv** — Kampagnentext im Marketing-Jargon:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.text.jargon` | Mit unserem Purpose-driven Impact-Programm committen wir uns zu nachhaltigem Stakeholder-Value. Unsere Diversity-&-Inclusion-Roadmap adressiert Barrieren im Community-Umfeld und schafft messbare Social-Impact-KPIs entlang der gesamten Wertschöpfungskette. |
+
+**Teil 1 behoben** — verständliches Deutsch:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.text.plain` | Wir unterstützen Projekte in unserem Stadtteil. In diesem Jahr sammeln wir Geld für den Nachbarschaftstreff an der Veringstraße. Dort treffen sich Menschen aus dem Viertel, es gibt Hausaufgabenhilfe und einen Mittagstisch. |
+
+**Teil 2 behoben** — zusätzlich eine eigenständige Fassung in Leichter Sprache:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.easyLanguage.toggle` | Diesen Text in Leichter Sprache lesen |
+| `csr.easyLanguage.h4` | Die Aktion in Leichter Sprache |
+| `csr.easyLanguage.body` | Elbwerk ist eine Firma in Hamburg. Elbwerk sammelt Geld. Das Geld ist für den Nachbarschafts-Treff. Der Treff ist ein Haus im Stadt-Teil Wilhelmsburg. Dort treffen sich Menschen. Kinder bekommen Hilfe bei den Haus-Aufgaben. Es gibt jeden Tag ein warmes Mittag-Essen. Der Treff braucht neue Stühle und Tische. Dafür sammeln wir 12.000 Euro. |
+
+Leichte Sprache ist kein vereinfachter Fließtext, sondern ein eigenes Regelwerk: kurze
+Sätze, ein Gedanke pro Satz, Bindestriche in zusammengesetzten Wörtern, keine Metaphern.
+Die Fassung oben folgt diesen Regeln annähernd — sie ist ein Platzhalter und **muss** vor
+Veröffentlichung von einer Fachstelle für Leichte Sprache geprüft werden. Eine schlecht
+gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine.
+
+**Warum das gekoppelt ist:** Wer nur Teil 1 behebt, hat verständliches Deutsch — für viele
+eine echte Verbesserung, für Menschen mit Lernbehinderung aber weiterhin zu schwer. Wer nur
+Teil 2 behebt, bietet Leichte Sprache als Sonderweg neben unverständlichem Haupttext an. Der
+Erklärtext muss beides benennen.
+
+### 9.3 Bereich „Medien" — Barriere „Alternativtexte"
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.social.h3` | Aus unserem Instagram-Feed |
+| `csr.social.disclaimer` | Nachbildung einer Social-Media-Einbettung. Es werden keine Daten an Dritte übertragen. |
+| `csr.social.post1.alt` | Zwölf Mitarbeitende von Elbwerk stehen mit Malerrollen vor der frisch gestrichenen Wand des Nachbarschaftstreffs. |
+| `csr.social.post2.alt` | Eine Frau übergibt einen symbolischen Spendenscheck über 2.000 Euro an zwei Vertreterinnen des Nachbarschaftstreffs. |
+| `csr.social.post3.alt` | Kinder sitzen an einem langen Tisch im Nachbarschaftstreff und basteln. |
+
+**Aktiv:** `alt` fehlt bei allen drei Bildern. **Behoben:** `alt` wie oben.
+
+Die Alternativtexte sind bewusst beschreibend und nicht interpretierend — sie taugen als
+Muster für das, was das Modul lehrt.
+
+### 9.4 Bereich „Medien" — Barriere „Emojis"
+
+**Aktiv** — Emojis tragen die Information, statt sie zu begleiten:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.social.emojiPost` | Aktionstag im Treff 🎉🎉🎉 Schon 8️⃣0️⃣% 🙌 Jetzt mitmachen 👉 Link in Bio ❤️♿ |
+
+Ein Screenreader liest daraus: *„Party-Popper, Party-Popper, Party-Popper, Schon, Ziffer
+acht, Ziffer null, Prozent, erhobene Hände, Jetzt mitmachen, nach rechts zeigende Hand,
+Link in Bio, rotes Herz, Rollstuhlsymbol."* Die Prozentzahl ist verloren, das
+Rollstuhlsymbol soll Inklusion signalisieren und ist nicht einmal beschriftet.
+
+**Behoben:**
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.social.plainPost` | Aktionstag im Nachbarschaftstreff: Wir haben 80 Prozent des Spendenziels erreicht. Machen Sie mit — der Link steht in unserem Profil. 🎉 |
+
+Ein Emoji bleibt stehen. Das ist Absicht: Die Lehre ist nicht „Emojis sind schlecht",
+sondern „Emojis dürfen keine Information tragen". Ein schmückendes Emoji nach einem
+vollständigen Satz ist unproblematisch.
+
+### 9.5 Bereich „Medien" — Barriere „Kontrast im Text-Overlay"
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.social.post1.overlay` | Aktionstag im Treff |
+| `csr.social.post2.overlay` | 2.000 € übergeben |
+| `csr.social.post3.overlay` | Bastelnachmittag |
+
+**Aktiv:** Overlay-Text in `--sim-fail-text` (2,92:1) direkt auf dem Bild.
+**Behoben:** Overlay in `--sim-text` auf einem abgedunkelten Verlauf, mindestens 4,5:1.
+
+### 9.6 Bereich „Event und Podiumsdiskussion" — kombinierte Barriere, 3 Teile
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.h3` | Podiumsdiskussion „Inklusiv. Nachhaltig. Sichtbar." |
+| `csr.event.basics` | Donnerstag, 24. September 2026, 18 Uhr, Nachbarschaftstreff Veringstraße, Hamburg-Wilhelmsburg |
+| `csr.event.registration` | Anmeldung bis zum 20. September per E-Mail an event@elbwerk.de |
+
+**Teil 1 — Einladung.** Aktiv: nur als PDF-Download.
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.pdfIntro` | Alle Einzelheiten entnehmen Sie bitte der Einladung. |
+| `csr.event.pdfLink` | Einladung_Podiumsdiskussion_Sept2026_final.pdf (1,2 MB) |
+
+Behoben: dieselben Angaben als Text auf der Seite, das PDF bleibt zusätzlich verfügbar.
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.htmlNote` | Sie können die Einladung hier lesen oder als PDF herunterladen. |
+| `csr.event.programme.h4` | Programm |
+| `csr.event.programme.items` | 18:00 Uhr Begrüßung durch die Geschäftsführung · 18:15 Uhr Podiumsdiskussion mit Gästen aus dem Stadtteil · 19:30 Uhr Ausklang bei Getränken |
+
+**Teil 2 — Gebärdensprachdolmetschung.** Aktiv: fehlt ersatzlos, kein Hinweis. Behoben:
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.dgs` | Die Veranstaltung wird durchgehend in Deutsche Gebärdensprache gedolmetscht. Eine Schriftdolmetschung wird auf eine Leinwand neben dem Podium übertragen. |
+
+**Teil 3 — Zugang.** Aktiv: Der Eingang hat drei Stufen, die Seite sagt dazu nichts. Das
+Bild zeigt den Eingang mit Stufen, ohne Alternativtext.
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.venueImageAlt.stairs` | Der Eingang des Nachbarschaftstreffs. Drei Stufen führen zur Eingangstür, ein Handlauf ist nicht vorhanden. |
+
+Behoben: Das Bild zeigt denselben Eingang mit einer Rampe, mit Alternativtext, und die Seite
+benennt den Zugang.
+
+| Schlüssel | Text |
+| --- | --- |
+| `csr.event.venueImageAlt.ramp` | Der Eingang des Nachbarschaftstreffs. Neben drei Stufen führt eine Rampe mit Handlauf zur Eingangstür. |
+| `csr.event.access.h4` | Barrierefreiheit der Veranstaltung |
+| `csr.event.access.items` | Stufenloser Zugang über eine Rampe am Haupteingang · Barrierefreie Toilette im Erdgeschoss · Induktive Höranlage im Saal · Reservierte Plätze in der ersten Reihe für Rollstuhlnutzende und für Menschen, die auf gute Sicht zur Dolmetschung angewiesen sind |
+| `csr.event.access.contact` | Sie brauchen etwas, das hier nicht steht? Melden Sie sich bei Torben Kruse, Telefon 040 555 0188. Wir versuchen es möglich zu machen. |
+
+**Zum Bild.** Beide Fassungen sind schematische SVG-Illustrationen, keine Fotos
+(`SPEC_v2.md` §4.2). Ein fotorealistisches Bild müsste erst erstellt werden und würde die
+Umsetzung an einen externen Liefergegenstand binden — dasselbe Problem wie beim Video.
+
+**Warum drei Teile gekoppelt sind:** Wer die Einladung als Text bereitstellt, aber die
+Stufen lässt, hat eine gut lesbare Einladung zu einer Veranstaltung, die man nicht betreten
+kann. Wer eine Rampe baut, aber nicht dolmetschen lässt, lädt gehörlose Menschen in einen
+Raum ein, in dem sie nichts verstehen. Drei Behinderungsarten, drei Teilbarrieren, keine
+Teillösung hilft den jeweils anderen. Das ist die stärkste kombinierte Barriere des
+Werkzeugs.
+
+**Der dritte Teil ist die einzige physische Barriere im Werkzeug.** Der Erklärtext muss den
+Unterschied benennen: Die digitale Barriere ist, dass die Seite den Zugang verschweigt. Die
+physische ist, dass es keine Rampe gibt. Eine Kampagne über Inklusion trägt für beides
+Verantwortung.
+
+### 9.7 Bereich „Spendenaufruf" — Barriere „Spendenstand"
 
 | Schlüssel | Text |
 | --- | --- |
@@ -1011,26 +1190,7 @@ ausschließlich als Beschriftung *innerhalb* der Grafik.
 `aria-hidden`. Kein `role="progressbar"` mit ARIA-Werten — der einfachere und
 verlässlichere Weg ist sichtbarer Text.
 
-### 9.4 Barriere „Social-Media-Einbettung"
-
-| Schlüssel | Text |
-| --- | --- |
-| `csr.social.h3` | Aus unserem Instagram-Feed |
-| `csr.social.disclaimer` | Nachbildung einer Social-Media-Einbettung. Es werden keine Daten an Dritte übertragen. |
-| `csr.social.post1.alt` | Zwölf Mitarbeitende von Elbwerk stehen mit Malerrollen vor der frisch gestrichenen Wand des Nachbarschaftstreffs. |
-| `csr.social.post1.overlay` | Aktionstag im Treff |
-| `csr.social.post2.alt` | Eine Frau übergibt einen symbolischen Spendenscheck über 2.000 Euro an zwei Vertreterinnen des Nachbarschaftstreffs. |
-| `csr.social.post2.overlay` | 2.000 € übergeben |
-| `csr.social.post3.alt` | Kinder sitzen an einem langen Tisch im Nachbarschaftstreff und basteln. |
-| `csr.social.post3.overlay` | Bastelnachmittag |
-
-**Aktiv:** `alt` fehlt, Overlay-Text in `--sim-fail-text` (2,92:1).
-**Behoben:** `alt` gesetzt, Overlay in `--sim-text` auf abgedunkeltem Verlauf.
-
-Die Alternativtexte sind bewusst beschreibend und nicht interpretierend — sie taugen als
-Muster für das, was das Modul lehrt.
-
-### 9.5 Barriere „Countdown"
+### 9.8 Bereich „Spendenaufruf" — Barriere „Countdown"
 
 | Schlüssel | Text |
 | --- | --- |
@@ -1044,14 +1204,14 @@ Muster für das, was das Modul lehrt.
 sekündlich — sonst redet die Live-Region dauernd dazwischen. Die sichtbare Anzeige läuft
 weiter im Sekundentakt.
 
-Dieser Unterschied ist selbst lehrreich: Eine Live-Region einzubauen genügt nicht, sie
-muss auch die richtige Frequenz haben.
+Dieser Unterschied ist selbst lehrreich: Eine Live-Region einzubauen genügt nicht, sie muss
+auch die richtige Frequenz haben.
 
 Der Minutentakt ist zugleich technisch notwendig. Der behobene Countdown ist die einzige
 Live-Region außerhalb des Rahmens (`ARCHITECTURE.md` §12.2). Liefe sie sekündlich, spräche
 sie über jede Bestätigung aus Abschnitt 5.7 hinweg, und beide Ansagen wären wertlos.
 
-### 9.6 Barriere „Spendenformular"
+### 9.9 Bereich „Spendenaufruf" — Barriere „Spendenformular"
 
 | Schlüssel | Text |
 | --- | --- |
@@ -1066,7 +1226,10 @@ sie über jede Bestätigung aus Abschnitt 5.7 hinweg, und beide Ansagen wären w
 **Behoben:** beschriftetes Zahlenfeld plus Voreinstellungs-Schaltflächen; der Regler bleibt
 als zusätzliche Option und ist tastaturbedienbar.
 
-### 9.7 Barriere „Testimonial-Karussell"
+`csr.donate.simulationNote` ist der fünfte **Simulationshinweis** (Abschnitt 8.4) — ein
+Eingabefeld für einen Geldbetrag ist genau der Fall, für den die Regel gemacht ist.
+
+### 9.10 Bereich „Spendenaufruf" — Barriere „Testimonial-Karussell"
 
 | Schlüssel | Text |
 | --- | --- |
@@ -1084,80 +1247,6 @@ stoppt bei Fokus oder Zeigerkontakt.
 
 Bei `prefers-reduced-motion` greift in beiden Zuständen der Hinweis aus Abschnitt 5.9 und
 der automatische Wechsel unterbleibt.
-
----
-
-### 9.8 Barriere „Anglizismen und Leichte Sprache"
-
-**Aktiv** — Kampagnentext im Marketing-Jargon:
-
-> Mit unserem Purpose-driven Impact-Programm committen wir uns zu nachhaltigem
-> Stakeholder-Value. Unsere Diversity-&-Inclusion-Roadmap adressiert Barrieren im
-> Community-Umfeld und schafft messbare Social Impact-KPIs entlang der gesamten
-> Wertschöpfungskette.
-
-**Behoben** — verständliche Fassung plus eigenständige Fassung in Leichter Sprache:
-
-> Wir unterstützen Projekte in unserem Stadtteil. In diesem Jahr sammeln wir Geld für den
-> Nachbarschaftstreff an der Veringstraße. Dort treffen sich Menschen aus dem Viertel, es
-> gibt Hausaufgabenhilfe und einen Mittagstisch.
-
-| Schlüssel | Text |
-| --- | --- |
-| `csr.plainLanguage.toggle` | Diesen Text in Leichter Sprache lesen |
-| `csr.plainLanguage.h3` | Die Aktion in Leichter Sprache |
-| `csr.plainLanguage.body` | Elbwerk ist eine Firma in Hamburg. Elbwerk sammelt Geld. Das Geld ist für den Nachbarschafts-Treff. Der Treff ist ein Haus im Stadt-Teil Wilhelmsburg. Dort treffen sich Menschen. Kinder bekommen Hilfe bei den Haus-Aufgaben. Es gibt jeden Tag ein warmes Mittag-Essen. Der Treff braucht neue Stühle und Tische. Dafür sammeln wir 12.000 Euro. |
-
-Leichte Sprache ist kein vereinfachter Fließtext, sondern ein eigenes Regelwerk: kurze
-Sätze, ein Gedanke pro Satz, Bindestriche in zusammengesetzten Wörtern, keine Metaphern.
-Die Fassung oben folgt diesen Regeln annähernd — sie ist ein Platzhalter und **muss** vor
-Veröffentlichung von einer Fachstelle für Leichte Sprache geprüft werden. Eine schlecht
-gemachte Fassung ist in einem Modul über Barrierefreiheit schlimmer als keine.
-
-### 9.9 Barriere „Emojis"
-
-**Aktiv** — Emojis tragen die Information, statt sie zu begleiten:
-
-| Schlüssel | Text |
-| --- | --- |
-| `csr.social.emojiPost` | Aktionstag im Treff 🎉🎉🎉 Schon 8️⃣0️⃣% 🙌 Jetzt mitmachen 👉 Link in Bio ❤️♿ |
-
-Ein Screenreader liest daraus: *„Party-Popper, Party-Popper, Party-Popper, Schon,
-Ziffer acht, Ziffer null, Prozent, erhobene Hände, Jetzt mitmachen, nach rechts zeigende
-Hand, Link in Bio, rotes Herz, Rollstuhlsymbol."* Die Prozentzahl ist verloren, das
-Rollstuhlsymbol soll Inklusion signalisieren und ist nicht einmal beschriftet.
-
-**Behoben:**
-
-| Schlüssel | Text |
-| --- | --- |
-| `csr.social.plainPost` | Aktionstag im Nachbarschaftstreff: Wir haben 80 Prozent des Spendenziels erreicht. Machen Sie mit — der Link steht in unserem Profil. 🎉 |
-
-Ein Emoji bleibt stehen. Das ist Absicht: Die Lehre ist nicht „Emojis sind schlecht",
-sondern „Emojis dürfen keine Information tragen". Ein schmückendes Emoji nach einem
-vollständigen Satz ist unproblematisch.
-
-### 9.10 Barriere „Event-Angaben"
-
-**Aktiv** — die Einladung nennt Ort und Zeit, sonst nichts:
-
-| Schlüssel | Text |
-| --- | --- |
-| `csr.event.h3` | Podiumsdiskussion „Inklusiv. Nachhaltig. Sichtbar." |
-| `csr.event.basics` | Donnerstag, 24. September 2026, 18 Uhr, Nachbarschaftstreff Veringstraße, Hamburg-Wilhelmsburg |
-| `csr.event.registration` | Anmeldung bis zum 20. September per E-Mail an event@elbwerk.de |
-
-**Behoben** — die Angaben, die über eine Teilnahme entscheiden:
-
-| Schlüssel | Text |
-| --- | --- |
-| `csr.event.access.h4` | Barrierefreiheit der Veranstaltung |
-| `csr.event.access.items` | Stufenloser Zugang über den Haupteingang, Aufzug vorhanden · Barrierefreie Toilette im Erdgeschoss · Gebärdensprachdolmetschung (DGS) durchgehend · Schriftdolmetschung auf einer Leinwand neben dem Podium · Induktive Höranlage im Saal · Reservierte Plätze in der ersten Reihe für Rollstuhlnutzende und für Menschen, die auf gute Sicht zur Dolmetschung angewiesen sind |
-| `csr.event.access.contact` | Sie brauchen etwas, das hier nicht steht? Melden Sie sich bei Torben Kruse, Telefon 040 555 0188. Wir versuchen es möglich zu machen. |
-
-Dies ist die zweite organisatorische Barriere im Werkzeug und die anschaulichste: Es fehlt
-keine Zeile Code. Es fehlt eine Information, die jemand hätte aufschreiben müssen — und
-ohne die eine gehörlose Person nicht weiß, ob sie hingehen kann.
 
 ---
 

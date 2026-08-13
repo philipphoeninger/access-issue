@@ -2,7 +2,7 @@
 
 **Project:** AccessIssue
 **Source document:** `docs/PRD.md` (v1)
-**Status:** Draft v2.0 — revised after the finished module deck
+**Status:** Draft v2.1 — barrier groups for single-page scenarios
 **Date:** August 2026
 
 ---
@@ -318,6 +318,9 @@ interface Barrier {
   categories: DisabilityCategory[];
   affectedGroups: string[];
   responsibleArea: ResponsibleArea;
+  /** Panel grouping key — a step for multi-step scenarios, a page section for
+   *  single-page ones. See §12.1.1. */
+  groupId: string;
   /**
    * True when the barrier is an organisational omission rather than a technical
    * defect — no missing labels, no failing contrast, nothing a checker could see.
@@ -532,7 +535,7 @@ lands on the German side despite being technical.
 /szenario/bewerbung/rueckmeldung         Application, step 4
 /szenario/softwarebeschaffung/vergabe    Procurement, part A
 /szenario/softwarebeschaffung/system     Procurement, part B
-/szenario/csr-kampagne                   CSR landing page
+/szenario/csr-kampagne                   CSR landing page (single page, 5 sections)
 /**                                      Not found → link back to home
 ```
 
@@ -709,8 +712,39 @@ grouping: *„Diese 11 Barrieren stammen aus 3 Bereichen: Personal, Kommunikatio
 sentence, always visible, and it states the point more directly than a grouping ever could
 — a user reading a grouped list has to count the group headings themselves to notice.
 
-For single-step scenarios (CSR campaign) the step grouping collapses to one group; the
-summary line still applies and does the work.
+**Single-page scenarios group by page section, not by step.** An earlier draft said the
+step grouping "collapses to one group" for the CSR campaign and that the summary line would
+carry it. That was written when the campaign had six barriers. It now has eleven barriers
+and fourteen switches on a single page — one flat group of fourteen is exactly the scanning
+problem §21 warns about, and the collapse would have produced it.
+
+The grouping key is therefore **not** the routing step. `Barrier` carries a `groupId`, and
+`Scenario` declares the groups:
+
+```ts
+interface BarrierGroup {
+  id: string;
+  /** Panel heading and, for single-page scenarios, the section anchor label. */
+  title: string;
+  /** Anchor target inside the simulation region, single-page scenarios only. */
+  anchorId?: string;
+}
+```
+
+For multi-step scenarios the groups mirror the steps one-to-one (application process: four
+groups, four steps). For single-page scenarios they mirror the page's sections — the CSR
+campaign's five come straight from the module deck's own breakdown of slide 29: campaign
+page, texts, media, event, donation appeal.
+
+This keeps one grouping mechanism rather than two, and it removes the assumption that
+routing structure and panel structure are the same thing. They coincided in the application
+process; they do not in general.
+
+**Single-page scenarios also need anchors.** With five sections on one long page, a user who
+resolves a barrier in "Event" should be able to reach the part of the simulation it changed.
+Each group's panel heading carries a link to its `anchorId`. Following it moves focus to the
+section heading inside the simulation region, which is a normal in-page jump — no focus
+trap, no scroll hijacking.
 
 An area filter is explicitly **not** in scope. It would let a user hide everything outside
 their own department — the exact reflex the chapter argues against.
@@ -1032,8 +1066,8 @@ Small, time-boxed investigations to run before or early in Phase 1 implementatio
   change. If scenario count passes roughly six, the home page needs grouping or filtering.
   Scenario order on the home page follows the module deck (application process, software
   procurement, CSR campaign) — it is presentation order, not implementation order.
-- **Barrier count per scenario above ten.** Already reached — the application process has
-  eleven. Grouping is specified in §12.1.1. Past roughly fifteen in one scenario, the
+- **Barrier count per scenario above ten.** Already reached twice — the application process
+  has eleven, the CSR campaign eleven barriers across fourteen switches. Grouping is specified in §12.1.1. Past roughly fifteen in one scenario, the
   summary line stops being scannable and the panel likely needs collapsible step groups.
 - **State beyond booleans.** If a future barrier needs a value rather than a flag
   (a contrast ratio, a timeout duration), the `frei` grammar needs extending —

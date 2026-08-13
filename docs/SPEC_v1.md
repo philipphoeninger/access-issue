@@ -57,8 +57,8 @@ the authority on what chapter 3 teaches, and the tool has to match it.
 
 | Not in this spec | Why | Where it goes |
 | --- | --- | --- |
-| Software procurement scenario | Now fully specified (`PRD.md` §6.2) but out of phase 1 scope | `SPEC_v2.md` |
-| CSR campaign scenario | Blocked on video, caption file and transcript (`PRD.md` §10) | `SPEC_v3.md` |
+| CSR campaign scenario | Out of phase 1 scope; built without the video (`PRD.md` §6.2) | `SPEC_v2.md` |
+| Software procurement scenario | Fully specified (`PRD.md` §6.3), not yet built | `SPEC_v3.md` |
 | Corporate design polish, funding notices | Assets pending; tokens already carry the palette | Phase 4 |
 | Hosting and deployment configuration | Host undecided; build stays host-agnostic | Phase 4 |
 | Cross-browser suite on Firefox and WebKit | Weekly job, not a merge gate (`TESTING.md` §15) | Phase 4 |

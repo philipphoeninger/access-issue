@@ -160,12 +160,13 @@ in a screenshot.
     The contrast is an intentional boundary signal.
 17. **One counter only**, in the simulation bar, counting *active* barriers. A partially
     resolved combined barrier counts as active.
-18. **Every barrier names a responsible business area.** The panel groups by flow step and
+18. **Every barrier names a responsible business area.** The panel groups by `groupId` —
+    flow steps in multi-step scenarios, page sections in single-page ones — and
     labels each barrier with its area; a summary line states how many areas a scenario
     spans. This is chapter 3's actual thesis — barriers arise between departments, not
     inside one — so it is not decoration. No area filter: letting a user hide other
     departments' barriers is the exact reflex the module argues against.
-19. **Barriers without a standards reference are legitimate.** Five of the 27 violate no
+19. **Barriers without a standards reference are legitimate.** Six of the 29 violate no
     WCAG criterion — no named contact person, no note that adjustments are possible, no
     accessibility criteria in a tender, no assigned responsibility, no event access
     details. They carry `organisational: true` and an empty `standards` array, and the
@@ -229,7 +230,7 @@ Tests are part of the slice, not a follow-up.
 - **Branch coverage ≥ 95 %** on `url-state.ts`, `barrier-state.service.ts`,
   `scenario-registry.service.ts`. No global threshold elsewhere.
 
-Roughly **two thirds of the 27 barriers are invisible to axe** (`TESTING.md` §2), and two
+Roughly **two thirds of the 29 barriers are invisible to axe** (`TESTING.md` §2), and two
 violate no success criterion at all. A
 green pipeline means no regression in the automatable subset — it does not mean the
 application is accessible. Manual passes with NVDA and VoiceOver are the primary evidence.

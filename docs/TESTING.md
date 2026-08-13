@@ -2,7 +2,7 @@
 
 **Project:** AccessIssue
 **Source documents:** `docs/PRD.md` (v1.1), `docs/ARCHITECTURE.md` (v1.1)
-**Status:** Draft v2.0 — revised after the finished module deck
+**Status:** Draft v2.1 — state matrix extended for the CSR campaign
 **Date:** August 2026
 
 ---
@@ -30,7 +30,7 @@ barrier, so that adding a barrier automatically adds its tests.
 ## 2. The Automation Ceiling
 
 This is the most important number in this document, and it should be stated before any
-tooling: **of the twenty-seven barriers across three scenarios, roughly nine are detectable
+tooling: **of the twenty-nine barriers across three scenarios, roughly nine are detectable
 by axe.** Two thirds are not.
 
 | Detectable by axe | Scenario | axe rule |
@@ -129,22 +129,30 @@ transcript, and with transcript but no captions.
 
 Concrete counts for v1:
 
-| Scenario | Step | Barriers | Tested states |
+| Scenario | Step / section | Barriers | Tested states |
 | --- | --- | --- | --- |
 | Application | 1 Job posting | 2 | 4 |
 | Application | 2 Form | 4 | 6 |
 | Application | 3 Documents | 2 | 4 |
 | Application | 4 Response | 3 | 5 |
+| CSR | Campaign page | 1 | 3 |
+| CSR | Texts (combined, 2 parts) | 1 | 4 + 2 partial |
+| CSR | Media | 3 | 5 |
+| CSR | Event (combined, 3 parts) | 1 | 5 + 6 partial |
+| CSR | Donation appeal | 4 | 6 |
 | Procurement | A Tender | 4 | 6 |
 | Procurement | B Ticket system | 3 | 5 |
-| CSR | (single page) | 9, one combined with 2 parts | 11 + 2 partial = 13 |
-| **Total** | | **27** | **43** |
+| **Total** | | **29** | **61** |
+
+The CSR campaign is a single page, so its rows are page sections rather than routing steps
+(`ARCHITECTURE.md` §12.1.1). Its partial-repair states outnumber the others: a three-part
+combined barrier has six of them, and they are where the teaching happens.
 
 State carries across steps, so step transitions are tested separately from the per-step
 matrix.
 
-Forty-three states, each running three axe passes plus structural assertions. That is
-roughly double the earlier estimate and pushes the suite past the point where it stays
+Sixty-one states, each running three axe passes plus structural assertions. That is
+roughly triple the original estimate and pushes the suite past the point where it stays
 comfortably inside an eight-minute pull-request budget on Chromium.
 
 Two mitigations, in this order: shard the Playwright suite by scenario across parallel CI
@@ -575,7 +583,7 @@ not automation, and pretending otherwise would let a release slip through on a g
 Stated plainly because this project of all projects should not overclaim.
 
 - **Automated accessibility testing catches a minority of WCAG issues.** For this
-  application specifically, roughly two thirds of the 27 barriers are invisible to axe, and
+  application specifically, roughly two thirds of the 29 barriers are invisible to axe, and
 two violate no success criterion at all (§2). A
   green pipeline means no regression in the automatable subset. It does not mean the frame
   is accessible.
