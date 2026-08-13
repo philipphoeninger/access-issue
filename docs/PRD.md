@@ -442,7 +442,7 @@ Ideen aus dem Brainstorming, die bewusst nicht in v1 einfließen:
 
 ## 12. Zeitliche Einordnung und Phasen
 
-Es sind derzeit keine harten Deadlines bekannt. Vorgeschlagene Phasierung entlang des in `ai_development_process.md` beschriebenen Prozesses:
+Es sind derzeit keine harten Deadlines bekannt. Vorgeschlagene Phasierung entlang des in `docs/ai_development_process.md` beschriebenen Prozesses:
 
 | Phase | Inhalt | Abhängigkeiten |
 | --- | --- | --- |
@@ -460,6 +460,6 @@ Phase 1 ist die eigentliche Risikophase: Hier entscheidet sich, ob die Trennung 
 - `docs/DESIGN.md` — Gestaltungsrichtung, Farb- und Typografie-Tokens
 - `docs/UX-COPY.md` — Oberflächentexte, Terminologie, Elbwerk-Platzhaltertexte
 - `docs/SPEC_v1.md` — Umsetzungsschnitte für Phase 1
-- `ai_development_process.md` — Entwicklungsprozess
+- `docs/ai_development_process.md` — Entwicklungsprozess
 - `docs/ARCHITECTURE.md` — folgt in Phase 2 des Prozesses
 - `docs/TESTING.md` — Teststrategie, Abdeckungsziele, CI-Pipeline

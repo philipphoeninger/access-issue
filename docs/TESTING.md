@@ -609,4 +609,4 @@ from the first commit.
 - `docs/ARCHITECTURE.md` — boundary invariants, domain model, testing hooks
 - `docs/DESIGN.md` — design direction, contrast verification
 - `docs/SPEC_v1.md` — phase 1 implementation slices
-- `ai_development_process.md` — development process
+- `docs/ai_development_process.md` — development process

@@ -19,7 +19,7 @@ document links rather than restates — a requirement written twice is a require
 will eventually contradict itself.
 
 Slices are sized to be implemented and reviewed in one Claude Code session each, per
-`ai_development_process.md` phase 4. They are ordered by dependency, and the order is not
+`docs/ai_development_process.md` phase 4. They are ordered by dependency, and the order is not
 negotiable in two places, called out where they occur.
 
 **Phase 1 delivers a complete, publishable application** with one scenario. That is
@@ -565,7 +565,7 @@ Phase 1 is complete when all of the following hold:
       suites (frame gate, barrier assertions, page-level rules, exit link)
 - [ ] Branch coverage ≥ 95 % on the three gated core modules
 - [ ] Manual passes recorded under `docs/test-reports/`
-- [ ] `CLAUDE.md` written and current (`ai_development_process.md` step 8)
+- [ ] `CLAUDE.md` written and current (`docs/ai_development_process.md` step 8)
 - [ ] Open questions in §9 below either answered or explicitly deferred with an owner
 
 **Not required for phase 1:** corporate design polish, hosting, the two remaining
@@ -616,4 +616,4 @@ require replacing a barrier the PRD names explicitly.
 - `docs/UX-COPY.md` — every German string, Elbwerk placeholder copy
 - `docs/TESTING.md` — the suites each slice has to satisfy
 - `CLAUDE.md` — working rules for implementation sessions
-- `ai_development_process.md` — process this spec sits in
+- `docs/ai_development_process.md` — process this spec sits in

@@ -87,7 +87,7 @@ already recorded.
 | Every German string, terminology, Elbwerk copy | `docs/UX-COPY.md` |
 | What is tested and how | `docs/TESTING.md` |
 | What to build next, in what order | `docs/SPEC_v1.md` |
-| How this project is run | `ai_development_process.md` |
+| How this project is run | `docs/ai_development_process.md` |
 
 ---
 

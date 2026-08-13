@@ -1025,4 +1025,4 @@ Small, time-boxed investigations to run before or early in Phase 1 implementatio
 - `docs/DESIGN.md` — design direction, token system, frame/simulation styling split
 - `docs/UX-COPY.md` — German interface strings, terminology canon, Elbwerk placeholder copy
 - `docs/SPEC_v1.md` — phase 1 implementation slices
-- `ai_development_process.md` — development process
+- `docs/ai_development_process.md` — development process
