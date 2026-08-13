@@ -8,17 +8,28 @@
 // later step slice adds its own rows: the promise is that the exit works in
 // *every* barrier state, and a state nobody runs it in is a state where nobody
 // knows.
+//
+// Slice 8 added step 2 — and with it the simulated keyboard trap, which is the
+// state this suite exists for. `tastatur` makes one control unreachable; if it
+// ever held the user inside the region instead, step 4 below is what says so.
 import { expect, test, type Page } from '@playwright/test';
 import { gotoRendered } from './support/goto';
 
-const PATH = '/szenario/bewerbung/stellenanzeige';
+const POSTING_PATH = '/szenario/bewerbung/stellenanzeige';
+const FORM_PATH = '/szenario/bewerbung/formular';
 
 /** docs/TESTING.md §4: the tested states. Grows with the barriers. */
-const STATES: Array<{ name: string; query: string }> = [
-  { name: 'all barriers active (default)', query: '' },
-  { name: 'all barriers resolved', query: '?frei=alle' },
-  { name: 'only `grafik` resolved', query: '?frei=grafik' },
-  { name: 'only `sprache` resolved', query: '?frei=sprache' },
+const STATES: Array<{ name: string; path: string; query: string }> = [
+  { name: 'step 1 — all barriers active (default)', path: POSTING_PATH, query: '' },
+  { name: 'step 1 — all barriers resolved', path: POSTING_PATH, query: '?frei=alle' },
+  { name: 'step 1 — only `grafik` resolved', path: POSTING_PATH, query: '?frei=grafik' },
+  { name: 'step 1 — only `sprache` resolved', path: POSTING_PATH, query: '?frei=sprache' },
+  { name: 'step 2 — all barriers active (default)', path: FORM_PATH, query: '' },
+  { name: 'step 2 — all barriers resolved', path: FORM_PATH, query: '?frei=alle' },
+  { name: 'step 2 — only `labels` resolved', path: FORM_PATH, query: '?frei=labels' },
+  { name: 'step 2 — only `tastatur` resolved', path: FORM_PATH, query: '?frei=tastatur' },
+  { name: 'step 2 — only `pflichtfeld` resolved', path: FORM_PATH, query: '?frei=pflichtfeld' },
+  { name: 'step 2 — only `fehler` resolved', path: FORM_PATH, query: '?frei=fehler' },
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';
@@ -32,10 +43,10 @@ function focusIsInsideRegion(page: Page): Promise<boolean> {
   });
 }
 
-for (const { name, query } of STATES) {
+for (const { name, path, query } of STATES) {
   test.describe(`Exit link — ${name}`, () => {
     test('is reached by a single Tab from the element preceding the region', async ({ page }) => {
-      await gotoRendered(page, `${PATH}${query}`);
+      await gotoRendered(page, `${path}${query}`);
 
       // Step 1 of §7. The element preceding the region is the
       // "Simulationsbereich überspringen" link; focusing it is setup, the
@@ -49,7 +60,7 @@ for (const { name, query } of STATES) {
     test('carries a visible focus indicator and is neither clipped nor overlapped', async ({
       page,
     }) => {
-      await gotoRendered(page, `${PATH}${query}`);
+      await gotoRendered(page, `${path}${query}`);
       const exitLink = page.locator('.exit-link');
       await exitLink.focus();
 
@@ -79,7 +90,7 @@ for (const { name, query } of STATES) {
     });
 
     test('leads back to the barrier panel and moves focus there', async ({ page }) => {
-      await gotoRendered(page, `${PATH}${query}`);
+      await gotoRendered(page, `${path}${query}`);
       await page.locator('.exit-link').focus();
 
       // Step 3 of §7 — a real Enter press, and focus has to *land*, not just
@@ -100,7 +111,7 @@ for (const { name, query } of STATES) {
     // never by interception (docs/ARCHITECTURE.md §5.3): a simulated trap may
     // make one control unreachable, never hold the user inside the region.
     test('Tab leaves the region within 50 presses and never cycles inside it', async ({ page }) => {
-      await gotoRendered(page, `${PATH}${query}`);
+      await gotoRendered(page, `${path}${query}`);
       await page.locator('.exit-link').focus();
 
       let left = false;

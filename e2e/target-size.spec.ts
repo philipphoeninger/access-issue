@@ -8,7 +8,7 @@
 import { expect, test } from '@playwright/test';
 import { gotoRendered } from './support/goto';
 
-const PAGES = ['/', '/szenario/bewerbung/stellenanzeige'];
+const PAGES = ['/', '/szenario/bewerbung/stellenanzeige', '/szenario/bewerbung/formular'];
 const MIN_TARGET_PX = 24;
 
 interface UndersizedTarget {

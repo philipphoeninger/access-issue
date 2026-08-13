@@ -188,6 +188,16 @@
   --sim-border: #d8dde2;
   --sim-white: #ffffff;
 
+  // Elbwerk's red, for the required-field asterisk and for error text.
+  //
+  // It passes AA on white **on purpose**, and that is not a contradiction with
+  // the barrier it serves. The required-field barrier (docs/UX-COPY.md §8.7)
+  // fails SC 1.4.1 — colour as the only carrier of meaning — and SC 3.3.2. It
+  // does not fail SC 1.4.3, and a red nobody can read would add a contrast
+  // barrier that no panel entry declares and no explanation covers
+  // (CLAUDE.md rule 18). The deliberate failures live in their own block below.
+  --sim-error: #c62828; // 5.62:1 on white — the only surface it is set as text on
+
   // Focus inside the simulation. NOT a --wi-* token: the boundary rule at the top of
   // this file forbids crossing, and a distinct ring reinforces the visual boundary.
   //

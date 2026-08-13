@@ -1,0 +1,175 @@
+<!-- Der sichtbare Beschriftungstext, genau einmal geschrieben. Die Barriere
+     `labels` entscheidet nur, ob er in einem `<label for>` oder in einem
+     `<div>` steht (docs/UX-COPY.md §8.4: „Die sichtbaren Texte bleiben") —
+     zwei Kopien desselben Textes wären eine Umschreibung davon entfernt, und
+     ausgerechnet an der Stelle, an der Gleichheit die Aussage ist. -->
+<ng-template #labelContent let-field>
+  {{ labelTextFor(field) }}
+
+  <!-- Das Sternchen trägt die Bedeutung allein: nur Farbe, kein Text, kein
+       `required`, keine Legende. Es steht innerhalb der Beschriftung und
+       bewusst nicht auf `aria-hidden` — mit behobener Barriere `labels` liest
+       ein Screenreader „Vorname Stern", mit aktiver gar nichts. Beide Fälle
+       nennt docs/UX-COPY.md §8.7, und sie entsprechen genau den beiden
+       Zuständen von `labels`. -->
+  @if (showsAsterisk(field)) {
+    <span class="required-star">*</span>
+  }
+</ng-template>
+
+<app-elbwerk-page>
+  <!-- Heading levels are fixed by docs/ARCHITECTURE.md §5.6 rule 1: page h1 =
+       scenario title (frame), region h2 = the region's own heading, all
+       scenario content from h3. `elbwerk.form.h2` is therefore an h3 and
+       `elbwerk.form.errorSummary.h3` an h4, whatever the key names in
+       docs/UX-COPY.md §8.4 and §8.5 say — the copy document records the same
+       rule. A broken outline is never an admissible barrier. -->
+  <h3 id="sim-form-heading">{{ heading }}</h3>
+
+  <!-- Barriere `fehler`, Muster A (docs/UX-COPY.md §8.5). Zwei eigenständig
+       geschriebene Fassungen derselben Ausgabe, nicht eine mit Attributen
+       nachgerüstete.
+
+       Aktiv: eine einzige technisch klingende Zeile am Seitenanfang. Kein
+       `role="alert"`, kein Bezug zu einem Feld, keine Angabe, was zu tun ist —
+       „Code 422" ist die Meldung, die in der Realität ankommt.
+
+       Behoben: Sammelmeldung mit Sprunglinks, dazu am Feld eine konkrete
+       Meldung, `aria-invalid` und `aria-describedby` (weiter unten), und der
+       Fokus wandert auf das erste fehlerhafte Feld. -->
+  @if (hasErrors()) {
+    @if (errorFeedback()) {
+      <div class="error-summary" role="alert">
+        <!-- Kein `aria-labelledby` auf dem Container: `role="alert"` lässt
+             ohnehin den ganzen Inhalt vorlesen, eine zusätzliche Benennung
+             brächte die Überschrift nur ein zweites Mal. Deshalb trägt die
+             Überschrift auch keine `id` — es gibt nichts, was auf sie
+             zeigen müsste. -->
+        <h4>{{ errorSummaryHeading }}</h4>
+        <p>{{ errorSummaryIntro() }}</p>
+
+        <!-- Sprunglinks, nicht bloß Text: die Meldung zu lesen und das Feld
+             danach selbst wiederzufinden ist der Schritt, an dem lange
+             Formulare scheitern. `appFragmentLink` statt `href="#…"`, weil
+             `<base href>` ein nacktes Fragment gegen die Basis-URL auflöst und
+             die Anwendung neu lädt (shared/fragment-link.directive.ts) — ein
+             Sprunglink, der die Seite neu lädt, wäre eine Barriere, die
+             niemand erklärt hat. -->
+        <ul>
+          @for (error of visibleErrors(); track error.fieldId) {
+            <li>
+              <a [appFragmentLink]="error.fieldId">{{ error.message }}</a>
+            </li>
+          }
+        </ul>
+      </div>
+    } @else {
+      <p class="error-generic">{{ errorGeneric }}</p>
+    }
+  }
+
+  <!-- Barriere `pflichtfeld`, Teil 1 (docs/UX-COPY.md §8.7). Aktiv erklärt der
+       Einleitungssatz das Sternchen; behoben gibt es kein Sternchen mehr, und
+       der Satz stünde falsch da — deshalb `introBase` plus Legende. -->
+  @if (requiredMarked()) {
+    <p class="form-intro">{{ introBase }}</p>
+    <p class="required-legend">{{ requiredLegend }}</p>
+  } @else {
+    <p class="form-intro">{{ intro }}</p>
+  }
+
+  <!-- Simulationshinweis (docs/UX-COPY.md §8.4). Steht überall dort, wo jemand
+       echte Daten eingeben könnte, ist unabhängig vom Barrierezustand immer
+       vorhanden und wird nie zur Barriere gemacht. -->
+  <p class="simulation-note">{{ simulationNote }}</p>
+
+  <!-- `novalidate`, damit die eingebaute Formularvalidierung des Browsers die
+       simulierte nicht überdeckt: Ohne das fängt der Browser das Absenden bei
+       gesetztem `required` selbst ab, und die Barriere `fehler` — die genau
+       diese Rückmeldung zum Thema hat — käme in der behobenen Fassung nie zur
+       Ausführung. `required` bleibt gesetzt, denn seine Aufgabe hier ist die
+       programmatische Kennzeichnung (docs/UX-COPY.md §8.7), nicht das
+       Blockieren des Absendens. -->
+  <form class="application-form" novalidate (submit)="onSubmit($event)">
+    @for (field of fields; track field.id) {
+      <div class="form-field">
+        <!-- Barriere `labels`, Muster B (docs/UX-COPY.md §8.4). Derselbe
+             sichtbare Text, einmal als `<label for>` und einmal als `<div>`
+             daneben. Das Eingabefeld steht außerhalb der Verzweigung und wird
+             beim Umschalten deshalb nicht neu erzeugt — Eingetipptes bleibt
+             stehen. -->
+        @if (labelsAssociated()) {
+          <label class="field-label" [for]="field.id">
+            <ng-container *ngTemplateOutlet="labelContent; context: { $implicit: field }" />
+          </label>
+        } @else {
+          <div class="field-label">
+            <ng-container *ngTemplateOutlet="labelContent; context: { $implicit: field }" />
+          </div>
+        }
+
+        @if (field.control === 'textarea') {
+          <textarea
+            class="field-control"
+            rows="5"
+            [id]="field.id"
+            [attr.name]="field.id"
+            [required]="isRequiredAttributeSet(field)"
+            [attr.aria-invalid]="ariaInvalidFor(field)"
+            [attr.aria-describedby]="describedByFor(field)"
+            (input)="onInput(field.id, $event)"
+          ></textarea>
+        } @else if (field.control === 'file') {
+          <input
+            class="field-control field-file"
+            type="file"
+            accept="application/pdf"
+            [id]="field.id"
+            [attr.name]="field.id"
+            [required]="isRequiredAttributeSet(field)"
+            [attr.aria-invalid]="ariaInvalidFor(field)"
+            [attr.aria-describedby]="describedByFor(field)"
+            (change)="onFileChange($event)"
+          />
+        } @else {
+          <input
+            class="field-control"
+            [type]="field.control"
+            [id]="field.id"
+            [attr.name]="field.id"
+            [attr.autocomplete]="field.autocomplete"
+            [required]="isRequiredAttributeSet(field)"
+            [attr.aria-invalid]="ariaInvalidFor(field)"
+            [attr.aria-describedby]="describedByFor(field)"
+            (input)="onInput(field.id, $event)"
+          />
+        }
+
+        <!-- Meldung am Feld nur in der behobenen Fassung. Aktiv gibt es
+             ausschließlich die Sammelzeile oben, ohne jeden Feldbezug. -->
+        @if (fieldErrorFor(field); as error) {
+          <p class="field-error" [id]="error.messageId">{{ error.message }}</p>
+        }
+      </div>
+    }
+
+    <p class="form-privacy">{{ privacy }}</p>
+
+    <!-- Barriere `tastatur`, Muster B (docs/ARCHITECTURE.md §5.3,
+         docs/UX-COPY.md §8.4). Aktiv ein `<div>` mit Klick-Handler: kein
+         `tabindex`, keine `role`, kein Tastaturereignis — die Schaltfläche ist
+         per Tabulator nicht erreichbar, weil sie nie im Tabulatorpfad war.
+         Nichts auf dieser Seite fängt eine Taste ab; der Ausstiegslink und
+         alle anderen Elemente des Bereichs bleiben unverändert erreichbar
+         (docs/TESTING.md §7, Trap-Detektor).
+
+         Weil das Formular in diesem Zustand keine Absende-Schaltfläche im
+         Sinne von HTML hat, löst auch Enter im Textfeld nichts aus — genau die
+         Sackgasse, in der Tastaturnutzer real landen. -->
+    @if (keyboardOperable()) {
+      <button class="submit-button" type="submit">{{ submitLabel }}</button>
+    } @else {
+      <div class="submit-button" (click)="submit()">{{ submitLabel }}</div>
+    }
+  </form>
+</app-elbwerk-page>

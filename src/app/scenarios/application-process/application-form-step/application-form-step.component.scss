@@ -1,0 +1,193 @@
+// --sim-* tokens only, with one documented exception at the bottom of this
+// file (CLAUDE.md rule 5). Ordinary corporate form styling, nothing
+// distinctive — docs/DESIGN.md §4.2.
+//
+// Nothing in here is a barrier. The four barriers of this step live in the
+// markup: an association that is present or absent, an element that is a
+// button or a div, a marker that is a word or a colour, an error output that
+// names a field or does not. Styling that *looked* broken would teach
+// participants to spot barriers by their appearance, which is the one habit
+// docs/DESIGN.md §2 is built to prevent.
+:host {
+  display: block;
+}
+
+h3 {
+  margin: 0 0 16px;
+  color: var(--sim-brand);
+  font-size: 1.5rem;
+}
+
+h4 {
+  margin: 0 0 8px;
+  font-size: 1.125rem;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+.form-intro,
+.required-legend {
+  max-width: 44rem;
+}
+
+.required-legend {
+  color: var(--sim-muted);
+}
+
+.application-form {
+  max-width: 34rem;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+// Both variants of the `labels` barrier carry this class — a `<label for>` and
+// a `<div>` have to look identical, or the barrier becomes visible instead of
+// structural (docs/UX-COPY.md §8.4: „Die sichtbaren Texte bleiben").
+.field-label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+// Colour, and nothing else. No text, no `required`, no legend — that is the
+// barrier (docs/UX-COPY.md §8.7, WCAG 1.4.1).
+.required-star {
+  color: var(--sim-error);
+}
+
+.field-control {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--sim-border);
+  border-radius: 2px;
+  background: var(--sim-white);
+  color: var(--sim-text);
+
+  // Inputs do not inherit the page font, and a form set in the browser default
+  // would look like a different site than the header above it.
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+textarea.field-control {
+  resize: vertical;
+}
+
+.field-file {
+  padding: 9px 10px;
+}
+
+// A missing focus indicator is never an admissible barrier — not in any state,
+// not on any control (CLAUDE.md rule 8, docs/DESIGN.md §5).
+.field-control:focus-visible,
+.submit-button:focus-visible,
+.error-summary a:focus-visible {
+  outline: var(--sim-focus-width) solid var(--sim-focus-ring);
+  outline-offset: var(--sim-focus-offset);
+}
+
+.field-error {
+  margin: 4px 0 0;
+  color: var(--sim-error);
+}
+
+// The `fehler` barrier's active variant. Styled exactly like the resolved
+// summary's own text: what is missing is the association, the field names and
+// the advice — not the visibility. A generic message rendered faintly would
+// make it a contrast barrier as well, and only one barrier is declared here.
+.error-generic {
+  max-width: 44rem;
+  padding: 12px 14px;
+  border-left: 4px solid var(--sim-error);
+  background: var(--sim-surface);
+  color: var(--sim-text);
+}
+
+.error-summary {
+  max-width: 44rem;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--sim-error);
+  background: var(--sim-surface);
+
+  ul {
+    margin: 0;
+    padding-left: 22px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  a {
+    color: var(--sim-brand);
+  }
+}
+
+// One rule for both variants of the `tastatur` barrier: the `<button>` and the
+// `<div>` are indistinguishable on screen. That is the barrier — a sighted
+// mouse user notices nothing at all, which is why it survives review in real
+// projects.
+//
+// 44px tall and generously padded, so it satisfies 2.5.8 in the resolved
+// state. Target size is not part of this barrier either.
+.submit-button {
+  display: inline-block;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: var(--sim-brand);
+  color: var(--sim-white);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  cursor: pointer;
+}
+
+.form-privacy {
+  max-width: 44rem;
+  color: var(--sim-muted);
+  font-size: 0.9375rem;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The one --wi-* usage inside the simulation, and the only one in the project.
+//
+// CLAUDE.md rule 5 forbids a frame token inside the region. docs/UX-COPY.md
+// §8.4 designates the Simulationshinweis as „der einen Textsorte, die aus dem
+// Rahmen in die Simulation hineinragt", says it is set „im Rahmenstil", and
+// requires it wherever someone could enter real data. The two cannot both hold
+// literally, and this file resolves it in favour of the copy document, because
+// the note's whole job is to be recognisably *not* Elbwerk speaking: a warning
+// that nothing is transmitted, set in Elbwerk's own typeface and colours,
+// reads as part of the fiction it is there to interrupt.
+//
+// This is flagged for review rather than settled here (CLAUDE.md, "When
+// something here is wrong"). If the rule wins instead, the note needs its own
+// --sim-* treatment that still reads as frame voice, and rule 5 keeps its
+// absolute form; if the copy wins, rule 5 gains this one named exception. It
+// should not stay ambiguous.
+// ─────────────────────────────────────────────────────────────────────────────
+.simulation-note {
+  max-width: 44rem;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  border: 2px dashed var(--wi-navy);
+  border-radius: var(--wi-radius-sm);
+  background: var(--wi-surface-card);
+  color: var(--wi-text-primary);
+  font-family: var(--wi-font-family);
+  font-size: var(--wi-size-meta);
+  line-height: var(--wi-leading-body);
+}

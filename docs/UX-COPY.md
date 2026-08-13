@@ -554,8 +554,9 @@ den die Leiste hinter `elbwerk.de` anzeigt.
 | Schritt | Pfad |
 | --- | --- |
 | 1 — Stellenanzeige | `/karriere/it-projektmanager` |
+| 2 — Bewerbungsformular | `/karriere/it-projektmanager/bewerbung` |
 
-Die Pfade der Schritte 2 bis 4 kommen mit ihren Slices hinzu.
+Die Pfade der Schritte 3 und 4 kommen mit ihren Slices hinzu.
 
 **Das Elbwerk-Logo.** Eine Wort-Bild-Marke (Wortmarke „ELBWERK", darunter
 „KG · HAMBURG", davor ein Signet) als SVG, selbst gehostet wie alle Assets
@@ -642,6 +643,7 @@ Schachtelsätzen.
 | --- | --- |
 | `elbwerk.form.h2` | Online-Bewerbung |
 | `elbwerk.form.intro` | Bitte füllen Sie das Formular vollständig aus. Mit * gekennzeichnete Felder sind Pflichtfelder. |
+| `elbwerk.form.introBase` | Bitte füllen Sie das Formular vollständig aus. |
 | `elbwerk.form.submit` | Bewerbung absenden |
 | `elbwerk.form.privacy` | Mit dem Absenden stimmen Sie unseren Datenschutzhinweisen zu. |
 | `elbwerk.form.simulationNote` | Diese Bewerbung wird nicht übertragen. Es werden keine Daten gespeichert. |
@@ -676,6 +678,20 @@ Screenreader-Nutzer hören „Eingabefeld, leer".
 **Barriere „Keine Tastaturbedienung" aktiv:** Die Absende-Schaltfläche ist ein `<div>` mit
 Klick-Handler. Beschriftung unverändert.
 
+**`elbwerk.form.intro` und `elbwerk.form.introBase`.** Der zweite Satz von
+`elbwerk.form.intro` erklärt das Sternchen — und gilt damit nur, solange die Barriere
+„Pflichtfelder" aktiv ist. Ist sie behoben, tragen die Beschriftungen „(Pflichtfeld)" und
+kein Sternchen mehr; der Satz wäre dann schlicht falsch. Im behobenen Zustand steht deshalb
+`elbwerk.form.introBase` — derselbe erste Satz ohne die Sternchen-Erklärung — und darunter
+`elbwerk.form.requiredLegend` (Abschnitt 8.7). Der Einleitungstext wechselt also mit der
+Barriere mit, obwohl er nicht zu ihr gehört: Eine Seite, die auf eine Kennzeichnung
+verweist, die es nicht gibt, ist kein ehrliches Negativbeispiel, sondern ein Fehler.
+
+**Kein Erfolgstext beim gültigen Absenden.** Diese Textsorte gibt es hier bewusst nicht.
+Die Bestätigung ist Schritt 4 (Abschnitt 8.9), erreicht wird sie über die Schrittnavigation
+des Rahmens. Ein gültiges Absenden in Schritt 2 räumt lediglich die Fehlerausgabe ab;
+`elbwerk.form.simulationNote` sagt durchgehend, warum nichts weiter passiert.
+
 ### 8.5 Barriere „Kein Fehler-Feedback"
 
 **Aktiv** — eine einzige, technisch klingende Meldung am Seitenanfang, ohne Bezug zum
@@ -692,6 +708,8 @@ Fokus auf das erste fehlerhafte Feld:
 | --- | --- |
 | `elbwerk.form.errorSummary.h3` | Die Bewerbung konnte nicht abgesendet werden |
 | `elbwerk.form.errorSummary.intro` | Bitte korrigieren Sie {count} Angaben: |
+| `elbwerk.form.errorSummary.intro.single` | Bitte korrigieren Sie eine Angabe: |
+| `elbwerk.form.error.firstNameMissing` | Bitte geben Sie Ihren Vornamen an. |
 | `elbwerk.form.error.emailMissing` | Bitte geben Sie Ihre E-Mail-Adresse an. |
 | `elbwerk.form.error.emailInvalid` | Diese E-Mail-Adresse enthält kein @. Bitte prüfen Sie die Schreibweise. |
 | `elbwerk.form.error.lastNameMissing` | Bitte geben Sie Ihren Nachnamen an. |
@@ -700,6 +718,19 @@ Fokus auf das erste fehlerhafte Feld:
 
 Der Kontrast ist der Lehrinhalt: „Code 422" gegen „enthält kein @". Beides sind
 Fehlermeldungen. Nur eine sagt, was zu tun ist.
+
+`elbwerk.form.errorSummary.h3` wird als `h4` ausgezeichnet — dieselbe Regel wie bei
+`elbwerk.jobs.h2` in Abschnitt 8.1: `ARCHITECTURE.md` §5.6 legt die Ebenen fest,
+Szenarioinhalt beginnt bei `h3`, und „Online-Bewerbung" ist dieser `h3`.
+
+**Warum `firstNameMissing` und die Einzahlfassung nachgetragen sind.** Vorname ist ein
+Pflichtfeld (Abschnitt 8.4), hatte aber keine Meldung — ein leeres Vornamensfeld wäre
+kommentarlos durchgegangen, und der Zähler in `errorSummary.intro` hätte eine Angabe zu
+wenig genannt. Die Einzahlfassung deckt den Fall ab, den man beim Korrigieren zwangsläufig
+erreicht: „Bitte korrigieren Sie 1 Angaben" wäre die letzte Meldung, die jemand vor dem
+Absenden liest. Beide Zeilen folgen dem Muster der bereits abgenommenen Meldungen
+(`lastNameMissing`, `panel.areaSummary.single`) und stehen unter dem Vorbehalt der
+fachlichen Freigabe wie alle Elbwerk-Texte (Abschnitt 10).
 
 ---
 

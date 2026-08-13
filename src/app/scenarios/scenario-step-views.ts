@@ -17,8 +17,8 @@
 // who opens the application process never downloads the CSR campaign.
 //
 // **One entry per step, and no entry is also a defined state.** A step with no
-// entry renders the region empty rather than throwing — that is what slices 8
-// to 10 look like from here until they land, and it keeps the frame gate
+// entry renders the region empty rather than throwing — that is what slices 9
+// and 10 look like from here until they land, and it keeps the frame gate
 // meaningful in the meantime.
 import type { Type } from '@angular/core';
 
@@ -45,6 +45,13 @@ export const SCENARIO_STEP_VIEWS: Readonly<Record<string, ScenarioStepView>> = {
     load: () =>
       import('./application-process/job-posting-step/job-posting-step.component').then(
         (m) => m.JobPostingStepComponent,
+      ),
+  },
+  [stepViewKey('application-process', 'formular')]: {
+    simulatedPath: '/karriere/it-projektmanager/bewerbung',
+    load: () =>
+      import('./application-process/application-form-step/application-form-step.component').then(
+        (m) => m.ApplicationFormStepComponent,
       ),
   },
 };

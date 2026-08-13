@@ -5,7 +5,7 @@
 import { expect, test } from '@playwright/test';
 import { gotoRendered } from './support/goto';
 
-const PAGES = ['/', '/szenario/bewerbung/stellenanzeige'];
+const PAGES = ['/', '/szenario/bewerbung/stellenanzeige', '/szenario/bewerbung/formular'];
 
 test.describe('Reflow at 320px width (docs/DESIGN.md §5, §8)', () => {
   for (const path of PAGES) {
