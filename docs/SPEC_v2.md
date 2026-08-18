@@ -2,7 +2,7 @@
 
 **Project:** AccessIssue
 **Scope:** `PRD.md` §12 phase 2 — the CSR campaign scenario, one page, five sections,
-eleven barriers, fourteen switches
+ten barriers, thirteen switches
 **Source documents:** `PRD.md` (v2.1), `ARCHITECTURE.md` (v2.1), `DESIGN.md`,
 `TESTING.md`, `UX-COPY.md` (v2.1)
 **Status:** Draft v1
@@ -57,8 +57,10 @@ that matters more with each scenario added, and what to do about it.
 ### 4.1 The panel grouping mechanism changes
 
 `ARCHITECTURE.md` §12.1.1 previously said single-page scenarios collapse to one panel group.
-That was written when the campaign had six barriers. It has fourteen switches. One flat
-group of fourteen is precisely the scanning problem the architecture warns about.
+That was written when the campaign had six barriers. It has thirteen switches, and the
+panel renders fifteen checkboxes for them — one per barrier, plus one per part of the two
+combined ones. One flat group of fifteen is precisely the scanning problem the architecture
+warns about.
 
 **Decision.** `Barrier` gains `groupId`; `Scenario` declares `BarrierGroup[]`. For
 multi-step scenarios the groups mirror the steps one-to-one; for single-page scenarios they
@@ -286,7 +288,7 @@ rather than inheriting from the parent, and fix the model here if not.
 
 **Delivers.** The whole-scenario behaviour that only exists once the sections are built.
 
-- Full state matrix for the scenario per `TESTING.md` §4 — thirteen states plus the
+- Full state matrix for the scenario per `TESTING.md` §4 — twelve states plus the
   partial-repair states of both combined barriers
 - Area summary line reporting the campaign's areas (Kommunikation, IT, CSR)
 - Deep links across all sections
@@ -296,12 +298,21 @@ rather than inheriting from the parent, and fix the model here if not.
 - [ ] Every tested state passes axe runs 1 and 3
 - [ ] Every axe-detectable barrier passes run 2 in both directions
 - [ ] Deep link reproduces every state at default system settings
-- [ ] `?frei=alle` resolves all fourteen switches including all parts of both combined
+- [ ] `?frei=alle` resolves all thirteen switches including all parts of both combined
       barriers
 - [ ] Area summary names exactly the areas present in this scenario
 - [ ] Pull-request suite stays within budget, or sharding is in place
 
 **Depends on.** Slices 15, 16, 17, 18.
+
+**Note.** The counts above were corrected while this slice was built. This document, the
+`PRD.md` §6.5 scope table, `ARCHITECTURE.md` §12.1.1 and §21, `TESTING.md` §2 and §4 and
+`CLAUDE.md` rule 19 all carried an off-by-one for the campaign — eleven barriers and
+fourteen switches, against the ten and thirteen its own barrier tables in `PRD.md` §6.2
+specify — and the totals inherited it. Nothing was missing from the application; the
+arithmetic was wrong. It surfaced because this slice derives its assertions from the
+content files rather than from a written-down number, which is also why it cannot recur
+silently.
 
 ---
 
@@ -384,7 +395,7 @@ to arrive at by default.
 
 | Question | Slice | Owner |
 | --- | --- | --- |
-| Explanation prose for the eleven campaign barriers | 14–18 | WERTE.IT — scaffolding proceeds under `SPEC_v1.md` §4.1 |
+| Explanation prose for the ten campaign barriers | 14–18 | WERTE.IT — scaffolding proceeds under `SPEC_v1.md` §4.1 |
 | Specialist review of the easy-language version | 15 | WERTE.IT / Fachstelle für Leichte Sprache |
 
 **Not blocking**

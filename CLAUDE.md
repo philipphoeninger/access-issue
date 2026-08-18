@@ -48,8 +48,16 @@ npm test               # unit + component tests (Karma/Jasmine)
 npm run lint           # angular-eslint, template a11y rules as errors
 npm run check:tokens   # frame/simulation token boundary (rule 5)
 npx prettier --check . # formatting (printWidth 100, singleQuote)
-npx playwright test    # e2e + accessibility suites
+npx playwright test    # e2e + accessibility suites (whole suite)
 ```
+
+CI runs Playwright as **four parallel jobs, sharded by scenario** — `application`,
+`campaign`, `frame`, `exit-link` — selected with `E2E_SHARD=<name>`
+(`playwright.config.ts`, `TESTING.md` §4). Without the variable every file runs, which is
+what a local run should keep doing; `E2E_SHARD=campaign npx playwright test` reproduces one
+CI job. **A new spec file has to be added to a shard**: the config checks membership
+against the directory on every run and refuses to load otherwise, because a file no shard
+claims would silently never run in CI.
 
 `npm test` resolves Chromium via Puppeteer (`karma.conf.js`), not via a system install or
 `CHROME_BIN`. **`karma.conf.js` only takes effect if `angular.json`'s `test` architect
@@ -178,7 +186,7 @@ in a screenshot.
     spans. This is chapter 3's actual thesis — barriers arise between departments, not
     inside one — so it is not decoration. No area filter: letting a user hide other
     departments' barriers is the exact reflex the module argues against.
-19. **Barriers without a standards reference are legitimate.** Six of the 29 violate no
+19. **Barriers without a standards reference are legitimate.** Six of the 28 violate no
     WCAG criterion — no named contact person, no note that adjustments are possible, no
     accessibility criteria in a tender, no assigned responsibility, no sign-language
     interpreting, no event access details. They carry `organisational: true` and an empty
@@ -258,7 +266,7 @@ Tests are part of the slice, not a follow-up.
 - **Branch coverage ≥ 95 %** on `url-state.ts`, `barrier-state.service.ts`,
   `scenario-registry.service.ts`. No global threshold elsewhere.
 
-Roughly **two thirds of the 29 barriers are invisible to axe** (`TESTING.md` §2), and two
+Roughly **two thirds of the 28 barriers are invisible to axe** (`TESTING.md` §2), and two
 violate no success criterion at all. A
 green pipeline means no regression in the automatable subset — it does not mean the
 application is accessible. Manual passes with NVDA and VoiceOver are the primary evidence.

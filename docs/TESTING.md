@@ -30,8 +30,8 @@ barrier, so that adding a barrier automatically adds its tests.
 ## 2. The Automation Ceiling
 
 This is the most important number in this document, and it should be stated before any
-tooling: **of the twenty-nine barriers across three scenarios, roughly nine are detectable
-by axe.** Two thirds are not.
+tooling: **of the twenty-eight barriers across three scenarios, eight are detectable by
+axe.** Two thirds are not.
 
 | Detectable by axe | Scenario | axe rule |
 | --- | --- | --- |
@@ -40,10 +40,19 @@ by axe.** Two thirds are not.
 | Image signature without alt | Application | `image-alt` |
 | Social embed without alt text | CSR | `image-alt` |
 | Low-contrast text overlay | CSR | `color-contrast` |
-| Progress bar as pure graphic | CSR | `svg-img-alt` |
-| Video without captions | CSR | `video-caption` |
+| Progress bar as pure graphic | CSR | `image-alt` |
 | Ticket system: tables without header cells | Procurement | `th-has-data-cells` |
 | Ticket system: insufficient contrast | Procurement | `color-contrast` |
+
+The first six are built and their rule ids come from `src/app/content/axe-rule-fixtures.ts`,
+which is what run 2 reads (§5) — the table above is a summary of that file, never a second
+source. The last two are `PRD.md` §6.3's, and will be checked against the fixture when the
+procurement scenario is built.
+
+This table listed nine until `SPEC_v2.md` slice 19. Two of the nine were stale rather than
+wrong at the time: the campaign video was dropped for want of material (`PRD.md` §6.2), and
+the progress bar turned out to plant `image-alt` rather than `svg-img-alt` when it was
+built.
 
 **Not detectable — the majority.** Untagged PDF, overly complex language, no keyboard
 operation, required fields marked by colour alone, no error feedback, missing upload format
@@ -142,7 +151,18 @@ Concrete counts for v1:
 | CSR | Donation appeal | 4 | 6 |
 | Procurement | A Tender | 4 | 6 |
 | Procurement | B Ticket system | 3 | 5 |
-| **Total** | | **29** | **64** |
+| **Total** | | **28** | **64** |
+
+The barrier total read 29 until `SPEC_v2.md` slice 19, one more than its own column adds
+up to and one more than `PRD.md` §6.2 specifies; the same off-by-one stood in `PRD.md`
+§6.5 and was corrected there at the same time. Nothing is missing from the application —
+every barrier the PRD lists is built.
+
+**The tested-states column adds up per row, not per scenario.** Rows share their two
+outermost states: „all active" and „all resolved" are one page load each for a whole
+scenario, not one per section. The campaign's five rows come to 34 that way and to
+**25 distinct states**, which is what `e2e/support/campaign-states.ts` declares and what
+`e2e/csr-integration.spec.ts` checks against the content.
 
 The CSR campaign is a single page, so its rows are page sections rather than routing steps
 (`ARCHITECTURE.md` §12.1.1). Its partial-repair states outnumber the others: a three-part
@@ -161,6 +181,23 @@ matrix of the *completed* scenarios to a nightly job while pull requests run the
 gate, the page-level run and the scenario under active development. Do not reach for
 reducing the state set — n + 2 is already the minimum that covers each barrier in
 isolation.
+
+**The first mitigation is in place** since `SPEC_v2.md` slice 19, when the campaign's
+twenty-five states brought the suite to 431 tests. Four shards, selected by the
+`E2E_SHARD` environment variable and declared in `playwright.config.ts`:
+`application`, `campaign`, `frame`, and `exit-link` — the last on its own because the
+safety-critical path (§7) runs across every state of every scenario and belongs to no
+single one. Without the variable, every file runs; a local `npx playwright test` is
+unchanged.
+
+Playwright's own `--shard=i/n` would balance the four more evenly. It is not used, because
+it splits by count rather than by subject: a red check named „shard 2 of 4" says nothing
+about what broke, and the weekly cross-browser run cannot ask it for one scenario.
+
+**A spec file that belongs to no shard would silently stop running in CI** while every
+check stayed green — so `playwright.config.ts` checks the membership against the directory
+on every run, local ones included, and refuses to load rather than reporting it. The second
+mitigation stays unused while this one fits.
 
 **Why not the full power set.** Barriers are implemented independently and share no
 state; an interaction bug between two of them would be a defect in the state service, not
@@ -615,16 +652,25 @@ structurally complete, never what it says.
 GitHub Actions, since the repository is already on GitHub. Hosting remains undecided
 (`PRD.md` §10) and CI does not depend on it.
 
-**On every pull request** (target: under 8 minutes)
+**On every pull request** (target: under 8 minutes), as two sets of jobs running side by
+side. The budget is wall-clock time, so the split is what buys it: five jobs, none waiting
+on another.
 
 ```
+build-and-test                       one job
 1. install, `npm run lint`, `prettier --check`, `npm run check:tokens`
    Template a11y rules run as errors in the frame; `src/app/scenarios/**` is exempt
    (deliberate barriers — see `SPEC_v1.md` slice 0)
    The token boundary (§8.1) is static, so it runs here rather than after the build
 2. ng build                          catches template and type errors early
 3. ng test --watch=false             unit + component + data contract tests
-4. playwright test --project=chromium
+4. scripts/check-coverage.js         the branch-coverage gate of §14
+
+e2e                                  four jobs, one per shard (§4)
+   E2E_SHARD=application  playwright test --project=chromium
+   E2E_SHARD=campaign     …
+   E2E_SHARD=frame        …
+   E2E_SHARD=exit-link    …
    ├── frame gate           (run 1, all states)
    ├── barrier assertions   (run 2, axe-detectable barriers)
    ├── page-level rules     (run 3, all states)
@@ -635,6 +681,10 @@ GitHub Actions, since the repository is already on GitHub. Hosting remains undec
 ```
 
 All of it blocks the merge. A failing accessibility gate in this project is not a warning.
+
+The shards do not cancel each other on failure (`fail-fast: false`): „the campaign is red"
+and „everything is red" are different diagnoses, and a cancelled job cannot tell them
+apart. Each uploads its report under its own name.
 
 **Weekly, and on release tags:** the same Playwright suite on Firefox and WebKit. Engine
 differences show up in focus handling and in `forced-colors`, but rarely enough that
@@ -655,7 +705,7 @@ not automation, and pretending otherwise would let a release slip through on a g
 Stated plainly because this project of all projects should not overclaim.
 
 - **Automated accessibility testing catches a minority of WCAG issues.** For this
-  application specifically, roughly two thirds of the 29 barriers are invisible to axe, and
+  application specifically, roughly two thirds of the 28 barriers are invisible to axe, and
 two violate no success criterion at all (§2). A
   green pipeline means no regression in the automatable subset. It does not mean the frame
   is accessible.

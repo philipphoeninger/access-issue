@@ -783,9 +783,10 @@ sentence, always visible, and it states the point more directly than a grouping 
 
 **Single-page scenarios group by page section, not by step.** An earlier draft said the
 step grouping "collapses to one group" for the CSR campaign and that the summary line would
-carry it. That was written when the campaign had six barriers. It now has eleven barriers
-and fourteen switches on a single page — one flat group of fourteen is exactly the scanning
-problem §21 warns about, and the collapse would have produced it.
+carry it. That was written when the campaign had six barriers. It now has ten barriers and
+thirteen switches on a single page, which the panel renders as fifteen checkboxes — one per
+barrier, plus one per part of the two combined ones. A flat group of fifteen is exactly the
+scanning problem §21 warns about, and the collapse would have produced it.
 
 The grouping key is therefore **not** the routing step. `Barrier` carries a `groupId`, and
 `Scenario` declares the groups:
@@ -835,8 +836,8 @@ Frame-owned, in `core/` and `shared/`:
 only". That is right for the frame and wrong for the application, because the resolved
 state of the CSR countdown barrier *is* a live region — announcing the remaining time is
 the accessible behaviour being demonstrated. A rule forbidding it outright would have made
-one of the eleven barriers unbuildable, and the contradiction would have surfaced as a
-failing test rather than as a design decision.
+one of the campaign's ten barriers unbuildable, and the contradiction would have surfaced
+as a failing test rather than as a design decision.
 
 The rule is therefore:
 
@@ -1138,7 +1139,8 @@ Small, time-boxed investigations to run before or early in Phase 1 implementatio
   Scenario order on the home page follows the module deck (application process, software
   procurement, CSR campaign) — it is presentation order, not implementation order.
 - **Barrier count per scenario above ten.** Already reached twice — the application process
-  has eleven, the CSR campaign eleven barriers across fourteen switches. Grouping is specified in §12.1.1. Past roughly fifteen in one scenario, the
+  has eleven, the CSR campaign ten barriers across thirteen switches and fifteen panel
+  checkboxes. Grouping is specified in §12.1.1. Past roughly fifteen in one scenario, the
   summary line stops being scannable and the panel likely needs collapsible step groups.
 - **State beyond booleans.** If a future barrier needs a value rather than a flag
   (a contrast ratio, a timeout duration), the `frei` grammar needs extending —

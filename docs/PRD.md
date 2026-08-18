@@ -294,11 +294,24 @@ Skala ist.
 | Szenario | Schritte / Bereiche | Barrieren | Schalter | davon ohne Normbezug |
 | --- | --- | --- | --- | --- |
 | Bewerbungsprozess | 4 Schritte | 11 | 11 | 2 |
-| CSR-Kampagne | 5 Bereiche (eine Seite) | 11 | 14 | 2 |
+| CSR-Kampagne | 5 Bereiche (eine Seite) | 10 | 13 | 2 |
 | Softwarebeschaffung | 2 Teile | 7 | 7 | 2 |
-| **Summe** | | **29** | **32** | **6** |
+| **Summe** | | **28** | **31** | **6** |
 
-Die CSR-Kampagne überschreitet als **einseitiges** Szenario mit vierzehn Schaltern die
+**Barriere** meint hier einen Eintrag der Tabellen in §6.1 bis §6.3 — eine kombinierte
+Barriere zählt einmal, nicht nach Teilen. **Schalter** meint die Zustände, die die URL
+unabhängig voneinander kennt: Bei einem einfachen Szenario dasselbe wie die Barrieren, bei
+der Kampagne die acht einfachen Barrieren plus die fünf Teile der beiden kombinierten. Im
+Panel stehen entsprechend fünfzehn Kästchen, weil jede kombinierte Barriere zusätzlich ihr
+Elternkästchen hat.
+
+Die Zeile der Kampagne stand hier zunächst mit 11 Barrieren und 14 Schaltern und war damit
+gegen die eigenen Tabellen in §6.2 um eins verschoben; die Summen ebenso. Korrigiert bei
+der Umsetzung von `SPEC_v2.md` Slice 19, nachdem die Testsuite die Zahlen aus den
+Inhaltsdateien selbst herleitet und die Abweichung sichtbar wurde. An der Sache ändert sich
+nichts: Jede in §6.2 aufgeführte Barriere ist gebaut.
+
+Die CSR-Kampagne überschreitet als **einseitiges** Szenario mit dreizehn Schaltern die
 Schwelle, ab der `ARCHITECTURE.md` §21 eine Gruppierung verlangt — und die dort vorgesehene
 Gruppierung nach Schritt greift hier nicht, weil es nur eine Seite gibt. Die Konsequenz ist
 in `ARCHITECTURE.md` §12.1.1 behandelt.
@@ -522,7 +535,7 @@ Es sind derzeit keine harten Deadlines bekannt. Vorgeschlagene Phasierung entlan
 | Phase | Inhalt | Abhängigkeiten |
 | --- | --- | --- |
 | 1 | Grundgerüst, Rahmen-Architektur, Panel mit Fachbereichs-Gruppierung, State-in-URL, Szenario Bewerbungsprozess (4 Schritte, 11 Barrieren) | Fachtexte für Szenario 1 |
-| 2 | Szenario CSR-Kampagne (5 Bereiche, 11 Barrieren, 14 Schalter) | Fachtexte |
+| 2 | Szenario CSR-Kampagne (5 Bereiche, 10 Barrieren, 13 Schalter) | Fachtexte |
 | 3 | Szenario Softwarebeschaffung (2 Teile, 7 Barrieren) | Fachtexte |
 | 4 | Corporate Design, Feinschliff, vollständige A11y-Abnahme, Deployment | CD-Assets, Hosting-Entscheidung |
 

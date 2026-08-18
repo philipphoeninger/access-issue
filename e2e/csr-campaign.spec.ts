@@ -28,13 +28,19 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { barrierAssertion, expectedRuleFor, frameGate, pageLevelRules } from './support/axe-runs';
 import { gotoRendered } from './support/goto';
+// The tested states of docs/TESTING.md §4, shared with e2e/csr-integration.spec.ts
+// since docs/SPEC_v2.md slice 19 — declared once so the two suites cannot run
+// different matrices (support/campaign-states.ts).
+import { CAMPAIGN_PATH as PATH, MEDIA_STATES, STATES } from './support/campaign-states';
+import { CSR_CAMPAIGN_SCENARIO } from '../src/app/content/csr-campaign/csr-campaign.scenario';
 
-const PATH = '/szenario/csr-kampagne';
-
-/** The rule ids come from the fixture, never from a literal (docs/TESTING.md §5). */
+/**
+ * The rule ids come from the fixture, never from a literal (docs/TESTING.md §5).
+ * Named here for the media section's eight-state loop, which reads both of them
+ * in one test; the per-barrier run 2 further down looks each one up as it goes.
+ */
 const ALT_RULE = expectedRuleFor('csr-kampagne', 'alt');
 const CONTRAST_RULE = expectedRuleFor('csr-kampagne', 'kontrast');
-const PROGRESS_RULE = expectedRuleFor('csr-kampagne', 'fortschritt');
 
 /**
  * The two sections whose barriers axe can see, as selectors.
@@ -49,6 +55,43 @@ const FEED = '[data-simulation-region] .feed';
 const PROGRESS = '[data-simulation-region] .progress';
 
 /**
+ * Where each axe-detectable barrier plants its finding — the second half of what
+ * run 2 needs, beside the rule id the fixture owns.
+ *
+ * Keyed by `Barrier.id`, and **read through `sectionFor` so a missing entry
+ * throws**, the same way `expectedRuleFor` throws for a missing fixture. A
+ * barrier marked `automatedDetection: 'axe'` that nobody scoped would otherwise
+ * arrive with a fixture entry, no run 2, and nothing anywhere saying so.
+ */
+const RUN_2_SECTIONS: Record<string, string> = {
+  alt: FEED,
+  kontrast: FEED,
+  fortschritt: PROGRESS,
+};
+
+function sectionFor(barrierId: string): string {
+  const within = RUN_2_SECTIONS[barrierId];
+  if (within === undefined) {
+    throw new Error(
+      `No run-2 section selector for barrier "csr-kampagne/${barrierId}". Add one to ` +
+        `RUN_2_SECTIONS in this file — see docs/TESTING.md §5, run 2.`,
+    );
+  }
+  return within;
+}
+
+/**
+ * The barriers run 2 has to cover, taken from the content rather than from a
+ * list kept by hand (docs/SPEC_v2.md slice 19: „Every axe-detectable barrier
+ * passes run 2 in both directions"). Add a barrier with
+ * `automatedDetection: 'axe'` and its two cases appear below; the only way to
+ * remove them is to change what the content claims about it.
+ */
+const AXE_BARRIERS = CSR_CAMPAIGN_SCENARIO.barriers.filter(
+  (barrier) => barrier.automatedDetection === 'axe',
+);
+
+/**
  * The campaign's two Simulationshinweise, each scoped to the section it belongs
  * to. Since slice 18 there are two of them on this page
  * (`csr.social.disclaimer` and `csr.donate.simulationNote`), so a bare
@@ -58,94 +101,6 @@ const PROGRESS = '[data-simulation-region] .progress';
  */
 const MEDIA_NOTE = '[data-simulation-region] app-campaign-media .simulation-note';
 const DONATE_NOTE = '[data-simulation-region] app-campaign-donation .simulation-note';
-
-/**
- * The media section's own matrix: **all eight combinations** of its three
- * barriers, which docs/SPEC_v2.md slice 16 asks for by name („All eight tested
- * states of this section pass runs 1 and 3").
- *
- * That is more than the n + 2 of docs/TESTING.md §4, which puts this section at
- * five. The two documents disagree, and this file follows the spec: eight
- * states of a three-barrier section cost three extra page loads, and the three
- * barriers share a component and a stylesheet — the one situation §4's
- * „barriers are implemented independently" argument does not cover on its face.
- * §4's rule stands everywhere else; do not read this as a licence to power-set
- * the donation section's four.
- */
-const MEDIA_KEYS = ['alt', 'emoji', 'kontrast'] as const;
-
-const MEDIA_STATES: Array<{ resolved: readonly string[]; url: string }> = [];
-for (let mask = 0; mask < 8; mask++) {
-  const resolved = MEDIA_KEYS.filter((_key, index) => (mask & (1 << index)) !== 0);
-  MEDIA_STATES.push({
-    resolved,
-    url: resolved.length === 0 ? PATH : `${PATH}?frei=${resolved.join(',')}`,
-  });
-}
-
-/**
- * docs/TESTING.md §4 — the tested states of this page. Grows with the
- * barriers, and a combined barrier contributes its partial-repair states as
- * well: those are where the teaching happens, and they are the states a
- * repair-layer implementation could not produce at all.
- *
- * The media section contributes its eight (see `MEDIA_STATES`). Its
- * „nothing resolved" state is the page default and already the first row, so
- * seven are added. `?frei=alt,emoji,kontrast` is not the same URL as
- * `?frei=alle` and stays a row of its own: the media section is repaired while
- * the navigation and the language barrier still stand.
- */
-const STATES: Array<{ name: string; url: string }> = [
-  { name: 'all barriers active (default)', url: PATH },
-  { name: 'all barriers resolved', url: `${PATH}?frei=alle` },
-  { name: 'only `navigation` resolved', url: `${PATH}?frei=navigation` },
-  { name: 'only `sprache` resolved (both parts)', url: `${PATH}?frei=sprache` },
-  { name: 'partial — only `jargon` resolved', url: `${PATH}?frei=jargon` },
-  { name: 'partial — only `leichte-sprache` resolved', url: `${PATH}?frei=leichte-sprache` },
-  ...MEDIA_STATES.filter(({ resolved }) => resolved.length > 0).map(({ resolved, url }) => ({
-    name: `media — ${resolved.join(' + ')} resolved`,
-    url,
-  })),
-  // The event section of slice 17 — three parts, and therefore **all six**
-  // partial-repair states, which is what docs/TESTING.md §4 budgets for it
-  // („5 + 6 partial"). They are not a power set of the section: the fully
-  // resolved and fully active states are the two rows at the top of this list,
-  // and the six below are exactly the one- and two-part repairs. §4 spends them
-  // here on purpose — „a three-part combined barrier has six of them, and they
-  // are where the teaching happens".
-  { name: 'only `event` resolved (all three parts)', url: `${PATH}?frei=event` },
-  { name: 'partial — only `einladung` resolved', url: `${PATH}?frei=einladung` },
-  { name: 'partial — only `dolmetschung` resolved', url: `${PATH}?frei=dolmetschung` },
-  { name: 'partial — only `zugang` resolved', url: `${PATH}?frei=zugang` },
-  {
-    name: 'partial — `einladung` + `dolmetschung` resolved',
-    url: `${PATH}?frei=einladung,dolmetschung`,
-  },
-  // The state docs/UX-COPY.md §9.6 names as the argument for coupling the three:
-  // a readable invitation to a building nobody can enter.
-  {
-    name: 'partial — `einladung` + `zugang` resolved',
-    url: `${PATH}?frei=einladung,zugang`,
-  },
-  {
-    name: 'partial — `dolmetschung` + `zugang` resolved',
-    url: `${PATH}?frei=dolmetschung,zugang`,
-  },
-  // The one crossing between two sections, and the only state in which the
-  // venue drawing carries a name at all: `alt` is what gives it `role="img"`
-  // and a `<title>` (scenarios/csr-campaign/campaign-event).
-  { name: '`zugang` resolved with alternative texts', url: `${PATH}?frei=zugang,alt` },
-  // The donation section of slice 18 — four independent barriers, so exactly
-  // the n + 2 of docs/TESTING.md §4: each one resolved on its own, with the
-  // fully active and fully resolved rows already at the top of this list. Not a
-  // power set, and §4 says so in as many words: sixteen states of four barriers
-  // that genuinely do not touch each other buy nothing the four rows below do
-  // not already buy.
-  { name: 'only `fortschritt` resolved', url: `${PATH}?frei=fortschritt` },
-  { name: 'only `countdown` resolved', url: `${PATH}?frei=countdown` },
-  { name: 'only `slider` resolved', url: `${PATH}?frei=slider` },
-  { name: 'only `karussell` resolved', url: `${PATH}?frei=karussell` },
-];
 
 /** The five sections of docs/UX-COPY.md §9, in page order. */
 const SECTIONS = [
@@ -1424,27 +1379,60 @@ async function gotoWithClock(page: Page, url: string): Promise<void> {
   await settle(page);
 }
 
-// Run 2 for `fortschritt`, scoped to its own section. The scoping is the whole
-// point: `alt` in the media section plants the same rule id, so a region-wide
-// run would let each of the two barriers pass on the other's finding.
-test.describe('axe run 2 — donation section', () => {
-  test(`reports a ${PROGRESS_RULE} violation while \`fortschritt\` is active`, async ({ page }) => {
-    await gotoRendered(page, PATH);
-    const results = await barrierAssertion(page, PROGRESS).analyze();
-    expect(results.violations.map((violation) => violation.id)).toContain(PROGRESS_RULE);
-  });
+// Run 2 per axe-detectable barrier, generated from the content — both
+// directions each, every one scoped to the section that barrier belongs to.
+//
+// It replaces a pair of hand-written cases for `fortschritt` and a claim in
+// e2e/csr-integration.spec.ts that the hand-written set was complete. That
+// claim was checked against a literal list in a third file, so deleting a case
+// left it green (code review of slice 19). Generating the cases is the version
+// that cannot drift: the set comes from `automatedDetection`, the rule id from
+// the fixture, and a barrier nobody scoped throws in `sectionFor` before a
+// single test runs.
+//
+// The four media cases overlap with the eight-state loop above, which is worth
+// the four page loads: that loop proves the combinations, this one proves that
+// *every* barrier the content calls machine-detectable is actually asserted.
+for (const barrier of AXE_BARRIERS) {
+  const rule = expectedRuleFor('csr-kampagne', barrier.id);
+  const within = sectionFor(barrier.id);
 
-  test(`reports no ${PROGRESS_RULE} violation once it is resolved`, async ({ page }) => {
-    // Both directions, and the second one with the media section's `alt`
-    // barrier still active: the finding has to be gone from *this* section
-    // while the other one still plants its own.
-    await gotoRendered(page, `${PATH}?frei=fortschritt`);
-    const results = await barrierAssertion(page, PROGRESS).analyze();
-    expect(results.violations.map((violation) => violation.id)).not.toContain(PROGRESS_RULE);
+  test.describe(`axe run 2 — \`${barrier.urlKey}\``, () => {
+    test(`plants a ${rule} violation in its own section while active`, async ({ page }) => {
+      await gotoRendered(page, PATH);
+      const results = await barrierAssertion(page, within).analyze();
+      expect(results.violations.map((violation) => violation.id)).toContain(rule);
+    });
 
-    const feed = await barrierAssertion(page, FEED).analyze();
-    expect(feed.violations.map((violation) => violation.id)).toContain(ALT_RULE);
+    test(`plants no ${rule} violation there once it is resolved`, async ({ page }) => {
+      await gotoRendered(page, `${PATH}?frei=${barrier.urlKey}`);
+
+      const results = await barrierAssertion(page, within).analyze();
+      expect(results.violations.map((violation) => violation.id)).not.toContain(rule);
+
+      // …while every other axe barrier, still active, still plants its own.
+      // Two of the three share the rule id `image-alt` in two different
+      // sections, which is exactly the confusion a region-wide run 2 could not
+      // resolve: without this half, a repair that silenced the whole page would
+      // read the same as one that repaired this barrier.
+      for (const other of AXE_BARRIERS.filter((entry) => entry.id !== barrier.id)) {
+        const stillThere = await barrierAssertion(page, sectionFor(other.id)).analyze();
+        expect(stillThere.violations.map((violation) => violation.id)).toContain(
+          expectedRuleFor('csr-kampagne', other.id),
+        );
+      }
+    });
   });
+}
+
+// The control for the generator above (the pattern of e2e/barrier-panel.spec.ts):
+// a content file that stopped marking anything `'axe'` would empty the loop and
+// remove run 2 from this scenario entirely, with every remaining test green.
+// The other direction needs no test — a barrier marked `'axe'` without a
+// section throws in `sectionFor` while the file is being read, so the shard
+// fails before it runs.
+test('run 2 has cases to run (docs/TESTING.md §5)', () => {
+  expect(AXE_BARRIERS.length).toBeGreaterThan(0);
 });
 
 test.describe('Barrier `fortschritt` — the donation total (docs/UX-COPY.md §9.7)', () => {
