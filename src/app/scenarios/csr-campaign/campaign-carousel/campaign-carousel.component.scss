@@ -1,0 +1,68 @@
+// Elbwerk, nicht WERTE.IT: ausschließlich --sim-*-Tokens (CLAUDE.md Regel 5).
+// Dieser Abschnitt hat keinen Simulationshinweis — hier kann niemand Daten
+// eingeben (docs/UX-COPY.md §8.4); der Hinweis des Spendenformulars steht in
+// campaign-donation.component.scss.
+//
+// **Keine Bewegung in dieser Datei.** Kein `transition`, keine `animation`,
+// kein Überblenden zwischen zwei Zitaten. Was die Barriere vorführt, ist der
+// *Wechsel* alle vier Sekunden, nicht die Animation dazwischen — und eine
+// Animation hier wäre eine zweite Bewegungsquelle, die `prefers-reduced-motion`
+// eigens abschalten müsste, ohne dass ein Panel-Eintrag von ihr spräche
+// (CLAUDE.md Regel 18).
+:host {
+  display: block;
+}
+
+h4 {
+  margin: 24px 0 8px;
+  color: var(--sim-brand);
+  font-family: var(--sim-font-family);
+  font-size: 1.0625rem;
+}
+
+.carousel {
+  max-width: 44rem;
+  border: 1px solid var(--sim-border);
+  background: var(--sim-surface);
+  padding: 16px;
+}
+
+// Zielgröße gilt für die behobene Fassung wie für jedes andere Bedienelement
+// (WCAG 2.5.8, docs/DESIGN.md §5). Eine Pause-Schaltfläche, die man nicht
+// trifft, ist keine.
+.carousel-toggle {
+  min-width: var(--sim-target-min);
+  min-height: var(--sim-target-min);
+  border: 1px solid var(--sim-brand);
+  background: var(--sim-white);
+  padding: 8px 16px;
+  color: var(--sim-brand);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  cursor: pointer;
+}
+
+.carousel-position {
+  margin: 8px 0 0;
+  color: var(--sim-muted);
+  font-family: var(--sim-font-family);
+  font-size: 0.875rem;
+}
+
+.carousel-quote {
+  margin: 12px 0 0;
+  border-left: 4px solid var(--sim-brand);
+  padding-left: 12px;
+
+  p {
+    margin: 0;
+    color: var(--sim-text);
+    font-family: var(--sim-font-family);
+    font-size: var(--sim-size-body);
+    line-height: var(--sim-leading-body);
+  }
+}
+
+// Kein `outline: none` in dieser Datei, nirgends (CLAUDE.md Regel 8): Den
+// Fokusring der Pause-Schaltfläche zeichnet `[data-simulation-region]
+// :focus-visible` global in src/styles.scss.

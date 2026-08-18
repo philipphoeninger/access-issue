@@ -93,6 +93,20 @@ const STATES: Array<{ name: string; path: string; query: string }> = [
   // `einladung` adds text beside the link, not another stop, and neither
   // `dolmetschung` nor `zugang` adds anything focusable at all. The two
   // campaign rows above cover it switched fully off and fully on.
+  //
+  // Slice 18's donation section adds two rows, and only two: `slider` and
+  // `karussell` are the barriers whose repair puts new stops into the region —
+  // a range input, four preset buttons, a number field, a pause control. Both
+  // sit *after* the submit button that stands in every state, so they are the
+  // states in which the walk from the exit link to the end of the region is
+  // longest. `fortschritt` and `countdown` add no focusable element in either
+  // direction; the two campaign rows above cover them.
+  { name: 'campaign — only `slider` resolved', path: CAMPAIGN_PATH, query: '?frei=slider' },
+  // The one state in which something inside the region moves by itself. A
+  // carousel that swaps content under the user is the classic way to lose
+  // focus to a removed element — and the exit link is the one path that may
+  // never depend on where focus happens to be.
+  { name: 'campaign — only `karussell` resolved', path: CAMPAIGN_PATH, query: '?frei=karussell' },
 ];
 
 const EXIT_LINK_TEXT = 'Simulation verlassen — zurück zum Barriere-Panel';

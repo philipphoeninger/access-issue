@@ -69,11 +69,21 @@
     <app-campaign-event />
   </section>
 
-  <!-- Der letzte Abschnitt trägt vorerst nur Überschrift und Sprungziel. Seine
-       Inhalte und Barrieren bringt Schnitt 18 (docs/SPEC_v2.md §5).
-       Erfundener Fülltext stünde hier nur so lange, bis ihn jemand für
-       redaktionell geprüft hält (CLAUDE.md Regel 14). -->
+  <!-- Der Abschnitt „Spendenaufruf" mit den vier Barrieren `fortschritt`,
+       `countdown`, `slider` und `karussell` (docs/UX-COPY.md §9.7 bis §9.10,
+       docs/SPEC_v2.md Slice 18). Er trägt die beiden einzigen zeitabhängigen
+       Barrieren des Werkzeugs — und mit dem Karussell die einzige, die eine
+       Systemeinstellung ganz abschaltet.
+
+       Zwei Komponenten für einen Abschnitt, und das ist die einzige Stelle der
+       Seite, an der das so ist: Das Karussell bringt einen Zeitgeber, vier
+       Bedingungen und die Anbindung an die Simulationsleiste mit, die neben
+       einem Formular und einem Countdown in derselben Datei drei Themen an
+       einem Ort wären. Auf der Seite steht es hinter dem Spendenformular, so
+       wie die Copy es ordnet. -->
   <section class="campaign-section">
     <h3 id="sim-spende" tabindex="-1">Jetzt spenden</h3>
+    <app-campaign-donation />
+    <app-campaign-carousel />
   </section>
 </app-elbwerk-page>

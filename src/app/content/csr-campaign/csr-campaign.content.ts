@@ -13,9 +13,8 @@
 // „Bereich" columns, section *CSR-Kampagne*). `standards` and `affectedGroups`
 // transcribe docs/PRD.md §6.2.
 //
-// Barrier set and order follow the five sections of docs/PRD.md §6.2. Slices 14
-// to 17 build the first four of them; slice 18 adds the donation appeal
-// (docs/SPEC_v2.md §5).
+// Barrier set and order follow the five sections of docs/PRD.md §6.2, and with
+// slice 18 all five of them are here (docs/SPEC_v2.md §5).
 import type { Barrier, BarrierPart } from '../../models/domain.model';
 import { BITV_2_0_4 } from '../standards/bitv';
 import {
@@ -23,9 +22,13 @@ import {
   WCAG_1_3_1,
   WCAG_1_4_3,
   WCAG_2_1_1,
+  WCAG_2_2_1,
+  WCAG_2_2_2,
   WCAG_2_4_7,
+  WCAG_2_5_7,
   WCAG_3_1_5,
   WCAG_4_1_2,
+  WCAG_4_1_3,
 } from '../standards/wcag';
 
 // ── Bereich 1: Kampagnenseite ────────────────────────────────────────────────
@@ -201,11 +204,20 @@ export const ALT_BARRIER: Barrier = {
     solution:
       '[Platzhalter] Jedes Bild trägt einen Alternativtext, der beschreibt, was zu sehen ist, statt es zu deuten. „Zwölf Mitarbeitende stehen mit Malerrollen vor der frisch gestrichenen Wand" sagt, was auf dem Bild ist; „Teamgeist in Aktion" sagt es nicht.',
   },
-  // **Diese Barriere gilt für die Bilder der ganzen Seite**, nicht nur für die
-  // der Einbettung — die Beschriftung im Panel sagt es so („Bilder mit
-  // Alternativtexten"), und seit Slice 17 hängt die Zeichnung des
-  // Veranstaltungseingangs mit daran (docs/SPEC_v2.md §4.2: „Both variants carry
-  // real alternative text … when the alt-text barrier is resolved").
+  // **Diese Barriere gilt für die redaktionellen Bilder der Seite**: die drei
+  // Beiträge der Einbettung und, seit Slice 17, die Zeichnung des
+  // Veranstaltungseingangs (docs/SPEC_v2.md §4.2: „Both variants carry real
+  // alternative text … when the alt-text barrier is resolved"). Der Erklärtext
+  // oben zählt sie einzeln auf, und das ist Absicht.
+  //
+  // **Sie gilt nicht für die Balkengrafik des Spendenstands.** Deren fehlende
+  // Textalternative ist die Barriere `fortschritt` (Slice 18, docs/UX-COPY.md
+  // §9.7), und sie gehört dorthin: Was dort fehlt, ist nicht die Beschreibung
+  // eines Bildes, sondern eine Zahl, die es nur als Bild gibt — behoben wird sie
+  // durch sichtbaren Text neben dem Balken, nicht durch ein `alt`. Zwei
+  // Barrieren, zwei Reparaturen, und deshalb zwei Einträge im Panel. Wer die
+  // Beschriftung „Bilder mit Alternativtexten" wörtlich nimmt, prüfe sie gegen
+  // diesen Zuschnitt — der Fall ist in docs/UX-COPY.md §10 vermerkt.
   //
   // Der Zuschnitt ist nicht kosmetisch. Läge der fehlende Alternativtext der
   // Zeichnung beim Teil `zugang`, wäre dieser Teil ein Verstoß gegen WCAG 1.1.1
@@ -432,6 +444,207 @@ export const EVENT_BARRIER: Barrier = {
   // das PDF ist für axe ein Link wie jeder andere (docs/TESTING.md §2). Prüfbar
   // ist, was auf der Seite steht und was nicht — das tun die Komponenten- und
   // die Playwright-Prüfung.
+  automatedDetection: 'manual',
+  contentStatus: 'placeholder',
+};
+
+// ── Bereich 5: Spendenaufruf ─────────────────────────────────────────────────
+//
+// Die vier Barrieren des letzten Abschnitts (docs/UX-COPY.md §9.7 bis §9.10,
+// docs/PRD.md §6.2 Bereich 5, docs/SPEC_v2.md Slice 18). Sie stammen als
+// einzige nicht aus dem Modul, sondern aus der Konzeption dieses Werkzeugs, und
+// sie bleiben, weil sie Barrierearten abdecken, die sonst nirgends vorkämen:
+// **Bewegung, Zeitdruck, Zeigergesten, Live-Aktualisierung**. Alle vier gehören
+// der IT — der einzige Abschnitt der Kampagne, in dem kein redaktioneller und
+// kein organisatorischer Fehler steckt, sondern vier Entscheidungen beim Bauen.
+//
+// Zwei von ihnen sind zeitabhängig, und das macht sie zu den einzigen des
+// Projekts, die überhaupt etwas tun, während niemand sie anfasst: Der Countdown
+// zählt, das Karussell wechselt. Beide werden in der Prüfung über die Uhr
+// gesteuert und nie über Wartezeiten (docs/TESTING.md §10).
+
+/**
+ * Der Spendenstand als reine Grafik.
+ *
+ * **Muster B** (docs/ARCHITECTURE.md §11): Dieselbe Zahl in beiden Zuständen,
+ * einmal ausschließlich als Beschriftung *in* der Balkengrafik, einmal
+ * zusätzlich als Text daneben — und dann trägt die Grafik `aria-hidden`, weil
+ * ihre Information vollständig danebensteht. Dieselbe Form wie bei der
+ * Textgrafik des Bewerbungsprozesses (docs/UX-COPY.md §8.6), und aus demselben
+ * Grund die zweite Barriere der Kampagne, die axe von sich aus findet: Ein
+ * `img` ohne `alt` ist `image-alt` (content/axe-rule-fixtures.ts).
+ *
+ * **Kein `role="progressbar"`** (docs/UX-COPY.md §9.7). Der behobene Zustand
+ * ist sichtbarer Text neben dem Balken, nicht ein Balken mit ARIA-Werten: Das
+ * ist der einfachere und der verlässlichere Weg, und er hilft außerdem den
+ * Nutzern, denen ein Screenreader gar nichts vorliest.
+ */
+export const FORTSCHRITT_BARRIER: Barrier = {
+  id: 'fortschritt',
+  urlKey: 'fortschritt',
+  title: 'Fortschrittsbalken',
+  shortTitle: 'Spendenstand als Text lesbar',
+  categories: ['visual'],
+  affectedGroups: ['blinde und sehbehinderte Personen'],
+  responsibleArea: 'it',
+  groupId: 'spende',
+  organisational: false,
+  standards: [WCAG_1_1_1, WCAG_4_1_2],
+  explanation: {
+    problem:
+      '[Platzhalter] Der Spendenstand steht ausschließlich in einer Balkengrafik: Der Balken zeigt, wie weit die Aktion gekommen ist, und der Prozentwert steht als Beschriftung innerhalb des Bildes. Das Bild trägt keine Textalternative.',
+    affected:
+      '[Platzhalter] Blinde und sehbehinderte Personen erfahren den Spendenstand nicht — und der Spendenstand ist das Argument des ganzen Abschnitts. Wer nicht weiß, dass 3.600 € fehlen, hat keinen Grund zu spenden.',
+    solution:
+      '[Platzhalter] Derselbe Stand steht als Text neben dem Balken: „8.400 € von 12.000 € erreicht — 70 Prozent" und „Noch 3.600 € bis zum Ziel". Der Balken bleibt als Bebilderung stehen und wird für Screenreader ausgeblendet, weil daneben schon alles steht, was er sagt.',
+  },
+  // axe sieht ein `img` ohne `alt` (Regel `image-alt`). Weil die Barriere `alt`
+  // des Medienabschnitts dieselbe Regel auslöst, prüft Lauf 2 diese hier
+  // ausdrücklich **auf den Abschnitt eingegrenzt** (e2e/csr-campaign.spec.ts) —
+  // sonst behauptete jede der beiden, die Fundstelle der anderen sei ihre
+  // eigene.
+  automatedDetection: 'axe',
+  contentStatus: 'placeholder',
+};
+
+/**
+ * Der Countdown ohne geeignete Live-Region.
+ *
+ * **Muster B**: Dieselben Zahlen, dieselbe Aktualisierung — was fehlt, ist die
+ * Ansage. Behoben trägt der Countdown eine `aria-live="polite"`-Region, und die
+ * spricht **im Minutentakt**, während die sichtbare Anzeige weiterläuft.
+ *
+ * **Der Unterschied zwischen „hat eine Live-Region" und „hat die richtige
+ * Frequenz" ist hier der eigentliche Lehrinhalt** (docs/UX-COPY.md §9.8). Er ist
+ * zugleich technisch zwingend: Der behobene Countdown ist die einzige
+ * Live-Region außerhalb des Rahmens (docs/ARCHITECTURE.md §12.2). Spräche sie
+ * sekündlich, redete sie über jede Umschaltbestätigung des Panels hinweg
+ * (docs/UX-COPY.md §5.7) — und beide Ansagen wären wertlos.
+ */
+export const COUNTDOWN_BARRIER: Barrier = {
+  id: 'countdown',
+  urlKey: 'countdown',
+  title: 'Countdown',
+  shortTitle: 'Countdown wird vorgelesen',
+  categories: ['visual', 'cognitive'],
+  affectedGroups: [
+    'blinde und sehbehinderte Personen',
+    'kognitive Einschränkungen',
+    'Screenreader-Nutzer',
+  ],
+  responsibleArea: 'it',
+  groupId: 'spende',
+  organisational: false,
+  standards: [WCAG_4_1_3, WCAG_2_2_1],
+  explanation: {
+    problem:
+      '[Platzhalter] Der Countdown zählt die verbleibende Zeit in Zahlenblöcken herunter und aktualisiert sie fortlaufend. Für einen Screenreader ändert sich dabei nichts: Es gibt keine Live-Region, also wird die Änderung nirgends angesagt.',
+    affected:
+      '[Platzhalter] Blinde und sehbehinderte Personen erfahren nicht, dass die Aktion überhaupt befristet ist. Für Menschen mit kognitiven Einschränkungen kommt hinzu, dass eine Zeitangabe, die man nicht mitbekommt, den Zeitdruck nicht kleiner macht, sondern nur unsichtbar.',
+    solution:
+      '[Platzhalter] Die verbleibende Zeit steht in einer Live-Region, die im Minutentakt ansagt, wie lange die Aktion noch läuft — nicht sekündlich. Eine Live-Region einzubauen genügt nicht: Eine, die jede Sekunde spricht, redet über jede andere Ansage hinweg und macht beide unbrauchbar.',
+  },
+  // Manuell. axe prüft, ob ein `aria-live`-Wert gültig ist, nicht ob es eine
+  // Live-Region gibt, wo eine hingehört — und über die *Frequenz* einer Ansage
+  // urteilt gar kein Werkzeug (docs/TESTING.md §2). Prüfbar ist beides über die
+  // gesteuerte Uhr: dass die Region existiert und dass ihr Text sich pro Minute
+  // ändert und nicht pro Sekunde (docs/TESTING.md §10).
+  automatedDetection: 'manual',
+  contentStatus: 'placeholder',
+};
+
+/**
+ * Das Spendenformular mit reinem Ziehregler.
+ *
+ * **Muster A**: Zwei ausgeschriebene Fassungen desselben Formulars. Aktiv gibt
+ * es einen Regler, den man ziehen muss — nicht fokussierbar, ohne Beschriftung,
+ * ohne Zahlenwert als Text. Behoben stehen Voreinstellungs-Schaltflächen und ein
+ * beschriftetes Zahlenfeld daneben, und **der Regler bleibt**: Er ist dann ein
+ * echtes `input[type=range]`, beschriftet und mit den Pfeiltasten bedienbar.
+ *
+ * „Auch ohne Ziehen bedienbar" ist der Wortlaut von SC 2.5.7, und er ist der
+ * Grund, warum der Regler nicht verschwindet. Wer ihn wegnimmt, repariert die
+ * Barriere, indem er die Funktion entfernt — und führt damit vor, dass
+ * Barrierefreiheit Möglichkeiten kostet. Genau das ist die Vorstellung, gegen
+ * die das Modul anschreibt.
+ */
+export const SLIDER_BARRIER: Barrier = {
+  id: 'slider',
+  urlKey: 'slider',
+  title: 'Spenden-Slider',
+  shortTitle: 'Betrag auch als Eingabefeld',
+  categories: ['motor', 'visual'],
+  affectedGroups: [
+    'motorische Einschränkungen',
+    'Tastatur- und Screenreader-Nutzer',
+    'Menschen mit Tremor',
+  ],
+  responsibleArea: 'it',
+  groupId: 'spende',
+  organisational: false,
+  standards: [WCAG_2_1_1, WCAG_2_5_7],
+  explanation: {
+    problem:
+      '[Platzhalter] Der Spendenbetrag lässt sich ausschließlich durch Ziehen eines Reglers einstellen. Der Regler steht nicht in der Tab-Reihenfolge, trägt keine Beschriftung, und der eingestellte Betrag steht nirgends als Zahl.',
+    affected:
+      '[Platzhalter] Wer nicht zielgenau ziehen kann, kann nicht spenden: Menschen mit motorischen Einschränkungen, mit Tremor, mit einer Handbedienung statt einer Maus. Screenreader-Nutzer erfahren nicht einmal, dass hier ein Betrag einzustellen wäre.',
+    solution:
+      '[Platzhalter] Neben dem Regler stehen Schaltflächen für die gängigen Beträge und ein beschriftetes Zahlenfeld für jeden anderen. Der Regler bleibt und wird mit den Pfeiltasten bedienbar — was per Ziehen geht, muss auch ohne Ziehen gehen, und nicht: was per Ziehen ging, fällt weg.',
+  },
+  // Manuell. Ein `div`, das auf `pointermove` reagiert, ist für axe ein
+  // Textblock (docs/TESTING.md §2) — dieselbe Lage wie bei der Barriere
+  // `tastatur` des Bewerbungsprozesses. Prüfbar ist es mit echten Tastenereig-
+  // nissen: Der behobene Regler ändert seinen Wert mit den Pfeiltasten, der
+  // aktive ist mit `Tab` überhaupt nicht zu erreichen (docs/TESTING.md §9).
+  automatedDetection: 'manual',
+  contentStatus: 'placeholder',
+};
+
+/**
+ * Das automatisch wechselnde Testimonial-Karussell.
+ *
+ * **Muster A**: Aktiv wechselt es alle vier Sekunden und hat keine
+ * Pause-Schaltfläche. Behoben steht die Pause-Schaltfläche als erstes Element
+ * der Gruppe, es gibt eine Positionsanzeige, und der Wechsel hält bei Fokus oder
+ * Zeigerkontakt an.
+ *
+ * **Die einzige Barriere des Werkzeugs, die eine Systemeinstellung ganz
+ * abschaltet** (CLAUDE.md Regel 9, docs/ARCHITECTURE.md §5.5): Bei
+ * `prefers-reduced-motion` wechselt nichts automatisch, und die
+ * Simulationsleiste sagt, was ohne die Einstellung zu sehen wäre. Vestibuläre
+ * Auslöser sind keine Lerngelegenheit — und ein Werkzeug über Barrierefreiheit,
+ * das jemandem übel macht, hat sein Thema verfehlt.
+ */
+export const KARUSSELL_BARRIER: Barrier = {
+  id: 'karussell',
+  urlKey: 'karussell',
+  title: 'Karussell',
+  shortTitle: 'Karussell mit Pause-Schaltfläche',
+  categories: ['cognitive', 'situational', 'visual'],
+  affectedGroups: [
+    'kognitive Einschränkungen',
+    'Aufmerksamkeitsstörungen',
+    'vestibuläre Störungen',
+    'langsam lesende Personen',
+  ],
+  responsibleArea: 'it',
+  groupId: 'spende',
+  organisational: false,
+  standards: [WCAG_2_2_2],
+  explanation: {
+    problem:
+      '[Platzhalter] Die Zitate aus dem Stadtteil wechseln alle vier Sekunden von selbst. Es gibt keine Schaltfläche, die das anhält, keine Anzeige, an welcher Stelle man ist, und der Wechsel hält auch dann nicht an, wenn jemand gerade liest.',
+    affected:
+      '[Platzhalter] Wer langsamer liest, liest nie zu Ende. Für Menschen mit Aufmerksamkeitsstörungen zieht die Bewegung den Blick von allem anderen auf der Seite ab, und für Menschen mit vestibulären Störungen ist automatische Bewegung nicht anstrengend, sondern körperlich unangenehm.',
+    solution:
+      '[Platzhalter] Eine Pause-Schaltfläche steht vor den Zitaten, eine Positionsanzeige sagt, wo man ist, und der Wechsel hält an, sobald der Fokus oder der Zeiger im Karussell steht. Fordert das System reduzierte Bewegung an, wechselt von vornherein nichts von selbst.',
+  },
+  // Manuell. Dass etwas sich bewegt, sieht kein Prüfwerkzeug, und ob eine
+  // Pause-Schaltfläche vorhanden ist, kann axe nicht von einer beliebigen
+  // Schaltfläche unterscheiden (docs/TESTING.md §2). Prüfbar ist es über die
+  // gesteuerte Uhr, in beide Richtungen: dass es wechselt, wenn es soll, und
+  // dass es nicht wechselt, wenn die Systemeinstellung es verbietet
+  // (docs/TESTING.md §10, §11).
   automatedDetection: 'manual',
   contentStatus: 'placeholder',
 };

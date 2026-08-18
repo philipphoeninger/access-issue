@@ -38,5 +38,12 @@ export const AXE_RULE_FIXTURES: Record<string, Record<string, string>> = {
     // caption sits on an opaque band rather than directly on the image —
     // scenarios/csr-campaign/campaign-media/ carries the full reasoning.
     kontrast: 'color-contrast',
+    // Donation section: the progress bar as a graphic with no text alternative
+    // (docs/SPEC_v2.md slice 18). Same rule as `alt` above, and that is the
+    // reason run 2 asserts both of them **scoped to their own section** rather
+    // than over the whole region: two barriers planting one rule id in one
+    // document cannot be told apart from the result list alone, so each would
+    // have passed on the other's finding (e2e/csr-campaign.spec.ts).
+    fortschritt: 'image-alt',
   },
 };

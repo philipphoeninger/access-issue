@@ -1,0 +1,217 @@
+@use '../../../../styles/simulation-note' as note;
+
+// Elbwerk, nicht WERTE.IT: ausschließlich --sim-*-Tokens (CLAUDE.md Regel 5).
+// Die eine Ausnahme ist der Simulationshinweis am Ende dieser Datei, und sie
+// ist als solche benannt.
+//
+// Nichts hier ist eine Barriere. Die drei Barrieren dieses Abschnitts liegen im
+// Markup: ein `alt`, das da ist oder fehlt; eine Live-Region, die es gibt oder
+// nicht; ein Bedienelement, das ein `input` ist oder eine Fläche mit
+// Zeigerhandlern. Eine Gestaltung, die *kaputt aussähe*, brächte
+// Teilnehmenden bei, Barrieren am Aussehen zu erkennen — die eine Gewohnheit,
+// gegen die docs/DESIGN.md §2 gebaut ist.
+:host {
+  display: block;
+}
+
+h4 {
+  margin: 24px 0 8px;
+  color: var(--sim-brand);
+  font-family: var(--sim-font-family);
+  font-size: 1.0625rem;
+}
+
+.progress-text,
+.progress-remaining,
+.countdown-label,
+.countdown-over {
+  margin: 0 0 4px;
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  line-height: var(--sim-leading-body);
+}
+
+.progress-text {
+  font-weight: bold;
+}
+
+// Die Balkengrafik. `height: auto` bei gesetztem `width`/`height` am Element:
+// Das Seitenverhältnis steht vor dem Layout fest, und der Balken skaliert bis
+// 320 px Fensterbreite und 400 % Vergrößerung ohne waagerechtes Scrollen
+// (WCAG 1.4.10, e2e/reflow.spec.ts).
+.progress-graphic {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  margin-bottom: 8px;
+}
+
+// ── Countdown ────────────────────────────────────────────────────────────────
+
+.countdown {
+  margin-top: 16px;
+}
+
+.countdown-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.countdown-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 4.5rem;
+  border: 1px solid var(--sim-border);
+  background: var(--sim-surface);
+  padding: 8px 12px;
+  font-family: var(--sim-font-family);
+}
+
+.countdown-number {
+  color: var(--sim-brand);
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.countdown-unit {
+  color: var(--sim-muted);
+  font-size: 0.875rem;
+}
+
+// ── Spendenformular ──────────────────────────────────────────────────────────
+
+.donate-form {
+  max-width: 34rem;
+  margin-top: 16px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  font-weight: 700;
+}
+
+.amount-range {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  // Nicht nur der Strich: Ein `input[type=range]` ist so hoch wie sein Griff,
+  // und 2.5.8 gilt für die behobene Fassung wie für jedes andere Bedienelement
+  // (docs/DESIGN.md §5).
+  min-height: var(--sim-target-min);
+}
+
+.amount-number {
+  min-height: var(--sim-target-min);
+  border: 1px solid var(--sim-border);
+  background: var(--sim-white);
+  padding: 6px 8px;
+  width: 8rem;
+  color: var(--sim-text);
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.preset,
+.donate-submit {
+  min-width: var(--sim-target-min);
+  min-height: var(--sim-target-min);
+  border: 1px solid var(--sim-brand);
+  padding: 8px 16px;
+  font-family: var(--sim-font-family);
+  font-size: var(--sim-size-body);
+  cursor: pointer;
+}
+
+.preset {
+  background: var(--sim-white);
+  color: var(--sim-brand);
+}
+
+// Der eingestellte Betrag ist nicht nur an der Färbung zu erkennen: Die
+// Schaltfläche trägt `aria-pressed`, und der Rahmen wird zusätzlich stärker —
+// Farbe allein trüge die Information sonst (SC 1.4.1).
+.preset[aria-pressed='true'] {
+  border-width: 3px;
+  background: var(--sim-brand);
+  color: var(--sim-white);
+  font-weight: bold;
+}
+
+.donate-submit {
+  background: var(--sim-brand);
+  color: var(--sim-white);
+  font-weight: bold;
+}
+
+// ── Der Ziehregler der aktiven Fassung ───────────────────────────────────────
+//
+// Er sieht aus wie ein Regler und ist keiner. Das ist die Barriere, und sie
+// liegt im Markup, nicht hier: Die Fläche hat kein `tabindex`, kein `role` und
+// keine Beschriftung. Die Gestaltung ist gewöhnlich — ein Regler, der *kaputt
+// aussieht*, führt etwas anderes vor als einer, der nur nicht bedienbar ist.
+//
+// `touch-action: none` steht hier ausdrücklich **nicht**: Das nähme dem
+// Browser das Scrollen mit dem Finger ab, und damit fiele die Barriere aus dem
+// Auslassen ins Abfangen (CLAUDE.md Regel 6).
+.drag-slider {
+  position: relative;
+  height: 28px;
+  margin-bottom: 16px;
+  max-width: 24rem;
+  border: 1px solid var(--sim-border);
+  border-radius: 14px;
+  background: var(--sim-surface);
+}
+
+.drag-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 14px 0 0 14px;
+  background: var(--sim-brand);
+}
+
+.drag-handle {
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--sim-brand);
+  border-radius: 50%;
+  background: var(--sim-white);
+}
+
+// Der Simulationshinweis — die benannte Ausnahme zu CLAUDE.md Regel 5 und die
+// einzigen --wi-*-Tokens im Simulationsbereich. Begründung, Textsorte und
+// Deklarationen stehen an einer Stelle: src/styles/_simulation-note.scss.
+// Hier wird sie nur aufgerufen.
+.simulation-note {
+  @include note.simulation-note;
+}
+
+// Kein `outline: none` in dieser Datei, nirgends (CLAUDE.md Regel 8): Den
+// Fokusring zeichnet `[data-simulation-region] :focus-visible` global in
+// src/styles.scss, für die Voreinstellungen, das Zahlenfeld, den Regler und die
+// Absende-Schaltfläche gleichermaßen.

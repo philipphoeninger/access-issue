@@ -1333,6 +1333,25 @@ Der Minutentakt ist zugleich technisch notwendig. Der behobene Countdown ist die
 Live-Region außerhalb des Rahmens (`ARCHITECTURE.md` §12.2). Liefe sie sekündlich, spräche
 sie über jede Bestätigung aus Abschnitt 5.7 hinweg, und beide Ansagen wären wertlos.
 
+**Drei Angaben, kein Sekundenblock** (Slice 18, redaktionell zu bestätigen). `csr.countdown.value`
+und `csr.countdown.units` nennen beide genau Tage, Stunden und Minuten. Die sichtbare Anzeige
+hat deshalb drei Blöcke; „Aktualisierung im Sekundentakt" ist als das umgesetzt, was davon
+bleibt — der Wert wird jede Sekunde neu berechnet, damit der Minutenwechsel auf die Sekunde
+genau fällt. Ein vierter Block bräuchte die Beschriftung „Sekunden", die es in der geprüften
+Copy nicht gibt.
+
+**Die Live-Region sagt `csr.countdown.value` wortwörtlich an**, ohne einleitenden Halbsatz
+(Slice 18, redaktionell zu bestätigen). „Die Aktion endet in 3 Tage, 4 Stunden" wäre falsches
+Deutsch, und eine Fassung im Dativ gibt die Copy nicht her. `csr.countdown.label` steht als
+sichtbare Beschriftung daneben.
+
+**Das Enddatum der Aktion steht in der Copy nicht** und ist in Slice 18 erfunden worden:
+30. September 2026, 23:59 Uhr — nach der Podiumsdiskussion am 24. September (Abschnitt 9.6),
+zum Monatsende. Es steht an genau einer Stelle im Code
+(`scenarios/csr-campaign/campaign-donation/`). Nach diesem Zeitpunkt zeigt der Countdown
+`csr.countdown.ended`, und damit ist die Barriere nicht mehr vorführbar: Ein Kurs nach dem
+30. September 2026 braucht ein vorgerücktes Datum. Siehe Abschnitt 10.
+
 ### 9.9 Bereich „Spendenaufruf" — Barriere „Spendenformular"
 
 | Schlüssel | Text |
@@ -1370,6 +1389,19 @@ stoppt bei Fokus oder Zeigerkontakt.
 Bei `prefers-reduced-motion` greift in beiden Zuständen der Hinweis aus Abschnitt 5.9 und
 der automatische Wechsel unterbleibt.
 
+**Der Hinweis steht nur im aktiven Zustand** (Slice 18, redaktionell zu bestätigen). Der
+automatische Wechsel unterbleibt weiterhin in *beiden* Zuständen — die Systemeinstellung hat
+Vorrang, ohne Ausnahme (`ARCHITECTURE.md` §5.5). Der Text von `suppressed.reducedMotion`
+endet aber auf „ohne dass du es anhalten kannst", und im behobenen Zustand gibt es die
+Pause-Schaltfläche: Der Hinweis beschriebe dort eine Barriere, die gerade nicht besteht, und
+widerspräche dem Panel daneben. Dieselbe Regel wie bei der Kontrast-Barriere in Abschnitt
+9.5, die ihren Hinweis ebenfalls nur zurückmeldet, solange sie steht.
+
+Im behobenen Zustand ist die Einstellung ohnehin keine Unterdrückung, sondern die
+zugängliche Umsetzung selbst: Das Karussell startet angehalten, die Schaltfläche sagt
+„Automatischen Wechsel fortsetzen", und wer den Wechsel ausdrücklich will, bekommt ihn.
+Unterdrückt wird die *automatische* Bewegung, nicht eine angeforderte.
+
 ---
 
 ## 10. Offene Punkte
@@ -1390,6 +1422,10 @@ der automatische Wechsel unterbleibt.
 | Der Emoji-Beitrag (Abschnitt 9.4) steht als eigener Beitrag im Feed, nicht als Unterschrift zu einem der drei Bilder — in Slice 16 festgelegt, weil die Copy genau einen Beitragstext hergibt | WERTE.IT-Team |
 | **Der Alternativtext der Eingangszeichnung hängt an der Barriere „Alternativtexte", nicht am Teil „Zugang" (Abschnitt 9.6)** — in Slice 17 entschieden. Andernfalls verstieße der Teil „Zugang" gegen WCAG 1.1.1, während der Erklärungsbereich daneben sagt, er verstoße gegen keine Norm. Die Barriere „Alternativtexte" gilt damit für die Bilder der ganzen Seite, wie ihre Panel-Beschriftung es ohnehin sagt | WERTE.IT-Team |
 | **Ist die Rahmung der physischen Barriere (Abschnitt 9.6, `SPEC_v2.md` §4.3) so gewollt?** Der Erklärtext zu „Zugang" benennt ausdrücklich, dass ein Haken zwei verschiedene Dinge zugleich behebt: das Verschweigen des Zugangs und die fehlende Rampe. Das ist die einzige Stelle, an der das Werkzeug über Webbarrierefreiheit hinaus etwas behauptet | WERTE.IT-Team |
+| **Das Enddatum der Spendenaktion (Abschnitt 9.8)** — in Slice 18 erfunden, weil ein Countdown ein Ziel braucht und die Copy keines nennt: 30. September 2026, 23:59 Uhr. **Nach diesem Zeitpunkt zeigt der Countdown `csr.countdown.ended`, und die Barriere ist nicht mehr vorführbar.** Vor einem Kurs nach diesem Datum muss die eine Zeile im Code vorgerückt werden | WERTE.IT-Team / Philipp |
+| Drei Blöcke statt vier und die Ansage ohne einleitenden Halbsatz (Abschnitt 9.8) — in Slice 18 festgelegt, weil `csr.countdown.units` und `csr.countdown.value` beide genau drei Einheiten nennen und „endet in 3 Tage" falsches Deutsch wäre | WERTE.IT-Team |
+| **Der Hinweis bei reduzierter Bewegung steht nur im aktiven Zustand (Abschnitt 9.10)** — in Slice 18 entschieden. Der Wechsel unterbleibt weiterhin in beiden Zuständen; der Hinweistext endet aber auf „ohne dass du es anhalten kannst", und im behobenen Zustand gibt es die Pause-Schaltfläche | WERTE.IT-Team |
+| **Die Barriere „Alternativtexte" (Abschnitt 9.3) gilt nicht für die Balkengrafik des Spendenstands** — deren fehlende Textalternative ist die Barriere „Spendenstand" (Abschnitt 9.7), weil sie durch sichtbaren Text neben dem Balken behoben wird und nicht durch ein `alt`. Die Panel-Beschriftung „Bilder mit Alternativtexten" ist damit weiter gefasst als die Barriere. Soll sie enger heißen? | WERTE.IT-Team |
 | Soll die Stellenanzeige eine reale BSVH-nahe Tätigkeit abbilden oder bewusst neutral bleiben? | WERTE.IT-Team |
 
 **Ein Hinweis zur Prüfung.** Die beiden Sprachfassungen in Abschnitt 8.3 sind der einzige

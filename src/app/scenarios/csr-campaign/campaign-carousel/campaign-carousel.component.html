@@ -1,0 +1,43 @@
+<!-- Barriere `karussell`, Muster A (docs/UX-COPY.md §9.10). Zwei
+     ausgeschriebene Fassungen derselben Zitatgruppe, keine die Reparatur der
+     anderen (CLAUDE.md Regel 10).
+
+     Zeiger- und Fokushandler stehen an der Gruppe in **beiden** Zuständen, weil
+     sie zum Bauteil gehören und nicht zur Barriere: Ob sie den Wechsel anhalten,
+     entscheidet `advancing()` in der Komponente. Sie am aktiven Zweig
+     wegzulassen wäre dieselbe Wirkung mit einer zweiten Stelle, an der sie
+     steht. -->
+<h4>{{ heading }}</h4>
+
+<div
+  class="carousel"
+  (mouseenter)="onPointerEnter()"
+  (mouseleave)="onPointerLeave()"
+  (focusin)="onFocusIn()"
+  (focusout)="onFocusOut($event)"
+>
+  @if (hasControls()) {
+    <!-- Die Pause-Schaltfläche als **erstes Element der Gruppe**
+         (docs/UX-COPY.md §9.10): Wer den Wechsel anhalten will, muss die
+         Steuerung erreichen, bevor er den Text zu lesen anfängt — und nicht
+         hinter drei Zitaten, die inzwischen weitergesprungen sind.
+
+         Die Beschriftung wechselt mit dem Zustand („anhalten" / „fortsetzen")
+         und sagt ihn damit im Namen der Schaltfläche. Kein `aria-pressed`
+         daneben: Beides zusammen ergäbe „fortsetzen, gedrückt", was niemand
+         auflösen kann (docs/UX-COPY.md §4). -->
+    <button type="button" class="carousel-toggle" (click)="toggle()">{{ toggleLabel() }}</button>
+
+    <!-- Gewöhnlicher Text, keine Live-Region: Die eine, die die Simulation
+         haben darf, gehört dem behobenen Countdown
+         (docs/ARCHITECTURE.md §12.2). -->
+    <p class="carousel-position">{{ position() }}</p>
+  }
+
+  <!-- In beiden Zuständen dasselbe: ein Zitat, das gerade dran ist. Kein
+       Überblenden, kein Schieben — die Bewegung, um die es in dieser Barriere
+       geht, ist der *Wechsel*, nicht die Animation dazwischen. -->
+  <blockquote class="carousel-quote">
+    <p>{{ current() }}</p>
+  </blockquote>
+</div>

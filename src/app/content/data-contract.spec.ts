@@ -288,6 +288,12 @@ describe('scenario data contract (docs/TESTING.md §8)', () => {
     { scenarioPath: 'csr-kampagne', urlKey: 'einladung' },
     { scenarioPath: 'csr-kampagne', urlKey: 'dolmetschung' },
     { scenarioPath: 'csr-kampagne', urlKey: 'zugang' },
+    // The donation section of slice 18, which completes the campaign's
+    // fourteen switches.
+    { scenarioPath: 'csr-kampagne', urlKey: 'fortschritt' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'countdown' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'slider' },
+    { scenarioPath: 'csr-kampagne', urlKey: 'karussell' },
   ];
 
   it('keeps every previously published {scenarioPath, urlKey} pair (add here on release)', () => {

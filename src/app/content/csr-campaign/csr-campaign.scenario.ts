@@ -10,10 +10,14 @@
 import type { Scenario } from '../../models/domain.model';
 import {
   ALT_BARRIER,
+  COUNTDOWN_BARRIER,
   EMOJI_BARRIER,
   EVENT_BARRIER,
+  FORTSCHRITT_BARRIER,
+  KARUSSELL_BARRIER,
   KONTRAST_BARRIER,
   NAVIGATION_BARRIER,
+  SLIDER_BARRIER,
   SPRACHE_BARRIER,
 } from './csr-campaign.content';
 
@@ -41,18 +45,19 @@ export const CSR_CAMPAIGN_SCENARIO: Scenario = {
   // component's markup (§5.2) — so e2e/barrier-panel.spec.ts is what proves a
   // declared anchor actually hits something.
   //
-  // **Only sections whose barriers exist are declared.** The page renders all
+  // **Only sections whose barriers exist are declared.** The page rendered all
   // five from slice 14 on, but a declared group with no barrier is a legend
   // promising controls that are not there, and content/data-contract.spec.ts
-  // rejects it. The last one is added by the slice that brings its barriers
-  // (docs/SPEC_v2.md slice 18):
-  //
-  //   { id: 'spende', title: 'Spendenaufruf', anchorId: 'sim-spende' }
+  // rejects it — so each group arrived with the slice that brought its
+  // barriers. `spende` is the last of them (docs/SPEC_v2.md slice 18), and with
+  // it the panel's five groups and the page's five sections finally say the
+  // same thing.
   groups: [
     { id: 'kampagnenseite', title: 'Kampagnenseite', anchorId: 'sim-kampagne' },
     { id: 'texte', title: 'Texte und Inhalte', anchorId: 'sim-texte' },
     { id: 'medien', title: 'Medien', anchorId: 'sim-medien' },
     { id: 'event', title: 'Event und Podiumsdiskussion', anchorId: 'sim-event' },
+    { id: 'spende', title: 'Spendenaufruf', anchorId: 'sim-spende' },
   ],
   barriers: [
     NAVIGATION_BARRIER,
@@ -61,5 +66,9 @@ export const CSR_CAMPAIGN_SCENARIO: Scenario = {
     EMOJI_BARRIER,
     KONTRAST_BARRIER,
     EVENT_BARRIER,
+    FORTSCHRITT_BARRIER,
+    COUNTDOWN_BARRIER,
+    SLIDER_BARRIER,
+    KARUSSELL_BARRIER,
   ],
 };

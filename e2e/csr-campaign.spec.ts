@@ -1,4 +1,4 @@
-// The CSR campaign page and its barriers (docs/SPEC_v2.md slices 14 to 16).
+// The CSR campaign page and its barriers (docs/SPEC_v2.md slices 14 to 18).
 //
 // The first two sections are `automatedDetection: 'manual'` throughout: axe
 // sees a `<div>` with a click handler as ordinary text, and no tool judges
@@ -12,6 +12,13 @@
 // something to say: `alt` plants an `image-alt` violation and `kontrast` a
 // `color-contrast` one, and both have to disappear when the barrier is
 // resolved.
+//
+// The donation section of slice 18 brings the only two barriers in the project
+// that do something while nobody touches them. They are driven by
+// `page.clock`, never by waiting (docs/TESTING.md §10), and the reduced-motion
+// run has its negative control beside it — without one, a bug that stops the
+// carousel unconditionally would pass the preference test and take a barrier
+// out of the module unnoticed (docs/TESTING.md §11).
 //
 // The safety-critical path (docs/TESTING.md §7) is not repeated here: the
 // campaign states are rows in e2e/exit-link.spec.ts, where the trap detector
@@ -27,6 +34,30 @@ const PATH = '/szenario/csr-kampagne';
 /** The rule ids come from the fixture, never from a literal (docs/TESTING.md §5). */
 const ALT_RULE = expectedRuleFor('csr-kampagne', 'alt');
 const CONTRAST_RULE = expectedRuleFor('csr-kampagne', 'kontrast');
+const PROGRESS_RULE = expectedRuleFor('csr-kampagne', 'fortschritt');
+
+/**
+ * The two sections whose barriers axe can see, as selectors.
+ *
+ * Run 2 is scoped to one of them rather than to the whole region, because
+ * `alt` and `fortschritt` plant the same rule id in two different sections
+ * (content/axe-rule-fixtures.ts). Over the whole region neither assertion could
+ * tell whose finding it was looking at, and both would have gone on passing
+ * while one of the two barriers was quietly gone.
+ */
+const FEED = '[data-simulation-region] .feed';
+const PROGRESS = '[data-simulation-region] .progress';
+
+/**
+ * The campaign's two Simulationshinweise, each scoped to the section it belongs
+ * to. Since slice 18 there are two of them on this page
+ * (`csr.social.disclaimer` and `csr.donate.simulationNote`), so a bare
+ * `.simulation-note` matches both — and the component selector is the one
+ * handle that says *which* section is meant without depending on document
+ * order.
+ */
+const MEDIA_NOTE = '[data-simulation-region] app-campaign-media .simulation-note';
+const DONATE_NOTE = '[data-simulation-region] app-campaign-donation .simulation-note';
 
 /**
  * The media section's own matrix: **all eight combinations** of its three
@@ -104,6 +135,16 @@ const STATES: Array<{ name: string; url: string }> = [
   // venue drawing carries a name at all: `alt` is what gives it `role="img"`
   // and a `<title>` (scenarios/csr-campaign/campaign-event).
   { name: '`zugang` resolved with alternative texts', url: `${PATH}?frei=zugang,alt` },
+  // The donation section of slice 18 — four independent barriers, so exactly
+  // the n + 2 of docs/TESTING.md §4: each one resolved on its own, with the
+  // fully active and fully resolved rows already at the top of this list. Not a
+  // power set, and §4 says so in as many words: sixteen states of four barriers
+  // that genuinely do not touch each other buy nothing the four rows below do
+  // not already buy.
+  { name: 'only `fortschritt` resolved', url: `${PATH}?frei=fortschritt` },
+  { name: 'only `countdown` resolved', url: `${PATH}?frei=countdown` },
+  { name: 'only `slider` resolved', url: `${PATH}?frei=slider` },
+  { name: 'only `karussell` resolved', url: `${PATH}?frei=karussell` },
 ];
 
 /** The five sections of docs/UX-COPY.md §9, in page order. */
@@ -184,6 +225,14 @@ for (const { name, url } of STATES) {
 // running the section's matrix rather than the page's: `alt` has to plant its
 // violation whether or not `kontrast` is repaired, and nothing about the
 // navigation may change what axe finds here.
+//
+// **Scoped to the feed, not to the region**, since slice 18. The donation
+// section's `fortschritt` barrier plants the *same* rule id — a progress bar as
+// a graphic with no `alt` is `image-alt` too — so a region-wide run cannot tell
+// the two apart: `not.toContain(ALT_RULE)` would fail here for a finding that
+// belongs to another section, and, once `fortschritt` were repaired,
+// `toContain` would pass on a finding this section no longer plants. axe does
+// the scoping through `within`, for the reason given in support/axe-runs.ts.
 for (const { resolved, url } of MEDIA_STATES) {
   const label = resolved.length === 0 ? 'none resolved' : `${resolved.join(' + ')} resolved`;
   const altResolved = resolved.includes('alt');
@@ -194,7 +243,7 @@ for (const { resolved, url } of MEDIA_STATES) {
       contrastResolved ? 'no' : 'a'
     } ${CONTRAST_RULE} violation`, async ({ page }) => {
       await gotoRendered(page, url);
-      const results = await barrierAssertion(page).analyze();
+      const results = await barrierAssertion(page, FEED).analyze();
       const ids = results.violations.map((violation) => violation.id);
 
       if (altResolved) {
@@ -529,13 +578,13 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
   // exists at all: a barrier that half stands is a barrier that stands.
   test('counts a partially resolved barrier as active', async ({ page }) => {
     await gotoRendered(page, PATH);
-    await expect(page.locator('.counter')).toHaveText('Alle 6 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('Alle 10 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=jargon`);
-    await expect(page.locator('.counter')).toHaveText('Alle 6 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('Alle 10 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=sprache`);
-    await expect(page.locator('.counter')).toHaveText('5 von 6 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('9 von 10 Barrieren aktiv');
 
     await gotoRendered(page, `${PATH}?frei=alle`);
     await expect(page.locator('.counter')).toHaveText('Keine Barriere aktiv');
@@ -551,7 +600,7 @@ test.describe('Barrier `sprache` — the combined language barrier (docs/UX-COPY
 
     await expect(boxFor(page, JARGON)).toBeChecked();
     await expect(boxFor(page, EASY)).toBeChecked();
-    await expect(page.locator('.counter')).toHaveText('5 von 6 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('9 von 10 Barrieren aktiv');
     // Focus stays where the user put it (docs/ARCHITECTURE.md §12.2).
     expect((await focused(page)).id).toBe(await boxFor(page, PARENT).getAttribute('id'));
   });
@@ -674,7 +723,7 @@ test.describe('Deep links into the campaign', () => {
   test('reproduce the barrier state the URL names', async ({ page }) => {
     await gotoRendered(page, `${PATH}?frei=navigation`);
     await expect(page.locator('nav.section-nav')).toHaveCount(1);
-    await expect(page.locator('.counter')).toHaveText('5 von 6 Barrieren aktiv');
+    await expect(page.locator('.counter')).toHaveText('9 von 10 Barrieren aktiv');
     await expect(page.locator('.panel input[type="checkbox"]:checked')).toHaveCount(1);
 
     await gotoRendered(page, PATH);
@@ -702,8 +751,6 @@ test.describe('Deep links into the campaign', () => {
 // milliseconds; what is here is what only a real browser can answer — what axe
 // computes, what the network does, and what a system preference overrides.
 test.describe('The media section (docs/UX-COPY.md §9.3 to §9.5)', () => {
-  const FEED = '[data-simulation-region] .feed';
-
   test('is a local reproduction, not an embed', async ({ page }) => {
     await gotoRendered(page, PATH);
 
@@ -712,7 +759,11 @@ test.describe('The media section (docs/UX-COPY.md §9.3 to §9.5)', () => {
     // docs/UX-COPY.md §9.3 `csr.social.disclaimer` — a Simulationshinweis, so
     // it stands in every state and is never made into a barrier
     // (docs/UX-COPY.md §8.4, CLAUDE.md rule 5).
-    await expect(page.locator('[data-simulation-region] .simulation-note')).toHaveText(
+    //
+    // Scoped to this section since slice 18: the donation form carries the
+    // campaign's second note (`csr.donate.simulationNote`), and an unscoped
+    // `.simulation-note` now matches both.
+    await expect(page.locator(`${MEDIA_NOTE}`)).toHaveText(
       'Nachbildung einer Social-Media-Einbettung. Es werden keine Daten an Dritte übertragen.',
     );
   });
@@ -895,7 +946,7 @@ test.describe('The media section (docs/UX-COPY.md §9.3 to §9.5)', () => {
       // the counter still counts the barrier, because it is still switched on
       // (docs/UX-COPY.md §5.6). A suppressed barrier is not a resolved one.
       await expect(page.locator('.suppression p')).toHaveCount(1);
-      await expect(page.locator('.counter')).toHaveText('Alle 6 Barrieren aktiv');
+      await expect(page.locator('.counter')).toHaveText('Alle 10 Barrieren aktiv');
     });
 
     // Nothing is being overridden once the barrier is repaired, so there is
@@ -1024,7 +1075,7 @@ test.describe('Barrier `event` — the three-part combined barrier (docs/UX-COPY
       'Zuständiger Bereich: CSR',
     );
     await expect(page.locator('.area-summary')).toHaveText(
-      'Diese 6 Barrieren stammen aus 3 Bereichen: IT, Kommunikation, CSR.',
+      'Diese 10 Barrieren stammen aus 3 Bereichen: IT, Kommunikation, CSR.',
     );
   });
 
@@ -1290,5 +1341,501 @@ test.describe('The panel anchor of the event group', () => {
     const stop = await focused(page);
     expect(stop.tag).toBe('A');
     expect(stop.text).toContain('Einladung_Podiumsdiskussion_Sept2026_final.pdf');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// The donation section (docs/SPEC_v2.md slice 18, docs/UX-COPY.md §9.7 to §9.10)
+//
+// The two time-dependent barriers of the project live here, and they are the
+// reason docs/TESTING.md §10 exists: **the clock is set, never waited on.** A
+// test that sleeps for the carousel interval fails on a loaded CI runner, gets
+// marked flaky, then skipped, then deleted.
+//
+// `page.clock.install` runs before the navigation and lets the page load at its
+// own pace; `pauseAt` freezes time once it is up, and every advance after that
+// is a `runFor`. `runFor` rather than `fastForward`, deliberately: fastForward
+// fires a due timer at most once, which for a four-second interval means one
+// advance no matter how far the clock jumps — an assertion about *how often*
+// something happens could not be written on it.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const DONATION = '[data-simulation-region] app-campaign-donation';
+const CAROUSEL = '[data-simulation-region] app-campaign-carousel';
+const LIVE_REGION = '[data-simulation-region] [aria-live]';
+
+/** docs/UX-COPY.md §9.10: „Wechsel alle vier Sekunden". */
+const ADVANCE_MS = 4000;
+
+/**
+ * Where the clock starts, and where it is frozen once the page is up.
+ *
+ * The pause point is five seconds past the minute on purpose. The campaign ends
+ * at a whole minute, so the countdown's own minute boundary is 55 seconds
+ * away — far enough that the „nothing changes for 30 seconds" assertion below
+ * cannot be decided by however long the page happened to take to load, and
+ * close enough that one further minute crosses it for certain.
+ */
+const CLOCK_START = new Date('2026-09-01T09:00:00');
+const CLOCK_PAUSED = new Date('2026-09-01T10:00:05');
+
+/**
+ * **A paused clock pauses rendering, not only the barriers.**
+ *
+ * The application is zoneless: a signal write marks the view dirty and Angular
+ * then schedules the change-detection pass through `requestAnimationFrame`
+ * racing `setTimeout` — both of which the fake clock owns. While time stands
+ * still, a click, a hover and a fired interval all *happen*, and none of them
+ * reaches the DOM. Every assertion in this file would then be reading the page
+ * as it was before the interaction, which is a failure mode that looks exactly
+ * like a broken component.
+ *
+ * So the clock is nudged after every interaction. Fifty milliseconds is far
+ * inside the carousel's four-second interval, so it can never advance a slide
+ * by itself, and far inside the countdown's second — this buys the frame its
+ * tick and nothing else. It is not a wait: no real time passes, and
+ * docs/TESTING.md §10's ban on `waitForTimeout` is about waiting for something
+ * to *become* true, which is the opposite of this.
+ */
+const SETTLE_MS = 50;
+
+async function settle(page: Page): Promise<void> {
+  await page.clock.runFor(SETTLE_MS);
+}
+
+/**
+ * **Once per test.** The clock is paused when this returns, and a paused clock
+ * means a page that cannot render (see `SETTLE_MS`) — a second navigation under
+ * it never gets past the router's own chunk, and the failure surfaces inside
+ * `gotoRendered` as a step view stuck on `pending`. A test that needs two states
+ * is two tests.
+ *
+ * The hour between `CLOCK_START` and `CLOCK_PAUSED` is jumped, and the jump
+ * fires every due timer once — so the carousel is one slide further on when this
+ * returns. Nothing here should assume which slide that is; the assertions below
+ * are written against what changes, not against an index.
+ */
+async function gotoWithClock(page: Page, url: string): Promise<void> {
+  await page.clock.install({ time: CLOCK_START });
+  await gotoRendered(page, url);
+  await page.clock.pauseAt(CLOCK_PAUSED);
+  // The jump itself is a change the page has not drawn yet — the countdown
+  // recomputed an hour of elapsed time and is still showing the old one.
+  await settle(page);
+}
+
+// Run 2 for `fortschritt`, scoped to its own section. The scoping is the whole
+// point: `alt` in the media section plants the same rule id, so a region-wide
+// run would let each of the two barriers pass on the other's finding.
+test.describe('axe run 2 — donation section', () => {
+  test(`reports a ${PROGRESS_RULE} violation while \`fortschritt\` is active`, async ({ page }) => {
+    await gotoRendered(page, PATH);
+    const results = await barrierAssertion(page, PROGRESS).analyze();
+    expect(results.violations.map((violation) => violation.id)).toContain(PROGRESS_RULE);
+  });
+
+  test(`reports no ${PROGRESS_RULE} violation once it is resolved`, async ({ page }) => {
+    // Both directions, and the second one with the media section's `alt`
+    // barrier still active: the finding has to be gone from *this* section
+    // while the other one still plants its own.
+    await gotoRendered(page, `${PATH}?frei=fortschritt`);
+    const results = await barrierAssertion(page, PROGRESS).analyze();
+    expect(results.violations.map((violation) => violation.id)).not.toContain(PROGRESS_RULE);
+
+    const feed = await barrierAssertion(page, FEED).analyze();
+    expect(feed.violations.map((violation) => violation.id)).toContain(ALT_RULE);
+  });
+});
+
+test.describe('Barrier `fortschritt` — the donation total (docs/UX-COPY.md §9.7)', () => {
+  // The graphic really renders. Same reasoning as „serves all three post
+  // images" in the media section: a file that 404s or will not parse still has
+  // no `alt`, so run 2 keeps finding its violation and every assertion here
+  // keeps passing over an empty box.
+  test('serves the bar graphic', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    await expect
+      .poll(() =>
+        page
+          .locator(`${DONATION} img.progress-graphic`)
+          .evaluate((image) => (image as HTMLImageElement).naturalWidth),
+      )
+      .toBe(600);
+  });
+
+  test('states the figures nowhere but inside the graphic while active', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    const graphic = page.locator(`${DONATION} img.progress-graphic`);
+    await expect(graphic).not.toHaveAttribute('alt', /.*/);
+    await expect(graphic).not.toHaveAttribute('aria-hidden', /.*/);
+    await expect(page.locator('[data-simulation-region]')).not.toContainText('70 Prozent');
+  });
+
+  test('puts the figures beside the bar once resolved', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=fortschritt`);
+
+    await expect(page.locator(`${DONATION} .progress-text`)).toHaveText(
+      '8.400 € von 12.000 € erreicht — 70 Prozent',
+    );
+    await expect(page.locator(`${DONATION} .progress-remaining`)).toHaveText(
+      'Noch 3.600 € bis zum Ziel',
+    );
+    await expect(page.locator(`${DONATION} img.progress-graphic`)).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+  });
+});
+
+test.describe('Barrier `countdown` — the live region (docs/UX-COPY.md §9.8)', () => {
+  test('has no live region at all while active', async ({ page }) => {
+    await gotoWithClock(page, PATH);
+
+    await expect(page.locator(LIVE_REGION)).toHaveCount(0);
+    // The visible display is the same in both states — the three blocks of
+    // `csr.countdown.units`. What the barrier removes is the announcement, not
+    // the countdown.
+    await expect(page.locator(`${DONATION} .countdown-unit`)).toHaveText([
+      'Tage',
+      'Stunden',
+      'Minuten',
+    ]);
+  });
+
+  // docs/SPEC_v2.md slice 18: „Exactly one live region in the frame plus at
+  // most one in the simulation" (docs/ARCHITECTURE.md §12.2). The frame's is
+  // the announcer's and is never removed; the simulation's exists only while
+  // this barrier is resolved.
+  test('adds exactly one polite live region, beside the frame’s own', async ({ page }) => {
+    await gotoWithClock(page, `${PATH}?frei=countdown`);
+
+    await expect(page.locator(LIVE_REGION)).toHaveCount(1);
+    await expect(page.locator(LIVE_REGION)).toHaveAttribute('aria-live', 'polite');
+    await expect(page.locator('[aria-live]')).toHaveCount(2);
+  });
+
+  // **The lesson of this barrier** (docs/UX-COPY.md §9.8): building a live
+  // region is not enough, it has to have the right cadence. A per-second region
+  // would talk over every toggle confirmation the frame makes, and both
+  // announcements would be worthless.
+  test('changes its announcement once a minute and never once a second', async ({ page }) => {
+    await gotoWithClock(page, `${PATH}?frei=countdown`);
+    const live = page.locator(LIVE_REGION);
+
+    const before = await live.textContent();
+    expect(before).toMatch(/^\d+ Tage, \d+ Stunden, \d+ Minuten$/);
+
+    // Thirty seconds, one tick at a time — the visible display recomputes in
+    // every one of them, and the announcement may not change in any.
+    await page.clock.runFor(30_000);
+    expect(await live.textContent()).toBe(before);
+
+    // And then, with the minute, exactly once.
+    await page.clock.runFor(60_000);
+    expect(await live.textContent()).not.toBe(before);
+  });
+});
+
+test.describe('Barrier `slider` — the donation amount (docs/UX-COPY.md §9.9)', () => {
+  test('offers no control at all while active, and Tab never reaches one', async ({ page }) => {
+    await gotoRendered(page, PATH);
+
+    await expect(page.locator(`${DONATION} .drag-slider`)).toHaveCount(1);
+    await expect(page.locator(`${DONATION} input`)).toHaveCount(0);
+    await expect(page.locator(`${DONATION} label`)).toHaveCount(0);
+
+    // Real key events, reading `document.activeElement` (docs/TESTING.md §9).
+    // The drag surface has no `tabindex` and nothing anywhere fights the Tab
+    // key — it simply is not a control (CLAUDE.md rule 6).
+    await page.locator(EXIT_LINK).focus();
+    for (let press = 0; press < 30; press++) {
+      await page.keyboard.press('Tab');
+      const inSlider = await page.evaluate(() => {
+        const slider = document.querySelector('.drag-slider');
+        const active = document.activeElement;
+        return slider !== null && active !== null && slider.contains(active);
+      });
+      expect(inSlider).toBe(false);
+    }
+  });
+
+  // „Was per Ziehen geht, muss auch ohne Ziehen gehen" (SC 2.5.7) — and the
+  // slider stays, rather than the repair consisting of taking a control away.
+  test('changes the amount with the arrow keys once resolved', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=slider`);
+
+    const range = page.locator(`${DONATION} input[type="range"]`);
+    const number = page.locator(`${DONATION} input[type="number"]`);
+
+    const before = await range.inputValue();
+    await range.focus();
+    await page.keyboard.press('ArrowRight');
+
+    const after = await range.inputValue();
+    expect(Number(after)).toBeGreaterThan(Number(before));
+
+    // The two controls are one amount, not two — and asserted with the
+    // retrying matcher rather than a bare read. The range moves in the browser
+    // the moment the key lands; the number field follows on the next
+    // change-detection pass, which is a frame later. A one-shot read is a race
+    // that passes on a warm machine and fails on a busy one.
+    await expect(number).toHaveValue(after);
+  });
+
+  // **Der Betrag lässt sich wirklich eintippen**, Ziffer für Ziffer, mit echten
+  // Tastenanschlägen — und das ist der Test, der einen Fehler gefunden hat, den
+  // keine der übrigen Prüfungen sah: Das Feld ist an das Signal gebunden, und
+  // solange jede Tasteneingabe sofort auf den kleinsten Betrag gehoben und
+  // zurückgeschrieben wurde, wurde aus „40" die 50 und aus „100" die 500. Jeder
+  // Betrag mit einer führenden Ziffer unter 5 war unerreichbar — in der
+  // behobenen Fassung einer Barriere über die Eingabe von Beträgen.
+  //
+  // Mit `type()` und nicht mit `fill()`: `fill()` setzt den Wert in einem Zug
+  // und löst ein einziges `input`-Ereignis aus. Der Fehler steckte zwischen den
+  // Tastenanschlägen.
+  test('accepts an amount typed digit by digit', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=slider`);
+    const number = page.locator(`${DONATION} input[type="number"]`);
+
+    for (const amount of ['40', '100']) {
+      await number.click();
+      await page.keyboard.press('Control+a');
+      await page.keyboard.press('Delete');
+      await page.keyboard.type(amount);
+
+      await expect(number).toHaveValue(amount);
+    }
+
+    // Gültig gemacht wird der Betrag beim Verlassen des Feldes — und dann
+    // zeigen beide Bedienelemente denselben.
+    await number.click();
+    await page.keyboard.press('Control+a');
+    await page.keyboard.press('Delete');
+    await page.keyboard.type('7');
+    await page.locator(`${DONATION} input[type="range"]`).focus();
+
+    await expect(number).toHaveValue('5');
+    await expect(page.locator(`${DONATION} input[type="range"]`)).toHaveValue('5');
+  });
+
+  test('gives the number field an associated label', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=slider`);
+
+    const labels = await page.locator(`${DONATION} label`).evaluateAll((elements) =>
+      elements.map((element) => ({
+        text: (element.textContent ?? '').trim(),
+        controls: (element as HTMLLabelElement).control?.getAttribute('type') ?? null,
+      })),
+    );
+    expect(labels).toEqual([
+      { text: 'Betrag in Euro', controls: 'range' },
+      { text: 'Anderer Betrag', controls: 'number' },
+    ]);
+
+    // The four preset buttons of `csr.donate.presets`, and the pressed state in
+    // words rather than in colour alone.
+    await expect(page.locator(`${DONATION} .preset`)).toHaveText(['10 €', '25 €', '50 €', '100 €']);
+    await expect(page.locator(`${DONATION} .preset[aria-pressed="true"]`)).toHaveText('25 €');
+  });
+
+  // docs/SPEC_v2.md slice 18: „Simulation note present in all states, never
+  // subject to a barrier" (docs/UX-COPY.md §8.4, CLAUDE.md rule 5).
+  test('keeps the simulation note in every state', async ({ page }) => {
+    for (const query of ['', '?frei=slider', '?frei=fortschritt,countdown', '?frei=alle']) {
+      await gotoRendered(page, `${PATH}${query}`);
+      await expect(page.locator(DONATE_NOTE)).toHaveText(
+        'Es wird keine Spende ausgelöst. Dies ist eine Nachbildung.',
+      );
+    }
+  });
+});
+
+test.describe('Barrier `karussell` — the testimonials (docs/UX-COPY.md §9.10)', () => {
+  const QUOTE = `${CAROUSEL} .carousel-quote`;
+
+  // The negative control docs/TESTING.md §11 asks for by name, and it comes
+  // first: without it, a bug that stops the carousel unconditionally would pass
+  // the reduced-motion test below and quietly remove a barrier from the module.
+  test('advances on its own while active, with no preference set', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await gotoWithClock(page, PATH);
+
+    const first = await page.locator(QUOTE).textContent();
+    await page.clock.runFor(ADVANCE_MS);
+    const second = await page.locator(QUOTE).textContent();
+    expect(second).not.toBe(first);
+
+    // Three quotes, and back to the first: it really cycles rather than
+    // stopping at the end.
+    await page.clock.runFor(2 * ADVANCE_MS);
+    expect(await page.locator(QUOTE).textContent()).toBe(first);
+
+    // Nothing to pause it with, and no position to orient by — omitted, not
+    // disabled (CLAUDE.md rule 6).
+    await expect(page.locator(`${CAROUSEL} button`)).toHaveCount(0);
+    await expect(page.locator(`${CAROUSEL} .carousel-position`)).toHaveCount(0);
+  });
+
+  test('stops on the pause control once resolved, and says where it is', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await gotoWithClock(page, `${PATH}?frei=karussell`);
+
+    const toggle = page.locator(`${CAROUSEL} .carousel-toggle`);
+    await expect(toggle).toHaveText('Automatischen Wechsel anhalten');
+
+    // `csr.carousel.position`, and the number is whichever slide is up — the
+    // clock jumped past a turn on the way in. What the indicator has to do is
+    // say where the reader is, and *keep* saying it as the slide changes; that
+    // it starts at one is a property of the jump, not of the component.
+    const position = page.locator(`${CAROUSEL} .carousel-position`);
+    await expect(position).toHaveText(/^Beitrag [1-3] von 3$/);
+    const before = await position.textContent();
+    await page.clock.runFor(ADVANCE_MS);
+    expect(await position.textContent()).not.toBe(before);
+
+    // Operated by keyboard, the way the control exists to be operated.
+    await toggle.focus();
+    await page.keyboard.press('Enter');
+    await settle(page);
+    await expect(toggle).toHaveText('Automatischen Wechsel fortsetzen');
+
+    // Focus then leaves the group, and *that* is what makes this a test of the
+    // pause rather than of the focus rule below: while the focus sits on the
+    // control, the rotation would be stopped either way, and a broken pause
+    // button would pass.
+    await page.locator(EXIT_LINK).focus();
+    await settle(page);
+
+    const held = await page.locator(QUOTE).textContent();
+    await page.clock.runFor(3 * ADVANCE_MS);
+    expect(await page.locator(QUOTE).textContent()).toBe(held);
+  });
+
+  // „Wechsel stoppt bei Fokus oder Zeigerkontakt" (docs/UX-COPY.md §9.10): who
+  // is reading should be able to finish reading, without first hunting for a
+  // control.
+  test('holds the quote while the pointer is inside', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await gotoWithClock(page, `${PATH}?frei=karussell`);
+
+    await page.locator(`${CAROUSEL} .carousel`).hover();
+    await settle(page);
+    const held = await page.locator(QUOTE).textContent();
+    await page.clock.runFor(2 * ADVANCE_MS);
+    expect(await page.locator(QUOTE).textContent()).toBe(held);
+
+    await page.mouse.move(0, 0);
+    await settle(page);
+    await page.clock.runFor(ADVANCE_MS);
+    expect(await page.locator(QUOTE).textContent()).not.toBe(held);
+  });
+
+  // Die andere Hälfte derselben Regel: der Fokus. Er landet hier über die
+  // Tastatur, nicht über `.focus()` — ein Halt, den ein Test nur mit einem
+  // programmatischen Fokus auslösen kann, hält für niemanden an
+  // (docs/TESTING.md §9).
+  test('holds the quote while the focus is inside', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await gotoWithClock(page, `${PATH}?frei=karussell`);
+
+    await page.locator(`${CAROUSEL} .carousel-toggle`).focus();
+    await settle(page);
+    const held = await page.locator(QUOTE).textContent();
+    await page.clock.runFor(2 * ADVANCE_MS);
+    expect(await page.locator(QUOTE).textContent()).toBe(held);
+
+    await page.locator(EXIT_LINK).focus();
+    await settle(page);
+    await page.clock.runFor(ADVANCE_MS);
+    expect(await page.locator(QUOTE).textContent()).not.toBe(held);
+  });
+
+  // CLAUDE.md rule 9 and docs/TESTING.md §11. The preference wins in *both*
+  // states, and while the barrier stands the frame says what it took away —
+  // without that note a lecturer with reduced motion switched on sees a barrier
+  // that is not there and reports it as broken.
+  test.describe('under reduced motion', () => {
+    const NOTE =
+      'Dein System fordert reduzierte Bewegung an. Diese Einstellung hat Vorrang: Das Karussell wechselt die Beiträge nicht automatisch. Ohne diese Einstellung würde es alle vier Sekunden weiterspringen, ohne dass du es anhalten kannst.';
+
+    // One test per state rather than a loop: `gotoWithClock` may only run once
+    // per page, and both halves of „in either state" are worth failing
+    // separately anyway — the active one is the barrier being overruled, the
+    // resolved one is the accessible variant respecting the preference by
+    // itself.
+    for (const { name, query } of [
+      { name: 'while the barrier is active', query: '' },
+      { name: 'once the barrier is resolved', query: '?frei=karussell' },
+    ]) {
+      test(`does not advance ${name}`, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await gotoWithClock(page, `${PATH}${query}`);
+
+        const first = await page.locator(QUOTE).textContent();
+        await page.clock.runFor(5 * ADVANCE_MS);
+        expect(await page.locator(QUOTE).textContent()).toBe(first);
+      });
+    }
+
+    test('names the suppressed barrier in the simulation bar', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await gotoRendered(page, PATH);
+
+      await expect(page.locator('.suppression p')).toHaveText(NOTE);
+      await expect(page.locator('.suppression p')).toHaveCount(1);
+      // A suppressed barrier is still an active barrier: the counter counts it,
+      // and the panel checkbox stays unchecked (docs/UX-COPY.md §5.6).
+      await expect(page.locator('.counter')).toHaveText('Alle 10 Barrieren aktiv');
+    });
+
+    // Nothing is being overridden once the barrier is repaired: the accessible
+    // variant respects the preference by itself, and it keeps its control — so
+    // the note, whose last clause is „ohne dass du es anhalten kannst", would
+    // be describing a barrier that is not there. The reasoning is in
+    // scenarios/csr-campaign/campaign-carousel/campaign-carousel.component.ts.
+    test('says nothing once the barrier is resolved, and keeps the control usable', async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await gotoWithClock(page, `${PATH}?frei=karussell`);
+
+      await expect(page.locator('.suppression')).toHaveCount(0);
+
+      const toggle = page.locator(`${CAROUSEL} .carousel-toggle`);
+      await expect(toggle).toHaveText('Automatischen Wechsel fortsetzen');
+
+      const first = await page.locator(QUOTE).textContent();
+      await toggle.click();
+      // Pointer and focus both leave the group afterwards: a click puts the
+      // focus on the button and the pointer over it, and either of those would
+      // hold the rotation for a reason that has nothing to do with the
+      // preference.
+      await page.mouse.move(0, 0);
+      await page.locator(EXIT_LINK).focus();
+      await settle(page);
+
+      await page.clock.runFor(ADVANCE_MS);
+      expect(await page.locator(QUOTE).textContent()).not.toBe(first);
+    });
+  });
+});
+
+// Same claim as for the four groups before it: the anchor has to land in front
+// of the part of the section its group is about — here the amount controls,
+// which are what the section's only barriers with a control are about.
+test.describe('The panel anchor of the donation group', () => {
+  test('lands in front of the controls the group is about', async ({ page }) => {
+    await gotoRendered(page, `${PATH}?frei=alle`);
+
+    await page.locator('#barrier-group-spende-anchor').focus();
+    await page.keyboard.press('Enter');
+    expect((await focused(page)).id).toBe('sim-spende');
+
+    await page.keyboard.press('Tab');
+    const stop = await focused(page);
+    expect(stop.tag).toBe('INPUT');
+    expect(stop.id).toBe('sim-donate-slider');
   });
 });

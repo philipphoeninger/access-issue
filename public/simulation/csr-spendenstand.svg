@@ -1,0 +1,73 @@
+<!-- Die Balkengrafik des Spendenstands (docs/UX-COPY.md §9.7,
+     docs/SPEC_v2.md Slice 18).
+
+     **Der Text steht absichtlich im Bild.** Das ist die Barriere: Solange
+     `fortschritt` aktiv ist, gibt es den Prozentwert und die Beträge nur hier
+     drin, und das `img` trägt kein `alt`. Was ein Screenreader daraus macht,
+     ist der Dateiname. Ist die Barriere behoben, stehen dieselben Angaben als
+     Text neben dem Balken, und das Bild wird ausgeblendet.
+
+     Deshalb bleibt es auch eine Datei und wird nicht als eingebettetes `svg`
+     ins Markup gezogen: Ein eingebettetes `svg` hat Textknoten, die ein
+     Screenreader vorlesen kann, und dann wäre die halbe Barriere schon von
+     selbst behoben. Ein `img` ist undurchsichtig, und genau das ist der Fall,
+     den eine Redaktion herstellt, wenn sie eine Grafik aus dem Designwerkzeug
+     exportiert.
+
+     Von Hand geschrieben und so ausgeliefert, wie die drei Beitragsbilder der
+     Einbettung (public/simulation/csr-post-anstrich.svg). Es gibt keine Quelle
+     in assets-src/: Es gibt nichts zu erzeugen.
+
+     **Die Farben stehen als Zahlenwerte, nicht als Tokens.** Eine über <img>
+     eingebundene SVG-Datei sieht die CSS-Variablen des Dokuments nicht; die
+     Werte unten sind die der Simulations-Tokens sim-brand, sim-white,
+     sim-surface, sim-border und sim-text aus src/styles/_tokens.scss. Wer dort
+     eine Farbe ändert, ändert sie hier mit — automatisch geschieht das nicht.
+     (Ohne die beiden führenden Bindestriche geschrieben: Zwei Bindestriche
+     hintereinander sind in einem XML-Kommentar nicht erlaubt, und die Datei
+     lädt dann gar nicht.)
+
+     Die Schriftfamilie ist dieselbe Systemschrift wie sim-font-family. Poppins
+     steht der Simulation nicht zu, und eine Datei kann die selbstgehostete
+     Schrift des Dokuments ohnehin nicht benutzen. -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 600 130"
+  width="600"
+  height="130"
+>
+  <!-- Die Schiene: der ganze Weg bis 12.000 Euro. -->
+  <rect x="1" y="21" width="598" height="48" rx="4" fill="#f5f6f7" stroke="#d8dde2" />
+
+  <!-- Der erreichte Teil: 70 Prozent von 598 Pixeln Innenbreite. -->
+  <rect x="1" y="21" width="418.6" height="48" rx="4" fill="#1f3a5f" />
+
+  <!-- Der Prozentwert, und zwar innerhalb des Balkens: die Angabe, die es
+       ausschließlich hier gibt, solange die Barriere aktiv ist. -->
+  <text
+    x="24"
+    y="53"
+    fill="#ffffff"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="26"
+    font-weight="bold"
+  >70 %</text>
+
+  <!-- Die Beträge, ebenfalls nur im Bild. -->
+  <text
+    x="1"
+    y="103"
+    fill="#33475b"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="20"
+  >8.400 € von 12.000 €</text>
+
+  <text
+    x="599"
+    y="103"
+    text-anchor="end"
+    fill="#33475b"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="20"
+  >Ziel: 12.000 €</text>
+</svg>

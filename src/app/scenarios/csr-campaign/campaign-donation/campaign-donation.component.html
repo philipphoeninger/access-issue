@@ -1,0 +1,163 @@
+<!-- Barriere `fortschritt`, Muster B (docs/UX-COPY.md §9.7). Dieselbe Grafik in
+     beiden Zuständen — was sich ändert, ist, ob ihre Zahlen auch als Text
+     dastehen.
+
+     Aktiv fehlt das `alt`-Attribut ganz. Ausgelassen, nicht abgefangen
+     (CLAUDE.md Regel 6): Es steht kein leeres `alt` da und kein `aria-hidden`,
+     das die Lücke kaschierte. Screenreader lesen dann den Dateinamen vor, und
+     das ist die Barriere, die axe sieht (Regel `image-alt`).
+
+     Behoben stehen dieselben Angaben als Text daneben, und *dann* wird die
+     Grafik ausgeblendet: `alt=""` plus `aria-hidden="true"`, weil ihre
+     Information vollständig danebensteht. Ein zusätzlich beschriftetes Bild
+     ließe denselben Stand zweimal vorlesen. Dieselbe Form wie bei der
+     Textgrafik in Schritt 1 des Bewerbungsprozesses.
+
+     Kein `role="progressbar"` mit ARIA-Werten: Sichtbarer Text ist der
+     einfachere und der verlässlichere Weg, und er hilft außerdem denen, denen
+     gar nichts vorgelesen wird (docs/UX-COPY.md §9.7). -->
+<h4>{{ progressHeading }}</h4>
+
+<div class="progress">
+  @if (progressAsText()) {
+    <img
+      class="progress-graphic"
+      [src]="progressGraphic"
+      alt=""
+      aria-hidden="true"
+      [width]="graphicSize.width"
+      [height]="graphicSize.height"
+    />
+    <p class="progress-text">{{ progressText }}</p>
+    <p class="progress-remaining">{{ progressRemaining }}</p>
+  } @else {
+    <img
+      class="progress-graphic"
+      [src]="progressGraphic"
+      [width]="graphicSize.width"
+      [height]="graphicSize.height"
+    />
+  }
+</div>
+
+<!-- Barriere `countdown`, Muster B (docs/UX-COPY.md §9.8). Die sichtbare
+     Anzeige ist in beiden Zuständen dieselbe und wird in beiden im
+     Sekundentakt neu berechnet. Was fehlt, ist die Ansage.
+
+     Die Live-Region gibt es nur im behobenen Zustand — sie ist die einzige
+     außerhalb des Rahmens (docs/ARCHITECTURE.md §12.2), und sie spricht im
+     Minutentakt, weil ihr Text keine Sekunden enthält. Warum das die richtige
+     Frequenz ist und warum sie den Wert ohne einleitenden Halbsatz ansagt,
+     steht in campaign-donation.component.ts. -->
+<div class="countdown">
+  @if (remaining() !== null) {
+    <p class="countdown-label">{{ countdownLabel }}</p>
+    <div class="countdown-blocks">
+      @for (unit of countdownUnits; track unit; let index = $index) {
+        <span class="countdown-block">
+          <span class="countdown-number">{{ countdownValues()[index] }}</span>
+          <span class="countdown-unit">{{ unit }}</span>
+        </span>
+      }
+    </div>
+  } @else {
+    <p class="countdown-over">{{ countdownEnded }}</p>
+  }
+
+  @if (countdownAnnounced()) {
+    <p class="countdown-live" appVisuallyHidden aria-live="polite">{{ announcement() }}</p>
+  }
+</div>
+
+<!-- Simulationshinweis (docs/UX-COPY.md §8.4, §9.9 `csr.donate.simulationNote`).
+     Steht vor dem Formular, in jedem Barrierezustand, und wird nie zur Barriere
+     gemacht — die benannte Ausnahme zu CLAUDE.md Regel 5, im Rahmenstil
+     gesetzt. Ein Eingabefeld für einen Geldbetrag ist genau der Fall, für den
+     die Regel gemacht ist. -->
+<p class="simulation-note">{{ simulationNote }}</p>
+
+<!-- Barriere `slider`, Muster A (docs/UX-COPY.md §9.9): zwei ausgeschriebene
+     Fassungen desselben Formulars, keine die Reparatur der anderen
+     (CLAUDE.md Regel 10). -->
+<form class="donate-form" (submit)="onSubmit($event)">
+  @if (amountAsNumber()) {
+    <!-- Der Regler bleibt, und er ist jetzt ein echtes `input[type=range]`:
+         beschriftet, in der Tab-Reihenfolge, mit den Pfeiltasten bedienbar.
+         Was per Ziehen geht, muss auch ohne Ziehen gehen (SC 2.5.7) — und
+         nicht: was per Ziehen ging, fällt weg. -->
+    <div class="field">
+      <label class="field-label" [attr.for]="sliderId">{{ amountLabel }}</label>
+      <input
+        class="amount-range"
+        type="range"
+        [id]="sliderId"
+        [min]="amountMin"
+        [max]="amountMax"
+        [step]="amountStep"
+        [value]="amount()"
+        (input)="onAmountInput($event)"
+      />
+    </div>
+
+    <!-- Die Voreinstellungen. `aria-pressed` sagt, welcher Betrag gerade
+         eingestellt ist — ohne das wäre die Auswahl allein an der Färbung zu
+         erkennen (SC 1.4.1). -->
+    <div class="presets">
+      @for (preset of presets; track preset) {
+        <button
+          type="button"
+          class="preset"
+          [attr.aria-pressed]="isPreset(preset)"
+          (click)="selectPreset(preset)"
+        >
+          {{ preset }} €
+        </button>
+      }
+    </div>
+
+    <!-- Dieselben Grenzen und dieselbe Schrittweite wie am Regler: Ein
+         `input[type=range]` rastet einen zugewiesenen Wert auf sein Raster ein,
+         eine feinere Schrittweite hier ließe die beiden nach der Eingabe von
+         „7" verschiedene Beträge anzeigen.
+
+         `blur` macht den Betrag gültig, nicht jeder Tastendruck — sonst wäre
+         „40" nicht eingebbar, weil die erste Ziffer sofort auf den kleinsten
+         Betrag gehoben und zurückgeschrieben würde
+         (campaign-donation.component.ts). -->
+    <div class="field">
+      <label class="field-label" [attr.for]="amountId">{{ customLabel }}</label>
+      <input
+        class="amount-number"
+        type="number"
+        [id]="amountId"
+        [min]="amountMin"
+        [max]="amountMax"
+        [step]="amountStep"
+        [value]="amount()"
+        (input)="onAmountInput($event)"
+        (blur)="onAmountCommit()"
+      />
+    </div>
+  } @else {
+    <!-- Der Ziehregler: eine Fläche mit Zeigerhandlern, ohne `tabindex`, ohne
+         `role`, ohne Beschriftung und ohne den Betrag als Zahl. Genau das
+         entsteht, wenn ein Regler aus dem Entwurf nachgebaut wird.
+
+         Nichts hier fängt etwas ab (CLAUDE.md Regel 6): kein
+         `preventDefault`, kein Tastenhandler, nichts, was dem Browser in den
+         Arm fiele. Die Fläche kann schlicht nur eins. -->
+    <div
+      class="drag-slider"
+      (pointerdown)="onTrackPointerDown($event)"
+      (pointermove)="onTrackPointerMove($event)"
+    >
+      <span class="drag-fill" [style.width.%]="amountRatio() * 100"></span>
+      <span class="drag-handle" [style.left.%]="amountRatio() * 100"></span>
+    </div>
+  }
+
+  <!-- In beiden Zuständen dieselbe echte Schaltfläche: Das Absenden ist keine
+       der Barrieren dieses Abschnitts. Sie löst nichts aus, und der
+       Simulationshinweis darüber sagt genau das. -->
+  <button type="submit" class="donate-submit">{{ submitLabel }}</button>
+</form>
